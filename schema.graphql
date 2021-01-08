@@ -12,6 +12,7 @@ type CryptoPunksAssigned @entity {
 }
 
 type cTokenTransfer @entity {
+  "Transaction ID"  
   id: ID!
   "Token symbol"
   symbol: String!
@@ -37,29 +38,48 @@ type cTokenTransfer @entity {
 }
 
 type CryptoPunkTransfer @entity {
+  "Transaction ID"  
   id: ID!
+  "Sender"
   transferedFrom: Bytes!
+  "Receiver"
   transferedTo: Bytes!
+  "Unique Cryptopunk Index"
   punkIndex: BigInt!
+  "Transaction date" 
   transactionDate: BigInt!
-
+  "Transaction Block" 
+  transactionBlock: BigInt!  
 }
 
 type CryptoPunkOffered @entity {
+  "Transaction ID"
   id: ID!
-  transferedFrom: Bytes!
-  transferedTo: Bytes!
-  punkIndex: BigInt! #
+  "Unique Cryptopunk Index"
+  punkIndex: BigInt!
+  "Address being offered"  
+  offeredTo: Bytes!
+  "Amount offered"
+  minimumAmount: BigInt!
+  "Transaction Date"
   transactionDate: BigInt!
-
+  "Transaction Block"
+  transactionBlock: BigInt!
 }
 
 type CryptoPunkBidsEntered @entity {
+  "Transaction ID"
   id: ID!
-  transferedFrom: Bytes!
-  transferedTo: Bytes!
+  "Unique Cryptopunk Index"
   punkIndex: BigInt!
+  "Address of Bidder"  
+  bidder: Bytes!
+  "Amount bidded"
+  amount: BigInt!
+  "Transaction Date"
   transactionDate: BigInt!
+  "Transaction Block"
+  transactionBlock: BigInt!
 }
 
 type CryptoPunkBidsWithdrawn @entity {
