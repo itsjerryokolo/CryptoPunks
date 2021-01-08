@@ -1,6 +1,87 @@
-type ExampleEntity @entity {
+type CryptoPunksAssigned @entity {
+  "Transaction ID"
   id: ID!
-  count: BigInt!
-  to: Bytes! # address
-  punkIndex: BigInt! # uint256
+  "Address Cryptopunk was assigned"
+  assignedTo: Bytes!
+  "PunkIndex assigned"
+  punkIndex: BigInt!
+  "Transaction Date" 
+  transactionDate: BigInt!
+  "Transaction Block" 
+  transactionBlock: BigInt!
+}
+
+type cTokenTransfer @entity {
+  id: ID!
+  "Token symbol"
+  symbol: String!
+  "Token name"
+  name: String!
+  "Sender"
+  transferedFrom: Bytes!
+  "Receiver"
+  transferedTo: Bytes!
+  "Amount of Crytopunk transfered"
+  amountTransfered: BigInt!
+  "True/False if all Cryptopunks have been assigned"
+  allPunksAssigned: Boolean! 
+  "Total supply of Crytopunk tokens"
+  totalSupply: BigInt!
+  "The hash of the composite image of all the Cryptopunks"
+  imageHash: String!
+  "Transaction date" 
+  transactionDate: BigInt!
+  "Transaction Block" 
+  transactionBlock: BigInt!  
+
+}
+
+type CryptoPunkTransfer @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
+
+}
+
+type CryptoPunkOffered @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt! #
+  transactionDate: BigInt!
+
+}
+
+type CryptoPunkBidsEntered @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
+}
+
+type CryptoPunkBidsWithdrawn @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
+}
+
+type CryptoPunkNotForSale @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
+}
+
+type CryptoPunkBought @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
 }
