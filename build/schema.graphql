@@ -1,0 +1,69 @@
+type Assigned @entity {
+  id: ID!
+  assignedTo: Bytes!
+  punkIndex: Bytes! 
+  transactionDate: BigInt!
+}
+
+type cTokenTransfer @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  transferedValue: BigInt!
+  transactionDate: BigInt!
+  contractname: String!
+  allPunksAssigned: Boolean! 
+  Symbol: String!
+  totalSupply: BigInt!
+  imageHash: String! 
+}
+
+type CryptoPunkTransfer @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
+
+}
+
+type CryptoPunkOffered @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt! #
+  transactionDate: BigInt!
+
+}
+
+type CryptoPunkBidsEntered @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
+}
+
+type CryptoPunkBidsWithdrawn @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
+}
+
+type CryptoPunkNotForSale @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
+}
+
+type CryptoPunkBought @entity {
+  id: ID!
+  transferedFrom: Bytes!
+  transferedTo: Bytes!
+  punkIndex: BigInt!
+  transactionDate: BigInt!
+}
