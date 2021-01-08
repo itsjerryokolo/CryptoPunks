@@ -60,6 +60,15 @@ export class CryptoPunksAssigned extends Entity {
     this.set("punkIndex", Value.fromBigInt(value));
   }
 
+  get punksRemainingToAssign(): BigInt {
+    let value = this.get("punksRemainingToAssign");
+    return value.toBigInt();
+  }
+
+  set punksRemainingToAssign(value: BigInt) {
+    this.set("punksRemainingToAssign", Value.fromBigInt(value));
+  }
+
   get transactionDate(): BigInt {
     let value = this.get("transactionDate");
     return value.toBigInt();
@@ -505,6 +514,15 @@ export class CryptoPunkBidsWithdrawn extends Entity {
   set transactionDate(value: BigInt) {
     this.set("transactionDate", Value.fromBigInt(value));
   }
+
+  get transactionBlock(): BigInt {
+    let value = this.get("transactionBlock");
+    return value.toBigInt();
+  }
+
+  set transactionBlock(value: BigInt) {
+    this.set("transactionBlock", Value.fromBigInt(value));
+  }
 }
 
 export class CryptoPunkNotForSale extends Entity {
@@ -540,24 +558,6 @@ export class CryptoPunkNotForSale extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get transferedFrom(): Bytes {
-    let value = this.get("transferedFrom");
-    return value.toBytes();
-  }
-
-  set transferedFrom(value: Bytes) {
-    this.set("transferedFrom", Value.fromBytes(value));
-  }
-
-  get transferedTo(): Bytes {
-    let value = this.get("transferedTo");
-    return value.toBytes();
-  }
-
-  set transferedTo(value: Bytes) {
-    this.set("transferedTo", Value.fromBytes(value));
-  }
-
   get punkIndex(): BigInt {
     let value = this.get("punkIndex");
     return value.toBigInt();
@@ -574,6 +574,15 @@ export class CryptoPunkNotForSale extends Entity {
 
   set transactionDate(value: BigInt) {
     this.set("transactionDate", Value.fromBigInt(value));
+  }
+
+  get transactionBlock(): BigInt {
+    let value = this.get("transactionBlock");
+    return value.toBigInt();
+  }
+
+  set transactionBlock(value: BigInt) {
+    this.set("transactionBlock", Value.fromBigInt(value));
   }
 }
 
@@ -625,6 +634,15 @@ export class CryptoPunkBought extends Entity {
     this.set("transferedTo", Value.fromBytes(value));
   }
 
+  get amount(): BigInt {
+    let value = this.get("amount");
+    return value.toBigInt();
+  }
+
+  set amount(value: BigInt) {
+    this.set("amount", Value.fromBigInt(value));
+  }
+
   get punkIndex(): BigInt {
     let value = this.get("punkIndex");
     return value.toBigInt();
@@ -641,5 +659,14 @@ export class CryptoPunkBought extends Entity {
 
   set transactionDate(value: BigInt) {
     this.set("transactionDate", Value.fromBigInt(value));
+  }
+
+  get transactionBlock(): BigInt {
+    let value = this.get("transactionBlock");
+    return value.toBigInt();
+  }
+
+  set transactionBlock(value: BigInt) {
+    this.set("transactionBlock", Value.fromBigInt(value));
   }
 }
