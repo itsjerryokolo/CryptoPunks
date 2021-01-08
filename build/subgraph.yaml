@@ -14,14 +14,14 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Assign
-        - Transfer
-        - PunkTransfer
-        - PunkOffered
-        - PunkBidEntered
-        - PunkBidWithdrawn
-        - PunkBought
-        - PunkNoLongerForSale
+        - CryptoPunksAssigned,
+        - cTokenTransfer,
+        - CryptoPunkTransfer,
+        - CryptoPunkOffered,
+        - CryptoPunkBidsEntered,
+        - CryptoPunkBidsWithdrawn,
+        - CryptoPunkBought,
+        - CryptoPunkNotForSale
       abis:
         - name: cryptopunks
           file: cryptopunks\abis\cryptopunks.json

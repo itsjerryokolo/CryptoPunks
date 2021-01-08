@@ -1,21 +1,39 @@
-type Assigned @entity {
+type CryptoPunksAssigned @entity {
+  "Transaction ID"
   id: ID!
+  "Address Cryptopunk was assigned"
   assignedTo: Bytes!
-  punkIndex: Bytes! 
+  "PunkIndex assigned"
+  punkIndex: BigInt!
+  "Transaction Date" 
   transactionDate: BigInt!
+  "Transaction Block" 
+  transactionBlock: BigInt!
 }
 
 type cTokenTransfer @entity {
   id: ID!
+  "Token symbol"
+  symbol: String!
+  "Token name"
+  name: String!
+  "Sender"
   transferedFrom: Bytes!
+  "Receiver"
   transferedTo: Bytes!
-  transferedValue: BigInt!
-  transactionDate: BigInt!
-  contractname: String!
+  "Amount of Crytopunk transfered"
+  amountTransfered: BigInt!
+  "True/False if all Cryptopunks have been assigned"
   allPunksAssigned: Boolean! 
-  Symbol: String!
+  "Total supply of Crytopunk tokens"
   totalSupply: BigInt!
-  imageHash: String! 
+  "The hash of the composite image of all the Cryptopunks"
+  imageHash: String!
+  "Transaction date" 
+  transactionDate: BigInt!
+  "Transaction Block" 
+  transactionBlock: BigInt!  
+
 }
 
 type CryptoPunkTransfer @entity {
