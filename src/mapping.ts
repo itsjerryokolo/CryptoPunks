@@ -78,13 +78,17 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   let contract = cryptopunks.bind(event.address)
   cryptopunkbidsentered.punkIndex = event.params.punkIndex
   cryptopunkbidsentered.bidder = event.params.fromAddress
-  cryptopunkbidsentered.amount = event.params.value
+  cryptopunkbidsentered.amountBidded = event.params.value
   cryptopunkbidsentered.transactionDate = event.block.timestamp
   cryptopunkbidsentered.transactionBlock = event.block.number
   cryptopunkbidsentered.save()
 }
 
-export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {}
+export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
+
+
+
+}
 
 export function handlePunkBought(event: PunkBought): void {
   let cryptopunkbought = new CryptoPunkBought(event.transaction.hash.toHex())
