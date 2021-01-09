@@ -77,7 +77,7 @@ type CryptoPunkBidsEntered @entity {
   "Address of Bidder"  
   bidder: Bytes!
   "Amount bidded"
-  amount: BigInt!
+  amountBidded: BigInt!
   "Transaction Date"
   transactionDate: BigInt!
   "Transaction Block"
@@ -85,19 +85,23 @@ type CryptoPunkBidsEntered @entity {
 }
 
 type CryptoPunkBidsWithdrawn @entity {
+  "Transaction ID"
   id: ID!
-  transferedFrom: Bytes!
-  transferedTo: Bytes!
-  "Unique Cryptopunk Index"  
+  "Withdrawn from"
+  withdrawnFrom: Bytes!
+  "Unique Cryptopunk index"  
   punkIndex: BigInt!
+  "Amount withdrawn"
+  amountWithdrawn: BigInt!
+  "Transaction date"
   transactionDate: BigInt!
-  "Transaction Block"
+  "Transaction block"
   transactionBlock: BigInt!
 }
 
 type CryptoPunkNotForSale @entity {
   id: ID!
-  "Unique Cryptopunk Index"  
+  "Unique Cryptopunk index"  
   punkIndex: BigInt!
   "Transaction Date"
   transactionDate: BigInt!
