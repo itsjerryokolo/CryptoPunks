@@ -3,9 +3,9 @@ type CryptoPunksAssigned @entity {
   id: ID!
   "Address Cryptopunk was assigned"
   assignedTo: Bytes!
-  "CryptoPunk Index assigned"
+  "CryptoPunk index assigned"
   punkIndex: BigInt!
-  "Cryptopunks remaing to assign"
+  "Cryptopunks remaining to assign"
   punksRemainingToAssign: BigInt!
   "Transaction Date" 
   transactionDate: BigInt!
@@ -46,7 +46,7 @@ type CryptoPunkTransfer @entity {
   transferedFrom: Bytes!
   "Receiver"
   transferedTo: Bytes!
-  "Unique Cryptopunk Index"
+  "Unique Cryptopunk index"
   punkIndex: BigInt!
   "Transaction date" 
   transactionDate: BigInt!
@@ -57,7 +57,7 @@ type CryptoPunkTransfer @entity {
 type CryptoPunkOffered @entity {
   "Transaction ID"
   id: ID!
-  "Unique Cryptopunk Index"
+  "Unique Cryptopunk index"
   punkIndex: BigInt!
   "Address being offered"  
   offeredTo: Bytes!
@@ -72,7 +72,7 @@ type CryptoPunkOffered @entity {
 type CryptoPunkBidsEntered @entity {
   "Transaction ID"
   id: ID!
-  "Unique Cryptopunk Index"
+  "Unique Cryptopunk index"
   punkIndex: BigInt!
   "Address of Bidder"  
   bidder: Bytes!
@@ -115,7 +115,7 @@ type CryptoPunkBought @entity {
   transferedFrom: Bytes!
   "Buyer"
   transferedTo: Bytes!
-  "Price Cryptopunk was sold"
+  "Price Cryptopunk was sold in ETH"
   amount: BigInt!
   "Unique Cryptopunk Index"
   punkIndex: BigInt!
