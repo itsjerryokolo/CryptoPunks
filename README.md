@@ -5,19 +5,16 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 ## Example Query
 ```graphql
 {
-  cryptoPunksAssigneds(where: {punkIndex_gt:"5000"}) {
-    id
-    assignedTo
+  purchases(first:50){
     punkIndex
-    punksRemainingToAssign
-    transactionDate
-  }
-  cryptoPunkBoughts(first: 5, where:{amount_not:"0"}) {
-    id
-    transferedTo
-    transferedFrom
     amount
-    transactionDate
+    seller
+    buyer
+    transaction{
+      id
+      date
+      block
+    }
   }
 }
 
