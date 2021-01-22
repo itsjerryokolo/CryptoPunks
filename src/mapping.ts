@@ -18,8 +18,11 @@ import {
   CryptoPunkTransfer,
   CryptoPunk,
   Transaction,
+  NotForSale,
   cToken,
   Offer,
+  Bid,
+  Withdrawn,
   Purchase
 } from "../generated/schema"
 
@@ -77,6 +80,63 @@ export function handleTransfer(event: Transfer): void {
 // ctokentransfer.transactionDate = event.block.timestamp
 // ctokentransfer.transactionBlock = event.block.number
 // ctokentransfer.save()
+
+let ctransfer = cTokenTransfer.load(event.params.to.toHexString())
+let owner = new Owner(event.params.to.toHexString())
+let transaction = Transaction.load(event.transaction.hash.toHexString())
+let contract = cryptopunks.bind(event.address)
+let ctoken = cToken.load(event.params.to.toHexString())
+if (ctransfer == null) {
+  ctransfer = new cTokenTransfer(event.params.from.toHexString())
+}
+if (transaction == null) {
+  transaction = new Transaction(event.transaction.hash.toHexString())
+}
+if (ctoken == null) {
+  ctoken = new cToken(event.transaction.hash.toHexString())
+}
+if (owner == null) {
+  owner = new Owner(event.params.to.toHexString())
+}
+
+
+ctransfer.OwnedBy = owner.id
+ctransfer.ctoken = ctoken.id
+ctransfer.transferedFrom = event.params.from
+ctransfer.transferedTo = event.params.to
+ctransfer.amountTransfered = event.params.value
+ctransfer.transaction = transaction.id
+
+ctoken.allPunksAssigned = contract.allPunksAssigned()
+ctoken.symbol = contract.symbol()
+ctoken.totalSupply = contract.totalSupply()
+ctoken.imageHash = contract.imageHash()
+ctoken.name = contract._name
+ctoken.transfers = ctransfer.id
+ctoken.transaction = transaction.id
+
+
+
+
+// // ctokentransfer.allTransfersFrom = [event.params.from]
+// // ctokentransfer.allTransfersTo = [event.params.to]
+
+owner.cTokenTransfer = ctransfer.id
+owner.transaction = transaction.id
+
+transaction.date = event.block.timestamp
+transaction.block = event.block.number
+
+
+
+ctoken.save()
+owner.save()
+transaction.save()
+ctransfer.save()
+
+
+
+
 }
 
 export function handlePunkTransfer(event: PunkTransfer): void {
@@ -97,7 +157,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   punk.punk = event.params.punkIndex
   punk.sender = event.params.from
   punk.receiver = event.params.to
-  punk.transfersBy = owner.id
+  punk.ownedBy = owner.id
   owner.punkTransfered = punk.id
   punk.transaction = transaction.id
   transaction.date = event.block.timestamp
@@ -191,4 +251,21 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   // cryptopunknotforsale.transactionDate = event.block.timestamp
   // cryptopunknotforsale.transactionBlock = event.block.number
   // cryptopunknotforsale.save()
+
+  let punk = NotForSale.load(event.params.punkIndex.toString())
+  let transaction = Transaction.load(event.transaction.hash.toHexString())
+  if (punk == null) {
+    punk = new NotForSale(event.params.punkIndex.toString())
+  }
+  if (transaction == null) {
+    transaction = new Transaction(event.transaction.hash.toHexString());
+  }
+
+  punk.punkIndex = event.params.punkIndex
+  punk.transaction = transaction.id
+  transaction.date = event.block.timestamp
+  transaction.block = event.block.number
+  punk.save()
+  transaction.save()
+
 }
