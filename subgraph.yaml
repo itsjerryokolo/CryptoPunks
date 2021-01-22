@@ -14,12 +14,15 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - cTokentransfer 
-        - User
+        - cTokenTransfer 
+        - Owner
         - CryptoPunk
+        - CryptoPunkTransfer
         - Transaction
         - cToken
+        - Assigned
         - Offer
+        - NotForSale
         - Purchase
       abis:
         - name: cryptopunks
