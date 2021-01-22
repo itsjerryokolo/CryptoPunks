@@ -127,8 +127,8 @@ export class Owner extends Entity {
     }
   }
 
-  get cTokenOwned(): string | null {
-    let value = this.get("cTokenOwned");
+  get cTokenTransfer(): string | null {
+    let value = this.get("cTokenTransfer");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -136,11 +136,11 @@ export class Owner extends Entity {
     }
   }
 
-  set cTokenOwned(value: string | null) {
+  set cTokenTransfer(value: string | null) {
     if (value === null) {
-      this.unset("cTokenOwned");
+      this.unset("cTokenTransfer");
     } else {
-      this.set("cTokenOwned", Value.fromString(value as string));
+      this.set("cTokenTransfer", Value.fromString(value as string));
     }
   }
 
@@ -740,23 +740,6 @@ export class cToken extends Entity {
     this.set("name", Value.fromString(value));
   }
 
-  get punk(): string | null {
-    let value = this.get("punk");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set punk(value: string | null) {
-    if (value === null) {
-      this.unset("punk");
-    } else {
-      this.set("punk", Value.fromString(value as string));
-    }
-  }
-
   get allPunksAssigned(): boolean {
     let value = this.get("allPunksAssigned");
     return value.toBoolean();
@@ -1085,23 +1068,6 @@ export class cTokenTransfer extends Entity {
     }
   }
 
-  get punk(): string | null {
-    let value = this.get("punk");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set punk(value: string | null) {
-    if (value === null) {
-      this.unset("punk");
-    } else {
-      this.set("punk", Value.fromString(value as string));
-    }
-  }
-
   get transferedFrom(): Bytes {
     let value = this.get("transferedFrom");
     return value.toBytes();
@@ -1111,23 +1077,6 @@ export class cTokenTransfer extends Entity {
     this.set("transferedFrom", Value.fromBytes(value));
   }
 
-  get allTransfersTo(): Array<Bytes> | null {
-    let value = this.get("allTransfersTo");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytesArray();
-    }
-  }
-
-  set allTransfersTo(value: Array<Bytes> | null) {
-    if (value === null) {
-      this.unset("allTransfersTo");
-    } else {
-      this.set("allTransfersTo", Value.fromBytesArray(value as Array<Bytes>));
-    }
-  }
-
   get transferedTo(): Bytes {
     let value = this.get("transferedTo");
     return value.toBytes();
@@ -1135,23 +1084,6 @@ export class cTokenTransfer extends Entity {
 
   set transferedTo(value: Bytes) {
     this.set("transferedTo", Value.fromBytes(value));
-  }
-
-  get allTransfersFrom(): Array<Bytes> | null {
-    let value = this.get("allTransfersFrom");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytesArray();
-    }
-  }
-
-  set allTransfersFrom(value: Array<Bytes> | null) {
-    if (value === null) {
-      this.unset("allTransfersFrom");
-    } else {
-      this.set("allTransfersFrom", Value.fromBytesArray(value as Array<Bytes>));
-    }
   }
 
   get amountTransfered(): BigInt {
@@ -1254,8 +1186,8 @@ export class CryptoPunkTransfer extends Entity {
     this.set("punk", Value.fromBigInt(value));
   }
 
-  get transfersBy(): string | null {
-    let value = this.get("transfersBy");
+  get ownedBy(): string | null {
+    let value = this.get("ownedBy");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1263,11 +1195,11 @@ export class CryptoPunkTransfer extends Entity {
     }
   }
 
-  set transfersBy(value: string | null) {
+  set ownedBy(value: string | null) {
     if (value === null) {
-      this.unset("transfersBy");
+      this.unset("ownedBy");
     } else {
-      this.set("transfersBy", Value.fromString(value as string));
+      this.set("ownedBy", Value.fromString(value as string));
     }
   }
 
@@ -1580,23 +1512,6 @@ export class NotForSale extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get Owner(): string | null {
-    let value = this.get("Owner");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set Owner(value: string | null) {
-    if (value === null) {
-      this.unset("Owner");
-    } else {
-      this.set("Owner", Value.fromString(value as string));
-    }
-  }
-
   get punkIndex(): BigInt {
     let value = this.get("punkIndex");
     return value.toBigInt();
@@ -1604,15 +1519,6 @@ export class NotForSale extends Entity {
 
   set punkIndex(value: BigInt) {
     this.set("punkIndex", Value.fromBigInt(value));
-  }
-
-  get punk(): string {
-    let value = this.get("punk");
-    return value.toString();
-  }
-
-  set punk(value: string) {
-    this.set("punk", Value.fromString(value));
   }
 
   get transaction(): string | null {
