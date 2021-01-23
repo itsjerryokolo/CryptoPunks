@@ -1,38 +1,54 @@
 type Owner @entity {
+  "Owner address"
   id: ID!
+
+  "Purchases by Owner"
   punkPurchased: Purchase
+
+  "Punk assigned to owner (if any)"
   punkAssigned: Assigned
+
+  "Punk transfers by Owner"
   punkTransfered: CryptoPunkTransfer
+
+  "Bids by Owner"
   punkBid: Bid
+
+  "Offers by Owner"
   punkOffer: Offer
-  cTokenTransfer: cTokenTransfer
+
+  "cToken transfers by Owner"
+  cTokenTransfered: cTokenTransfer
+  
+  "Owner transaction data"
   transaction: Transaction
 
 }
+
+
 type CryptoPunk @entity {
   "Punk Index"
   id: ID!
-  "Query ctoken data"
-  ctoken: cToken
+
   "Punk"
   punk: BigInt!
+
   "Owner"
-  OwnedBy: [Owner!] #Use BoughtFrom address as ID
-  "Current punk bid"
-  currentBid: Bid
-  "Current punk offer"
-  currentOffer: Offer
-  "All punk Bids"
-  bids: [Bid!]
-  "Current punk Offers"
-  offers: [Offer!]
-  "All punk purchases"
+  OwnedBy: Owner #Used boughtFrom address as owner ID
+
+  "Bids for Punk"
+  bid: Bid
+
+  "Offers for punk"
+  offer: Offer
+
+  "Purchases of punk"
   purchase: Purchase
-  "Current punk transfered"
+
+  "Punk transfers"
   punkTransfer: CryptoPunkTransfer
-  "All punk transfers"
-  punkTransfers: [CryptoPunkTransfer!]
-  "Transaction Data"
+
+  "Transaction data"
   transaction: Transaction
 
 }
@@ -41,25 +57,23 @@ type CryptoPunk @entity {
 type Bid @entity{
   "Punk Index"
     id: ID!
-  "Query bid for specific user"
+
+  "Bids by Owner"
   bidsBy: Owner
+
   "punk bidded"
   punk: CryptoPunk
+
   "Bids Withdrawn"
-  bidWithdrawn: Withdrawn @derivedFrom (field:"withdrawnBid")  
-  "Current punk bid"
-  currentBid: Owner
-  "Current punk offer"
-  currentOffer: Owner
+  bidWithdrawn: Withdrawn @derivedFrom (field:"withdrawnBid") 
+
   "Address of Bidder" 
   bidder: Bytes!
-  "Address of all Bidders"  
-  bidders: [Bytes!]!
+
   "Amount bidded"
   bid: BigInt!
-  "All bids"
-  bids: [BigInt!]!
-  "Transaction Data"
+
+  "Transaction data"
   transaction: Transaction
 
 }
@@ -67,21 +81,29 @@ type Bid @entity{
 type Transaction @entity {  
   "Transaction Hash"
   id: ID!
-  "Query user transaction data"
+
+  "Owner transactions"
   ownerTransactions: Owner  
+  
   "cToken Transactions"
   ctoken: cToken
-  "CryptoPunkTransfer Transactions"
+
+  "CryptoPunkTransfer transactions"
   punkTransfers: CryptoPunkTransfer
+
   "Punk"
   punk: CryptoPunk
-  "Query Assign transactions"
+
+  "Assign transactions"
   assigned: Assigned
-  "Query transactions of Offers"
+
+  "Offer transactions"
   offer: Offer
-  "Transaction Date" 
+
+  "Transaction date" 
   date: BigInt!
-  "Transaction Block" 
+
+  "Transaction block" 
   block: BigInt!
   
 }
@@ -90,20 +112,28 @@ type Transaction @entity {
 type cToken @entity {
   "cToken Owner"  
   id: ID!
+
   "Token symbol"
-  symbol: String!
+  symbol: String
+
   "Token name"
-  name: String!
-  # "Punk"
-  # punk: CryptoPunk
+  name: String
+  
+  "Contract Address"
+  address: Bytes
+
   "True/False if all Cryptopunks have been assigned"
-  allPunksAssigned: Boolean!
+  allPunksAssigned: Boolean
+
   "cToken Transfer data" 
   transfers: cTokenTransfer 
+
   "Total supply of Crytopunk tokens"
-  totalSupply: BigInt!
+  totalSupply: BigInt
+
   "The hash of the composite image of all the Cryptopunks"
-  imageHash: String!
+  imageHash: String
+
   "Transaction date" 
   transaction: Transaction
 }
@@ -111,25 +141,26 @@ type cToken @entity {
 type Purchase @entity {
   "Punk Index"
   id: ID!
+
   "Query User data"
-  purchaseBy: Owner
+  purchaseBy: Owner #Used buyer address as owner ID
 
   "Cryptopunk purchased"
   punkIndex: BigInt!
 
-  "Query punk data against purchases"
+  "Punk data"
   punk: CryptoPunk   
 
   "Address of Buyer" 
   buyer: Bytes!
 
-  "Bought for"
+  "amount in ETH"
   amount: BigInt!
 
   "Seller"
   seller: Bytes!
 
-  "Transaction Data"
+  "Transaction data"
   transaction: Transaction
 }
 
@@ -137,44 +168,44 @@ type Purchase @entity {
 type Assigned @entity {
   "Punk Index"
   id: ID!
+
   "Query User data"
-  assignedTo: Owner!
+  assignedTo: Owner
 
   "Address Cryptopunk was assigned"
   assigned: Bytes!
+
   "CryptoPunk index assigned"
   punkAssigned: BigInt!
 
   "Cryptopunks remaining to assign"
   punksRemainingToAssign: BigInt!
   
-  "Transaction Data"
+  "Transaction data"
   transaction: Transaction
 }
-
 
 
 type cTokenTransfer @entity {
   "cToken Owner"
   id: ID!
-  "Query user data"
-  OwnedBy: Owner
+
+  "Owner"
+  ownedBy: Owner #Used transferedTo address as owner ID
 
   "cToken data"
-  ctoken: cToken
+  ctoken: cToken #Used transferedTo address as cToken owner ID
 
-  # "Cryptopunk data"
-  # punk: CryptoPunk
+  "Punk data"
+  punk: CryptoPunk
 
   "Sender"
   transferedFrom: Bytes!
-  # allTransfersTo: [Bytes!]
 
   "Receiver"
   transferedTo: Bytes!
-  # allTransfersFrom: [Bytes!]
 
-  "Amount of Crytopunk transfered"
+  "Amount of punk transfered"
   amountTransfered: BigInt!
 
   "Transaction data"
@@ -186,63 +217,82 @@ type cTokenTransfer @entity {
 type CryptoPunkTransfer @entity {
   "Punk" 
   id: ID!
+
+  "Owner"
+  ownedBy: Owner #Used receiver address as owner ID
+
   "Sender"
-  sender: Bytes
+  sender: Bytes!
+
   "Receiver"
-  receiver: Bytes
+  receiver: Bytes!
 
-  "Unique Cryptopunk index"
+  "Punk transfered"
   punk: BigInt!
-  ownedBy: Owner
 
-  "Transaction Data"
+  "Transaction data"
   transaction: Transaction
 }
+
 
 type Offer @entity {
   "Punk Index"
   id: ID!
-  "Query Ctoken data"
-  ctoken: cToken
-  "Query user data"
-  offersBy: Owner
+
+  "Offers by Owner"
+  offersBy: Owner #Used offeredTo address as owner ID
+
   "Punk"
-  punk: CryptoPunk!
+  punk: CryptoPunk
+
   "Amount offered"
-  minimumAmount: BigInt!
+  amount: BigInt!
+
   "Address being Offered"
   offeredTo: Bytes!
+
   "Punk offer"
   offer: BigInt!
-  "All offers for Punk"
-  offers: [BigInt!]
-  "Transaction Data"
+
+  "Transaction data"
   transaction: Transaction
 }
+
 
 type Withdrawn @entity {
   "Punk"
   id: ID!
-  "User data"
-  withdrawnBy: Owner
+
+  "Owner" 
+  withdrawnBy: Owner #Used withdrawnFrom address as owner ID
+
   "Withdrawn from"
   withdrawnFrom: Bytes!
+
   "Unique Cryptopunk index"  
   punkIndex: BigInt!
+
   "Amount withdrawn"
   amountWithdrawn: BigInt!
-  "Query punk data"
-  punk:CryptoPunk
+
+  "Punk data"
+  punk: CryptoPunk
+
+  "Bids withdrawn"
   withdrawnBid: Bid
-  "Transaction Data"
+
+  "Transaction data"
   transaction: Transaction
 }
+
 
 type NotForSale @entity {
   "Punk"
   id: ID!
-  "Unique Cryptopunk index"  
+
+  "punk"  
   punkIndex: BigInt!
-  "Transaction Data"
+
+  "Transaction data"
   transaction: Transaction
 }
