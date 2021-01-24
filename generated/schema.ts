@@ -110,8 +110,8 @@ export class Owner extends Entity {
     }
   }
 
-  get punkOffer(): string | null {
-    let value = this.get("punkOffer");
+  get punkOfferedForSale(): string | null {
+    let value = this.get("punkOfferedForSale");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -119,11 +119,11 @@ export class Owner extends Entity {
     }
   }
 
-  set punkOffer(value: string | null) {
+  set punkOfferedForSale(value: string | null) {
     if (value === null) {
-      this.unset("punkOffer");
+      this.unset("punkOfferedForSale");
     } else {
-      this.set("punkOffer", Value.fromString(value as string));
+      this.set("punkOfferedForSale", Value.fromString(value as string));
     }
   }
 
@@ -1189,8 +1189,8 @@ export class Offer extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get offersBy(): string | null {
-    let value = this.get("offersBy");
+  get offeredByPunkBuyer(): string | null {
+    let value = this.get("offeredByPunkBuyer");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1198,11 +1198,45 @@ export class Offer extends Entity {
     }
   }
 
-  set offersBy(value: string | null) {
+  set offeredByPunkBuyer(value: string | null) {
     if (value === null) {
-      this.unset("offersBy");
+      this.unset("offeredByPunkBuyer");
     } else {
-      this.set("offersBy", Value.fromString(value as string));
+      this.set("offeredByPunkBuyer", Value.fromString(value as string));
+    }
+  }
+
+  get offeredByPunkHolder(): string | null {
+    let value = this.get("offeredByPunkHolder");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set offeredByPunkHolder(value: string | null) {
+    if (value === null) {
+      this.unset("offeredByPunkHolder");
+    } else {
+      this.set("offeredByPunkHolder", Value.fromString(value as string));
+    }
+  }
+
+  get offeredByAssignee(): string | null {
+    let value = this.get("offeredByAssignee");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set offeredByAssignee(value: string | null) {
+    if (value === null) {
+      this.unset("offeredByAssignee");
+    } else {
+      this.set("offeredByAssignee", Value.fromString(value as string));
     }
   }
 
@@ -1223,31 +1257,30 @@ export class Offer extends Entity {
     }
   }
 
-  get amountOffered(): BigInt {
+  get amountOffered(): BigInt | null {
     let value = this.get("amountOffered");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set amountOffered(value: BigInt | null) {
+    if (value === null) {
+      this.unset("amountOffered");
+    } else {
+      this.set("amountOffered", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get punkOfferedForSale(): BigInt {
+    let value = this.get("punkOfferedForSale");
     return value.toBigInt();
   }
 
-  set amountOffered(value: BigInt) {
-    this.set("amountOffered", Value.fromBigInt(value));
-  }
-
-  get offeredTo(): Bytes {
-    let value = this.get("offeredTo");
-    return value.toBytes();
-  }
-
-  set offeredTo(value: Bytes) {
-    this.set("offeredTo", Value.fromBytes(value));
-  }
-
-  get punkOffered(): BigInt {
-    let value = this.get("punkOffered");
-    return value.toBigInt();
-  }
-
-  set punkOffered(value: BigInt) {
-    this.set("punkOffered", Value.fromBigInt(value));
+  set punkOfferedForSale(value: BigInt) {
+    this.set("punkOfferedForSale", Value.fromBigInt(value));
   }
 
   get transaction(): string | null {
