@@ -5,6 +5,7 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 ## Example Query
 ### Query Owner data
 ```graphql
+
 {
   owners(where:{id: "0x00bd9fd57c423a1b1c969823d409156d90974d77"}) {
     id
@@ -29,6 +30,10 @@ No two are exactly alike, and each one of them can be officially owned by a sing
         date
       }
     }
+    punkOfferedForSale{
+      id
+      amountOffered
+    }
     transaction{
       date
       block
@@ -37,12 +42,11 @@ No two are exactly alike, and each one of them can be officially owned by a sing
   }
 }
 ```
-## Example Query
 ### Query purchases of specific owner
 ```graphql
 {
   purchases(where:{purchaseBy: "0x00bd9fd57c423a1b1c969823d409156d90974d77"}) {
-		id
+    id
     punkIndex
     buyer
     seller
