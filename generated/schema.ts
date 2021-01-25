@@ -484,8 +484,8 @@ export class Transaction extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get ownerTransactions(): string | null {
-    let value = this.get("ownerTransactions");
+  get owner(): string | null {
+    let value = this.get("owner");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -493,11 +493,11 @@ export class Transaction extends Entity {
     }
   }
 
-  set ownerTransactions(value: string | null) {
+  set owner(value: string | null) {
     if (value === null) {
-      this.unset("ownerTransactions");
+      this.unset("owner");
     } else {
-      this.set("ownerTransactions", Value.fromString(value as string));
+      this.set("owner", Value.fromString(value as string));
     }
   }
 
@@ -583,6 +583,23 @@ export class Transaction extends Entity {
       this.unset("offer");
     } else {
       this.set("offer", Value.fromString(value as string));
+    }
+  }
+
+  get bid(): string | null {
+    let value = this.get("bid");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set bid(value: string | null) {
+    if (value === null) {
+      this.unset("bid");
+    } else {
+      this.set("bid", Value.fromString(value as string));
     }
   }
 
@@ -1325,7 +1342,7 @@ export class Offer extends Entity {
   }
 }
 
-export class Withdrawn extends Entity {
+export class WithdrawnBid extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -1333,17 +1350,17 @@ export class Withdrawn extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Withdrawn entity without an ID");
+    assert(id !== null, "Cannot save WithdrawnBid entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save Withdrawn entity with non-string ID. " +
+      "Cannot save WithdrawnBid entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("Withdrawn", id.toString(), this);
+    store.set("WithdrawnBid", id.toString(), this);
   }
 
-  static load(id: string): Withdrawn | null {
-    return store.get("Withdrawn", id) as Withdrawn | null;
+  static load(id: string): WithdrawnBid | null {
+    return store.get("WithdrawnBid", id) as WithdrawnBid | null;
   }
 
   get id(): string {

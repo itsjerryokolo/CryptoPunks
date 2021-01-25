@@ -68,7 +68,7 @@ type Bid @entity{
   punk: CryptoPunk
 
   "Bids Withdrawn"
-  bidWithdrawn: Withdrawn
+  bidWithdrawn: WithdrawnBid
 
   "Address of Bidder" 
   bidder: Bytes
@@ -85,23 +85,26 @@ type Transaction @entity {
   "Transaction Hash"
   id: ID!
 
-  "Owner transaction"
-  ownerTransactions: Owner  
+  "Owner transaction data"
+  owner: Owner  
   
-  "cToken Transaction"
+  "cToken Transaction data"
   ctoken: cToken
 
-  "CryptoPunkTransfer transaction"
+  "CryptoPunkTransfer transaction data"
   punkTransfers: CryptoPunkTransfer
 
   "Punk"
   punk: CryptoPunk
 
-  "Assign transaction"
+  "Assign transaction data"
   assigned: Assigned
 
-  "Offer transaction"
+  "Offer transaction data"
   offer: Offer
+
+  "Bid transaction data"
+  bid: Bid
 
   "Transaction date" 
   date: BigInt!
@@ -262,7 +265,7 @@ type Offer @entity {
 }
 
 
-type Withdrawn @entity {
+type WithdrawnBid @entity {
   "Punk"
   id: ID!
 
