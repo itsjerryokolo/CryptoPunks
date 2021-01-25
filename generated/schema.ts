@@ -334,8 +334,8 @@ export class Bid extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get bidsBy(): string | null {
-    let value = this.get("bidsBy");
+  get bidsByOwner(): string | null {
+    let value = this.get("bidsByOwner");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -343,11 +343,28 @@ export class Bid extends Entity {
     }
   }
 
-  set bidsBy(value: string | null) {
+  set bidsByOwner(value: string | null) {
     if (value === null) {
-      this.unset("bidsBy");
+      this.unset("bidsByOwner");
     } else {
-      this.set("bidsBy", Value.fromString(value as string));
+      this.set("bidsByOwner", Value.fromString(value as string));
+    }
+  }
+
+  get bidsByAssignee(): string | null {
+    let value = this.get("bidsByAssignee");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set bidsByAssignee(value: string | null) {
+    if (value === null) {
+      this.unset("bidsByAssignee");
+    } else {
+      this.set("bidsByAssignee", Value.fromString(value as string));
     }
   }
 
@@ -385,22 +402,38 @@ export class Bid extends Entity {
     }
   }
 
-  get bidder(): Bytes {
+  get bidder(): Bytes | null {
     let value = this.get("bidder");
-    return value.toBytes();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
   }
 
-  set bidder(value: Bytes) {
-    this.set("bidder", Value.fromBytes(value));
+  set bidder(value: Bytes | null) {
+    if (value === null) {
+      this.unset("bidder");
+    } else {
+      this.set("bidder", Value.fromBytes(value as Bytes));
+    }
   }
 
-  get bid(): BigInt {
+  get bid(): BigInt | null {
     let value = this.get("bid");
-    return value.toBigInt();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set bid(value: BigInt) {
-    this.set("bid", Value.fromBigInt(value));
+  set bid(value: BigInt | null) {
+    if (value === null) {
+      this.unset("bid");
+    } else {
+      this.set("bid", Value.fromBigInt(value as BigInt));
+    }
   }
 
   get transaction(): string | null {
@@ -896,15 +929,6 @@ export class Assigned extends Entity {
     }
   }
 
-  get assigned(): Bytes {
-    let value = this.get("assigned");
-    return value.toBytes();
-  }
-
-  set assigned(value: Bytes) {
-    this.set("assigned", Value.fromBytes(value));
-  }
-
   get punkAssigned(): BigInt {
     let value = this.get("punkAssigned");
     return value.toBigInt();
@@ -1331,8 +1355,8 @@ export class Withdrawn extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get withdrawnBy(): string | null {
-    let value = this.get("withdrawnBy");
+  get withdrawnByOwner(): string | null {
+    let value = this.get("withdrawnByOwner");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1340,39 +1364,80 @@ export class Withdrawn extends Entity {
     }
   }
 
-  set withdrawnBy(value: string | null) {
+  set withdrawnByOwner(value: string | null) {
     if (value === null) {
-      this.unset("withdrawnBy");
+      this.unset("withdrawnByOwner");
     } else {
-      this.set("withdrawnBy", Value.fromString(value as string));
+      this.set("withdrawnByOwner", Value.fromString(value as string));
     }
   }
 
-  get withdrawnFrom(): Bytes {
-    let value = this.get("withdrawnFrom");
-    return value.toBytes();
+  get withdrawnByAssignee(): string | null {
+    let value = this.get("withdrawnByAssignee");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set withdrawnFrom(value: Bytes) {
-    this.set("withdrawnFrom", Value.fromBytes(value));
+  set withdrawnByAssignee(value: string | null) {
+    if (value === null) {
+      this.unset("withdrawnByAssignee");
+    } else {
+      this.set("withdrawnByAssignee", Value.fromString(value as string));
+    }
   }
 
-  get punkIndex(): BigInt {
+  get withdrawnBy(): Bytes | null {
+    let value = this.get("withdrawnBy");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set withdrawnBy(value: Bytes | null) {
+    if (value === null) {
+      this.unset("withdrawnBy");
+    } else {
+      this.set("withdrawnBy", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get punkIndex(): BigInt | null {
     let value = this.get("punkIndex");
-    return value.toBigInt();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set punkIndex(value: BigInt) {
-    this.set("punkIndex", Value.fromBigInt(value));
+  set punkIndex(value: BigInt | null) {
+    if (value === null) {
+      this.unset("punkIndex");
+    } else {
+      this.set("punkIndex", Value.fromBigInt(value as BigInt));
+    }
   }
 
-  get amountWithdrawn(): BigInt {
+  get amountWithdrawn(): BigInt | null {
     let value = this.get("amountWithdrawn");
-    return value.toBigInt();
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set amountWithdrawn(value: BigInt) {
-    this.set("amountWithdrawn", Value.fromBigInt(value));
+  set amountWithdrawn(value: BigInt | null) {
+    if (value === null) {
+      this.unset("amountWithdrawn");
+    } else {
+      this.set("amountWithdrawn", Value.fromBigInt(value as BigInt));
+    }
   }
 
   get punk(): string | null {

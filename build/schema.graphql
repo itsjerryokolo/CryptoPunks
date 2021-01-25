@@ -59,19 +59,22 @@ type Bid @entity{
     id: ID!
 
   "Bids by Owner"
-  bidsBy: Owner
+  bidsByOwner: Owner
+
+  "Bids by Assignee"
+  bidsByAssignee: Owner
 
   "punk bidded"
   punk: CryptoPunk
 
   "Bids Withdrawn"
-  bidWithdrawn: Withdrawn @derivedFrom (field:"withdrawnBid") 
+  bidWithdrawn: Withdrawn
 
   "Address of Bidder" 
-  bidder: Bytes!
+  bidder: Bytes
 
   "Amount bidded"
-  bid: BigInt!
+  bid: BigInt
 
   "Transaction data"
   transaction: Transaction
@@ -172,9 +175,6 @@ type Assigned @entity {
   "Address of Assignee as Owner ID"
   assignedTo: Owner
 
-  "Address CryptoPunk was assigned"
-  assigned: Bytes!
-
   "CryptoPunk index assigned"
   punkAssigned: BigInt!
 
@@ -267,16 +267,19 @@ type Withdrawn @entity {
   id: ID!
 
   "Owner" 
-  withdrawnBy: Owner #Used withdrawnFrom address in Withdrawn as owner ID
+  withdrawnByOwner: Owner #Used withdrawnFrom address in Withdrawn as owner ID
+
+  "Bids withdrawn by Assignee"
+  withdrawnByAssignee: Owner
 
   "Withdrawn from"
-  withdrawnFrom: Bytes!
+  withdrawnBy: Bytes
 
   "Unique Cryptopunk index"  
-  punkIndex: BigInt!
+  punkIndex: BigInt
 
   "Amount withdrawn"
-  amountWithdrawn: BigInt!
+  amountWithdrawn: BigInt
 
   "Punk data"
   punk: CryptoPunk
