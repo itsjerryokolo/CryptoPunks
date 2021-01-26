@@ -334,8 +334,8 @@ export class Bid extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get bidsByOwner(): string | null {
-    let value = this.get("bidsByOwner");
+  get owner(): string | null {
+    let value = this.get("owner");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -343,28 +343,11 @@ export class Bid extends Entity {
     }
   }
 
-  set bidsByOwner(value: string | null) {
+  set owner(value: string | null) {
     if (value === null) {
-      this.unset("bidsByOwner");
+      this.unset("owner");
     } else {
-      this.set("bidsByOwner", Value.fromString(value as string));
-    }
-  }
-
-  get bidsByAssignee(): string | null {
-    let value = this.get("bidsByAssignee");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set bidsByAssignee(value: string | null) {
-    if (value === null) {
-      this.unset("bidsByAssignee");
-    } else {
-      this.set("bidsByAssignee", Value.fromString(value as string));
+      this.set("owner", Value.fromString(value as string));
     }
   }
 
@@ -811,8 +794,8 @@ export class Purchase extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get purchaseBy(): string | null {
-    let value = this.get("purchaseBy");
+  get buyer(): string | null {
+    let value = this.get("buyer");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -820,21 +803,12 @@ export class Purchase extends Entity {
     }
   }
 
-  set purchaseBy(value: string | null) {
+  set buyer(value: string | null) {
     if (value === null) {
-      this.unset("purchaseBy");
+      this.unset("buyer");
     } else {
-      this.set("purchaseBy", Value.fromString(value as string));
+      this.set("buyer", Value.fromString(value as string));
     }
-  }
-
-  get punkIndex(): BigInt {
-    let value = this.get("punkIndex");
-    return value.toBigInt();
-  }
-
-  set punkIndex(value: BigInt) {
-    this.set("punkIndex", Value.fromBigInt(value));
   }
 
   get punk(): string | null {
@@ -852,15 +826,6 @@ export class Purchase extends Entity {
     } else {
       this.set("punk", Value.fromString(value as string));
     }
-  }
-
-  get buyer(): Bytes {
-    let value = this.get("buyer");
-    return value.toBytes();
-  }
-
-  set buyer(value: Bytes) {
-    this.set("buyer", Value.fromBytes(value));
   }
 
   get amount(): BigInt {
@@ -1372,88 +1337,20 @@ export class WithdrawnBid extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get withdrawnByOwner(): string | null {
-    let value = this.get("withdrawnByOwner");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set withdrawnByOwner(value: string | null) {
-    if (value === null) {
-      this.unset("withdrawnByOwner");
-    } else {
-      this.set("withdrawnByOwner", Value.fromString(value as string));
-    }
-  }
-
-  get withdrawnByAssignee(): string | null {
-    let value = this.get("withdrawnByAssignee");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set withdrawnByAssignee(value: string | null) {
-    if (value === null) {
-      this.unset("withdrawnByAssignee");
-    } else {
-      this.set("withdrawnByAssignee", Value.fromString(value as string));
-    }
-  }
-
-  get withdrawnBy(): Bytes | null {
+  get withdrawnBy(): string | null {
     let value = this.get("withdrawnBy");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set withdrawnBy(value: Bytes | null) {
+  set withdrawnBy(value: string | null) {
     if (value === null) {
       this.unset("withdrawnBy");
     } else {
-      this.set("withdrawnBy", Value.fromBytes(value as Bytes));
-    }
-  }
-
-  get punkIndex(): BigInt | null {
-    let value = this.get("punkIndex");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set punkIndex(value: BigInt | null) {
-    if (value === null) {
-      this.unset("punkIndex");
-    } else {
-      this.set("punkIndex", Value.fromBigInt(value as BigInt));
-    }
-  }
-
-  get amountWithdrawn(): BigInt | null {
-    let value = this.get("amountWithdrawn");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set amountWithdrawn(value: BigInt | null) {
-    if (value === null) {
-      this.unset("amountWithdrawn");
-    } else {
-      this.set("amountWithdrawn", Value.fromBigInt(value as BigInt));
+      this.set("withdrawnBy", Value.fromString(value as string));
     }
   }
 
@@ -1474,8 +1371,25 @@ export class WithdrawnBid extends Entity {
     }
   }
 
-  get withdrawnBid(): string | null {
-    let value = this.get("withdrawnBid");
+  get amountWithdrawn(): BigInt | null {
+    let value = this.get("amountWithdrawn");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set amountWithdrawn(value: BigInt | null) {
+    if (value === null) {
+      this.unset("amountWithdrawn");
+    } else {
+      this.set("amountWithdrawn", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get bid(): string | null {
+    let value = this.get("bid");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1483,11 +1397,11 @@ export class WithdrawnBid extends Entity {
     }
   }
 
-  set withdrawnBid(value: string | null) {
+  set bid(value: string | null) {
     if (value === null) {
-      this.unset("withdrawnBid");
+      this.unset("bid");
     } else {
-      this.set("withdrawnBid", Value.fromString(value as string));
+      this.set("bid", Value.fromString(value as string));
     }
   }
 

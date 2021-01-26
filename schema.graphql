@@ -1,5 +1,5 @@
 type Owner @entity {
-  "Address of Owner "
+  "Ethereum Address"
   id: ID! #Used buyer address in Purchase as owner ID
 
   "Purchase by Owner"
@@ -11,10 +11,10 @@ type Owner @entity {
   "Punk transfer by Owner"
   punkTransfered: CryptoPunkTransfer
 
-  "Bid by Owner"
+  "Query Bid to Owner or by Owner"
   punkBid: Bid
 
-  "Offer by Owner"
+  "Offered for sale by Owner"
   punkOfferedForSale: Offer
 
   "cToken transfer by Owner"
@@ -58,11 +58,8 @@ type Bid @entity{
   "Punk"
     id: ID!
 
-  "Bids by Owner"
-  bidsByOwner: Owner
-
-  "Bids by Assignee"
-  bidsByAssignee: Owner
+  "Owner of punk bidded"
+  owner: Owner
 
   "punk bidded"
   punk: CryptoPunk
@@ -145,20 +142,14 @@ type cToken @entity {
 }
 
 type Purchase @entity {
-  "Address of buyer as ID"
+  "Punk"
   id: ID! 
 
   "Address of buyer as Owner ID"
-  purchaseBy: Owner #Used the buyer address below as owner ID
+  buyer: Owner #Used the buyer address below as owner ID
 
-  "Cryptopunk purchased"
-  punkIndex: BigInt!
-
-  "Punk data"
+  "Punk purchased"
   punk: CryptoPunk   
-
-  "Address of Buyer" 
-  buyer: Bytes!
 
   "amount in ETH"
   amount: BigInt!
@@ -270,25 +261,16 @@ type WithdrawnBid @entity {
   id: ID!
 
   "Owner" 
-  withdrawnByOwner: Owner #Used withdrawnFrom address in Withdrawn as owner ID
-
-  "Bids withdrawn by Assignee"
-  withdrawnByAssignee: Owner
-
-  "Withdrawn from"
-  withdrawnBy: Bytes
-
-  "Unique Cryptopunk index"  
-  punkIndex: BigInt
-
-  "Amount withdrawn"
-  amountWithdrawn: BigInt
+  withdrawnBy: Owner #Used withdrawnFrom address in Withdrawn as owner ID
 
   "Punk data"
   punk: CryptoPunk
 
-  "Bids withdrawn"
-  withdrawnBid: Bid
+  "Amount withdrawn"
+  amountWithdrawn: BigInt
+
+  "Bid withdrawn"
+  bid: Bid
 
   "Transaction data"
   transaction: Transaction
