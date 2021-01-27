@@ -42,123 +42,84 @@ export class Owner extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get punkPurchased(): string | null {
+  get punkOwned(): Array<string> | null {
+    let value = this.get("punkOwned");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set punkOwned(value: Array<string> | null) {
+    if (value === null) {
+      this.unset("punkOwned");
+    } else {
+      this.set("punkOwned", Value.fromStringArray(value as Array<string>));
+    }
+  }
+
+  get punkPurchased(): Array<string> {
     let value = this.get("punkPurchased");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set punkPurchased(value: string | null) {
-    if (value === null) {
-      this.unset("punkPurchased");
-    } else {
-      this.set("punkPurchased", Value.fromString(value as string));
-    }
+  set punkPurchased(value: Array<string>) {
+    this.set("punkPurchased", Value.fromStringArray(value));
   }
 
-  get punkAssigned(): string | null {
+  get punkAssigned(): Array<string> {
     let value = this.get("punkAssigned");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set punkAssigned(value: string | null) {
-    if (value === null) {
-      this.unset("punkAssigned");
-    } else {
-      this.set("punkAssigned", Value.fromString(value as string));
-    }
+  set punkAssigned(value: Array<string>) {
+    this.set("punkAssigned", Value.fromStringArray(value));
   }
 
-  get punkTransfered(): string | null {
+  get punkTransfered(): Array<string> {
     let value = this.get("punkTransfered");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set punkTransfered(value: string | null) {
-    if (value === null) {
-      this.unset("punkTransfered");
-    } else {
-      this.set("punkTransfered", Value.fromString(value as string));
-    }
+  set punkTransfered(value: Array<string>) {
+    this.set("punkTransfered", Value.fromStringArray(value));
   }
 
-  get punkBid(): string | null {
+  get punkBid(): Array<string> {
     let value = this.get("punkBid");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set punkBid(value: string | null) {
-    if (value === null) {
-      this.unset("punkBid");
-    } else {
-      this.set("punkBid", Value.fromString(value as string));
-    }
+  set punkBid(value: Array<string>) {
+    this.set("punkBid", Value.fromStringArray(value));
   }
 
-  get punkOfferedForSale(): string | null {
+  get punkOfferedForSale(): Array<string | null> {
     let value = this.get("punkOfferedForSale");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set punkOfferedForSale(value: string | null) {
-    if (value === null) {
-      this.unset("punkOfferedForSale");
-    } else {
-      this.set("punkOfferedForSale", Value.fromString(value as string));
-    }
+  set punkOfferedForSale(value: Array<string | null>) {
+    this.set("punkOfferedForSale", Value.fromStringArray(value));
   }
 
-  get cTokenTransfered(): string | null {
+  get cTokenTransfered(): Array<string> {
     let value = this.get("cTokenTransfered");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set cTokenTransfered(value: string | null) {
-    if (value === null) {
-      this.unset("cTokenTransfered");
-    } else {
-      this.set("cTokenTransfered", Value.fromString(value as string));
-    }
+  set cTokenTransfered(value: Array<string>) {
+    this.set("cTokenTransfered", Value.fromStringArray(value));
   }
 
-  get transaction(): string | null {
+  get transaction(): Array<string> {
     let value = this.get("transaction");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set transaction(value: string | null) {
-    if (value === null) {
-      this.unset("transaction");
-    } else {
-      this.set("transaction", Value.fromString(value as string));
-    }
+  set transaction(value: Array<string>) {
+    this.set("transaction", Value.fromStringArray(value));
   }
 }
 
@@ -192,115 +153,66 @@ export class CryptoPunk extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get punk(): BigInt {
-    let value = this.get("punk");
-    return value.toBigInt();
-  }
-
-  set punk(value: BigInt) {
-    this.set("punk", Value.fromBigInt(value));
-  }
-
-  get OwnedBy(): string | null {
+  get OwnedBy(): string {
     let value = this.get("OwnedBy");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toString();
   }
 
-  set OwnedBy(value: string | null) {
-    if (value === null) {
-      this.unset("OwnedBy");
-    } else {
-      this.set("OwnedBy", Value.fromString(value as string));
-    }
+  set OwnedBy(value: string) {
+    this.set("OwnedBy", Value.fromString(value));
   }
 
-  get bid(): string | null {
+  get bid(): Array<string> | null {
     let value = this.get("bid");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toString();
+      return value.toStringArray();
     }
   }
 
-  set bid(value: string | null) {
+  set bid(value: Array<string> | null) {
     if (value === null) {
       this.unset("bid");
     } else {
-      this.set("bid", Value.fromString(value as string));
+      this.set("bid", Value.fromStringArray(value as Array<string>));
     }
   }
 
-  get offer(): string | null {
+  get offer(): Array<string> {
     let value = this.get("offer");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set offer(value: string | null) {
-    if (value === null) {
-      this.unset("offer");
-    } else {
-      this.set("offer", Value.fromString(value as string));
-    }
+  set offer(value: Array<string>) {
+    this.set("offer", Value.fromStringArray(value));
   }
 
-  get purchase(): string | null {
+  get purchase(): Array<string> {
     let value = this.get("purchase");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set purchase(value: string | null) {
-    if (value === null) {
-      this.unset("purchase");
-    } else {
-      this.set("purchase", Value.fromString(value as string));
-    }
+  set purchase(value: Array<string>) {
+    this.set("purchase", Value.fromStringArray(value));
   }
 
-  get punkTransfer(): string | null {
+  get punkTransfer(): Array<string> {
     let value = this.get("punkTransfer");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set punkTransfer(value: string | null) {
-    if (value === null) {
-      this.unset("punkTransfer");
-    } else {
-      this.set("punkTransfer", Value.fromString(value as string));
-    }
+  set punkTransfer(value: Array<string>) {
+    this.set("punkTransfer", Value.fromStringArray(value));
   }
 
-  get transaction(): string | null {
+  get transaction(): Array<string> {
     let value = this.get("transaction");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set transaction(value: string | null) {
-    if (value === null) {
-      this.unset("transaction");
-    } else {
-      this.set("transaction", Value.fromString(value as string));
-    }
+  set transaction(value: Array<string>) {
+    this.set("transaction", Value.fromStringArray(value));
   }
 }
 
@@ -894,8 +806,17 @@ export class Assigned extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get assignedTo(): string | null {
+  get assignedTo(): string {
     let value = this.get("assignedTo");
+    return value.toString();
+  }
+
+  set assignedTo(value: string) {
+    this.set("assignedTo", Value.fromString(value));
+  }
+
+  get punk(): string | null {
+    let value = this.get("punk");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -903,21 +824,12 @@ export class Assigned extends Entity {
     }
   }
 
-  set assignedTo(value: string | null) {
+  set punk(value: string | null) {
     if (value === null) {
-      this.unset("assignedTo");
+      this.unset("punk");
     } else {
-      this.set("assignedTo", Value.fromString(value as string));
+      this.set("punk", Value.fromString(value as string));
     }
-  }
-
-  get punkAssigned(): BigInt {
-    let value = this.get("punkAssigned");
-    return value.toBigInt();
-  }
-
-  set punkAssigned(value: BigInt) {
-    this.set("punkAssigned", Value.fromBigInt(value));
   }
 
   get punksRemainingToAssign(): BigInt {
@@ -1103,8 +1015,51 @@ export class CryptoPunkTransfer extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get ownedBy(): string | null {
+  get ownedBy(): string {
     let value = this.get("ownedBy");
+    return value.toString();
+  }
+
+  set ownedBy(value: string) {
+    this.set("ownedBy", Value.fromString(value));
+  }
+
+  get sender(): Bytes | null {
+    let value = this.get("sender");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set sender(value: Bytes | null) {
+    if (value === null) {
+      this.unset("sender");
+    } else {
+      this.set("sender", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get receiver(): Bytes | null {
+    let value = this.get("receiver");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set receiver(value: Bytes | null) {
+    if (value === null) {
+      this.unset("receiver");
+    } else {
+      this.set("receiver", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get punk(): string | null {
+    let value = this.get("punk");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1112,39 +1067,12 @@ export class CryptoPunkTransfer extends Entity {
     }
   }
 
-  set ownedBy(value: string | null) {
+  set punk(value: string | null) {
     if (value === null) {
-      this.unset("ownedBy");
+      this.unset("punk");
     } else {
-      this.set("ownedBy", Value.fromString(value as string));
+      this.set("punk", Value.fromString(value as string));
     }
-  }
-
-  get sender(): Bytes {
-    let value = this.get("sender");
-    return value.toBytes();
-  }
-
-  set sender(value: Bytes) {
-    this.set("sender", Value.fromBytes(value));
-  }
-
-  get receiver(): Bytes {
-    let value = this.get("receiver");
-    return value.toBytes();
-  }
-
-  set receiver(value: Bytes) {
-    this.set("receiver", Value.fromBytes(value));
-  }
-
-  get punk(): BigInt {
-    let value = this.get("punk");
-    return value.toBigInt();
-  }
-
-  set punk(value: BigInt) {
-    this.set("punk", Value.fromBigInt(value));
   }
 
   get transaction(): string | null {
@@ -1195,55 +1123,13 @@ export class Offer extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get offeredByPunkBuyer(): string | null {
-    let value = this.get("offeredByPunkBuyer");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+  get offeredBy(): string {
+    let value = this.get("offeredBy");
+    return value.toString();
   }
 
-  set offeredByPunkBuyer(value: string | null) {
-    if (value === null) {
-      this.unset("offeredByPunkBuyer");
-    } else {
-      this.set("offeredByPunkBuyer", Value.fromString(value as string));
-    }
-  }
-
-  get offeredByPunkHolder(): string | null {
-    let value = this.get("offeredByPunkHolder");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set offeredByPunkHolder(value: string | null) {
-    if (value === null) {
-      this.unset("offeredByPunkHolder");
-    } else {
-      this.set("offeredByPunkHolder", Value.fromString(value as string));
-    }
-  }
-
-  get offeredByAssignee(): string | null {
-    let value = this.get("offeredByAssignee");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set offeredByAssignee(value: string | null) {
-    if (value === null) {
-      this.unset("offeredByAssignee");
-    } else {
-      this.set("offeredByAssignee", Value.fromString(value as string));
-    }
+  set offeredBy(value: string) {
+    this.set("offeredBy", Value.fromString(value));
   }
 
   get punk(): string | null {
