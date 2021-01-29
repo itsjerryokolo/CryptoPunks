@@ -42,8 +42,25 @@ export class Owner extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get punkOwned(): Array<string> | null {
-    let value = this.get("punkOwned");
+  get punk(): string | null {
+    let value = this.get("punk");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set punk(value: string | null) {
+    if (value === null) {
+      this.unset("punk");
+    } else {
+      this.set("punk", Value.fromString(value as string));
+    }
+  }
+
+  get allpunksOwned(): Array<string> | null {
+    let value = this.get("allpunksOwned");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -51,11 +68,11 @@ export class Owner extends Entity {
     }
   }
 
-  set punkOwned(value: Array<string> | null) {
+  set allpunksOwned(value: Array<string> | null) {
     if (value === null) {
-      this.unset("punkOwned");
+      this.unset("allpunksOwned");
     } else {
-      this.set("punkOwned", Value.fromStringArray(value as Array<string>));
+      this.set("allpunksOwned", Value.fromStringArray(value as Array<string>));
     }
   }
 
@@ -153,13 +170,64 @@ export class CryptoPunk extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get OwnedBy(): string {
-    let value = this.get("OwnedBy");
+  get owner(): string {
+    let value = this.get("owner");
     return value.toString();
   }
 
-  set OwnedBy(value: string) {
-    this.set("OwnedBy", Value.fromString(value));
+  set owner(value: string) {
+    this.set("owner", Value.fromString(value));
+  }
+
+  get transferedTo(): string | null {
+    let value = this.get("transferedTo");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set transferedTo(value: string | null) {
+    if (value === null) {
+      this.unset("transferedTo");
+    } else {
+      this.set("transferedTo", Value.fromString(value as string));
+    }
+  }
+
+  get assignedTo(): string | null {
+    let value = this.get("assignedTo");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set assignedTo(value: string | null) {
+    if (value === null) {
+      this.unset("assignedTo");
+    } else {
+      this.set("assignedTo", Value.fromString(value as string));
+    }
+  }
+
+  get purchasedBy(): string | null {
+    let value = this.get("purchasedBy");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set purchasedBy(value: string | null) {
+    if (value === null) {
+      this.unset("purchasedBy");
+    } else {
+      this.set("purchasedBy", Value.fromString(value as string));
+    }
   }
 
   get bid(): Array<string> | null {
@@ -213,307 +281,6 @@ export class CryptoPunk extends Entity {
 
   set transaction(value: Array<string>) {
     this.set("transaction", Value.fromStringArray(value));
-  }
-}
-
-export class Bid extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save Bid entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Bid entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Bid", id.toString(), this);
-  }
-
-  static load(id: string): Bid | null {
-    return store.get("Bid", id) as Bid | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get owner(): string | null {
-    let value = this.get("owner");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set owner(value: string | null) {
-    if (value === null) {
-      this.unset("owner");
-    } else {
-      this.set("owner", Value.fromString(value as string));
-    }
-  }
-
-  get punk(): string | null {
-    let value = this.get("punk");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set punk(value: string | null) {
-    if (value === null) {
-      this.unset("punk");
-    } else {
-      this.set("punk", Value.fromString(value as string));
-    }
-  }
-
-  get bidWithdrawn(): string | null {
-    let value = this.get("bidWithdrawn");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set bidWithdrawn(value: string | null) {
-    if (value === null) {
-      this.unset("bidWithdrawn");
-    } else {
-      this.set("bidWithdrawn", Value.fromString(value as string));
-    }
-  }
-
-  get bidder(): Bytes | null {
-    let value = this.get("bidder");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set bidder(value: Bytes | null) {
-    if (value === null) {
-      this.unset("bidder");
-    } else {
-      this.set("bidder", Value.fromBytes(value as Bytes));
-    }
-  }
-
-  get bid(): BigInt | null {
-    let value = this.get("bid");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set bid(value: BigInt | null) {
-    if (value === null) {
-      this.unset("bid");
-    } else {
-      this.set("bid", Value.fromBigInt(value as BigInt));
-    }
-  }
-
-  get transaction(): string | null {
-    let value = this.get("transaction");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set transaction(value: string | null) {
-    if (value === null) {
-      this.unset("transaction");
-    } else {
-      this.set("transaction", Value.fromString(value as string));
-    }
-  }
-}
-
-export class Transaction extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save Transaction entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Transaction entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Transaction", id.toString(), this);
-  }
-
-  static load(id: string): Transaction | null {
-    return store.get("Transaction", id) as Transaction | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get owner(): string | null {
-    let value = this.get("owner");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set owner(value: string | null) {
-    if (value === null) {
-      this.unset("owner");
-    } else {
-      this.set("owner", Value.fromString(value as string));
-    }
-  }
-
-  get ctoken(): string | null {
-    let value = this.get("ctoken");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set ctoken(value: string | null) {
-    if (value === null) {
-      this.unset("ctoken");
-    } else {
-      this.set("ctoken", Value.fromString(value as string));
-    }
-  }
-
-  get punkTransfers(): string | null {
-    let value = this.get("punkTransfers");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set punkTransfers(value: string | null) {
-    if (value === null) {
-      this.unset("punkTransfers");
-    } else {
-      this.set("punkTransfers", Value.fromString(value as string));
-    }
-  }
-
-  get punk(): string | null {
-    let value = this.get("punk");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set punk(value: string | null) {
-    if (value === null) {
-      this.unset("punk");
-    } else {
-      this.set("punk", Value.fromString(value as string));
-    }
-  }
-
-  get assigned(): string | null {
-    let value = this.get("assigned");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set assigned(value: string | null) {
-    if (value === null) {
-      this.unset("assigned");
-    } else {
-      this.set("assigned", Value.fromString(value as string));
-    }
-  }
-
-  get offer(): string | null {
-    let value = this.get("offer");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set offer(value: string | null) {
-    if (value === null) {
-      this.unset("offer");
-    } else {
-      this.set("offer", Value.fromString(value as string));
-    }
-  }
-
-  get bid(): string | null {
-    let value = this.get("bid");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set bid(value: string | null) {
-    if (value === null) {
-      this.unset("bid");
-    } else {
-      this.set("bid", Value.fromString(value as string));
-    }
-  }
-
-  get date(): BigInt {
-    let value = this.get("date");
-    return value.toBigInt();
-  }
-
-  set date(value: BigInt) {
-    this.set("date", Value.fromBigInt(value));
-  }
-
-  get block(): BigInt {
-    let value = this.get("block");
-    return value.toBigInt();
-  }
-
-  set block(value: BigInt) {
-    this.set("block", Value.fromBigInt(value));
   }
 }
 
@@ -607,21 +374,13 @@ export class cToken extends Entity {
     this.set("allPunksAssigned", Value.fromBoolean(value));
   }
 
-  get transfers(): string | null {
+  get transfers(): Array<string> {
     let value = this.get("transfers");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
+    return value.toStringArray();
   }
 
-  set transfers(value: string | null) {
-    if (value === null) {
-      this.unset("transfers");
-    } else {
-      this.set("transfers", Value.fromString(value as string));
-    }
+  set transfers(value: Array<string>) {
+    this.set("transfers", Value.fromStringArray(value));
   }
 
   get totalSupply(): BigInt | null {
@@ -656,6 +415,81 @@ export class cToken extends Entity {
     } else {
       this.set("imageHash", Value.fromString(value as string));
     }
+  }
+
+  get transaction(): Array<string> {
+    let value = this.get("transaction");
+    return value.toStringArray();
+  }
+
+  set transaction(value: Array<string>) {
+    this.set("transaction", Value.fromStringArray(value));
+  }
+}
+
+export class Assigned extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Assigned entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Assigned entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Assigned", id.toString(), this);
+  }
+
+  static load(id: string): Assigned | null {
+    return store.get("Assigned", id) as Assigned | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get assignedTo(): string {
+    let value = this.get("assignedTo");
+    return value.toString();
+  }
+
+  set assignedTo(value: string) {
+    this.set("assignedTo", Value.fromString(value));
+  }
+
+  get punk(): string | null {
+    let value = this.get("punk");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set punk(value: string | null) {
+    if (value === null) {
+      this.unset("punk");
+    } else {
+      this.set("punk", Value.fromString(value as string));
+    }
+  }
+
+  get punksRemainingToAssign(): BigInt {
+    let value = this.get("punksRemainingToAssign");
+    return value.toBigInt();
+  }
+
+  set punksRemainingToAssign(value: BigInt) {
+    this.set("punksRemainingToAssign", Value.fromBigInt(value));
   }
 
   get transaction(): string | null {
@@ -776,323 +610,6 @@ export class Purchase extends Entity {
   }
 }
 
-export class Assigned extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save Assigned entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save Assigned entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("Assigned", id.toString(), this);
-  }
-
-  static load(id: string): Assigned | null {
-    return store.get("Assigned", id) as Assigned | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get assignedTo(): string {
-    let value = this.get("assignedTo");
-    return value.toString();
-  }
-
-  set assignedTo(value: string) {
-    this.set("assignedTo", Value.fromString(value));
-  }
-
-  get punk(): string | null {
-    let value = this.get("punk");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set punk(value: string | null) {
-    if (value === null) {
-      this.unset("punk");
-    } else {
-      this.set("punk", Value.fromString(value as string));
-    }
-  }
-
-  get punksRemainingToAssign(): BigInt {
-    let value = this.get("punksRemainingToAssign");
-    return value.toBigInt();
-  }
-
-  set punksRemainingToAssign(value: BigInt) {
-    this.set("punksRemainingToAssign", Value.fromBigInt(value));
-  }
-
-  get transaction(): string | null {
-    let value = this.get("transaction");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set transaction(value: string | null) {
-    if (value === null) {
-      this.unset("transaction");
-    } else {
-      this.set("transaction", Value.fromString(value as string));
-    }
-  }
-}
-
-export class cTokenTransfer extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save cTokenTransfer entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save cTokenTransfer entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("cTokenTransfer", id.toString(), this);
-  }
-
-  static load(id: string): cTokenTransfer | null {
-    return store.get("cTokenTransfer", id) as cTokenTransfer | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get ownedBy(): string | null {
-    let value = this.get("ownedBy");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set ownedBy(value: string | null) {
-    if (value === null) {
-      this.unset("ownedBy");
-    } else {
-      this.set("ownedBy", Value.fromString(value as string));
-    }
-  }
-
-  get ctoken(): string | null {
-    let value = this.get("ctoken");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set ctoken(value: string | null) {
-    if (value === null) {
-      this.unset("ctoken");
-    } else {
-      this.set("ctoken", Value.fromString(value as string));
-    }
-  }
-
-  get punk(): string | null {
-    let value = this.get("punk");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set punk(value: string | null) {
-    if (value === null) {
-      this.unset("punk");
-    } else {
-      this.set("punk", Value.fromString(value as string));
-    }
-  }
-
-  get transferedFrom(): Bytes {
-    let value = this.get("transferedFrom");
-    return value.toBytes();
-  }
-
-  set transferedFrom(value: Bytes) {
-    this.set("transferedFrom", Value.fromBytes(value));
-  }
-
-  get transferedTo(): Bytes {
-    let value = this.get("transferedTo");
-    return value.toBytes();
-  }
-
-  set transferedTo(value: Bytes) {
-    this.set("transferedTo", Value.fromBytes(value));
-  }
-
-  get amountTransfered(): BigInt {
-    let value = this.get("amountTransfered");
-    return value.toBigInt();
-  }
-
-  set amountTransfered(value: BigInt) {
-    this.set("amountTransfered", Value.fromBigInt(value));
-  }
-
-  get transaction(): string | null {
-    let value = this.get("transaction");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set transaction(value: string | null) {
-    if (value === null) {
-      this.unset("transaction");
-    } else {
-      this.set("transaction", Value.fromString(value as string));
-    }
-  }
-}
-
-export class CryptoPunkTransfer extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id !== null, "Cannot save CryptoPunkTransfer entity without an ID");
-    assert(
-      id.kind == ValueKind.STRING,
-      "Cannot save CryptoPunkTransfer entity with non-string ID. " +
-        'Considering using .toHex() to convert the "id" to a string.'
-    );
-    store.set("CryptoPunkTransfer", id.toString(), this);
-  }
-
-  static load(id: string): CryptoPunkTransfer | null {
-    return store.get("CryptoPunkTransfer", id) as CryptoPunkTransfer | null;
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get ownedBy(): string {
-    let value = this.get("ownedBy");
-    return value.toString();
-  }
-
-  set ownedBy(value: string) {
-    this.set("ownedBy", Value.fromString(value));
-  }
-
-  get sender(): Bytes | null {
-    let value = this.get("sender");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set sender(value: Bytes | null) {
-    if (value === null) {
-      this.unset("sender");
-    } else {
-      this.set("sender", Value.fromBytes(value as Bytes));
-    }
-  }
-
-  get receiver(): Bytes | null {
-    let value = this.get("receiver");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set receiver(value: Bytes | null) {
-    if (value === null) {
-      this.unset("receiver");
-    } else {
-      this.set("receiver", Value.fromBytes(value as Bytes));
-    }
-  }
-
-  get punk(): string | null {
-    let value = this.get("punk");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set punk(value: string | null) {
-    if (value === null) {
-      this.unset("punk");
-    } else {
-      this.set("punk", Value.fromString(value as string));
-    }
-  }
-
-  get transaction(): string | null {
-    let value = this.get("transaction");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set transaction(value: string | null) {
-    if (value === null) {
-      this.unset("transaction");
-    } else {
-      this.set("transaction", Value.fromString(value as string));
-    }
-  }
-}
-
 export class Offer extends Entity {
   constructor(id: string) {
     super();
@@ -1132,8 +649,8 @@ export class Offer extends Entity {
     this.set("offeredBy", Value.fromString(value));
   }
 
-  get punk(): string | null {
-    let value = this.get("punk");
+  get punkOfferedForSale(): string | null {
+    let value = this.get("punkOfferedForSale");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -1141,11 +658,11 @@ export class Offer extends Entity {
     }
   }
 
-  set punk(value: string | null) {
+  set punkOfferedForSale(value: string | null) {
     if (value === null) {
-      this.unset("punk");
+      this.unset("punkOfferedForSale");
     } else {
-      this.set("punk", Value.fromString(value as string));
+      this.set("punkOfferedForSale", Value.fromString(value as string));
     }
   }
 
@@ -1166,13 +683,137 @@ export class Offer extends Entity {
     }
   }
 
-  get punkOfferedForSale(): BigInt {
-    let value = this.get("punkOfferedForSale");
-    return value.toBigInt();
+  get transaction(): string | null {
+    let value = this.get("transaction");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set punkOfferedForSale(value: BigInt) {
-    this.set("punkOfferedForSale", Value.fromBigInt(value));
+  set transaction(value: string | null) {
+    if (value === null) {
+      this.unset("transaction");
+    } else {
+      this.set("transaction", Value.fromString(value as string));
+    }
+  }
+}
+
+export class Bid extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Bid entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Bid entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Bid", id.toString(), this);
+  }
+
+  static load(id: string): Bid | null {
+    return store.get("Bid", id) as Bid | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get owner(): string | null {
+    let value = this.get("owner");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set owner(value: string | null) {
+    if (value === null) {
+      this.unset("owner");
+    } else {
+      this.set("owner", Value.fromString(value as string));
+    }
+  }
+
+  get punk(): string | null {
+    let value = this.get("punk");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set punk(value: string | null) {
+    if (value === null) {
+      this.unset("punk");
+    } else {
+      this.set("punk", Value.fromString(value as string));
+    }
+  }
+
+  get bidWithdrawn(): string | null {
+    let value = this.get("bidWithdrawn");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set bidWithdrawn(value: string | null) {
+    if (value === null) {
+      this.unset("bidWithdrawn");
+    } else {
+      this.set("bidWithdrawn", Value.fromString(value as string));
+    }
+  }
+
+  get bidder(): Bytes | null {
+    let value = this.get("bidder");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set bidder(value: Bytes | null) {
+    if (value === null) {
+      this.unset("bidder");
+    } else {
+      this.set("bidder", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get bid(): BigInt | null {
+    let value = this.get("bid");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set bid(value: BigInt | null) {
+    if (value === null) {
+      this.unset("bid");
+    } else {
+      this.set("bid", Value.fromBigInt(value as BigInt));
+    }
   }
 
   get transaction(): string | null {
@@ -1363,5 +1004,415 @@ export class NotForSale extends Entity {
     } else {
       this.set("transaction", Value.fromString(value as string));
     }
+  }
+}
+
+export class cTokenTransfer extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save cTokenTransfer entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save cTokenTransfer entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("cTokenTransfer", id.toString(), this);
+  }
+
+  static load(id: string): cTokenTransfer | null {
+    return store.get("cTokenTransfer", id) as cTokenTransfer | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get ownedBy(): string | null {
+    let value = this.get("ownedBy");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set ownedBy(value: string | null) {
+    if (value === null) {
+      this.unset("ownedBy");
+    } else {
+      this.set("ownedBy", Value.fromString(value as string));
+    }
+  }
+
+  get ctoken(): string | null {
+    let value = this.get("ctoken");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set ctoken(value: string | null) {
+    if (value === null) {
+      this.unset("ctoken");
+    } else {
+      this.set("ctoken", Value.fromString(value as string));
+    }
+  }
+
+  get punk(): string | null {
+    let value = this.get("punk");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set punk(value: string | null) {
+    if (value === null) {
+      this.unset("punk");
+    } else {
+      this.set("punk", Value.fromString(value as string));
+    }
+  }
+
+  get transferedFrom(): Bytes {
+    let value = this.get("transferedFrom");
+    return value.toBytes();
+  }
+
+  set transferedFrom(value: Bytes) {
+    this.set("transferedFrom", Value.fromBytes(value));
+  }
+
+  get transferedTo(): Bytes {
+    let value = this.get("transferedTo");
+    return value.toBytes();
+  }
+
+  set transferedTo(value: Bytes) {
+    this.set("transferedTo", Value.fromBytes(value));
+  }
+
+  get amountTransfered(): BigInt {
+    let value = this.get("amountTransfered");
+    return value.toBigInt();
+  }
+
+  set amountTransfered(value: BigInt) {
+    this.set("amountTransfered", Value.fromBigInt(value));
+  }
+
+  get transaction(): string | null {
+    let value = this.get("transaction");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set transaction(value: string | null) {
+    if (value === null) {
+      this.unset("transaction");
+    } else {
+      this.set("transaction", Value.fromString(value as string));
+    }
+  }
+}
+
+export class CryptoPunkTransfer extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save CryptoPunkTransfer entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save CryptoPunkTransfer entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("CryptoPunkTransfer", id.toString(), this);
+  }
+
+  static load(id: string): CryptoPunkTransfer | null {
+    return store.get("CryptoPunkTransfer", id) as CryptoPunkTransfer | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get ownedBy(): string | null {
+    let value = this.get("ownedBy");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set ownedBy(value: string | null) {
+    if (value === null) {
+      this.unset("ownedBy");
+    } else {
+      this.set("ownedBy", Value.fromString(value as string));
+    }
+  }
+
+  get sender(): Bytes | null {
+    let value = this.get("sender");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set sender(value: Bytes | null) {
+    if (value === null) {
+      this.unset("sender");
+    } else {
+      this.set("sender", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get receiver(): Bytes | null {
+    let value = this.get("receiver");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set receiver(value: Bytes | null) {
+    if (value === null) {
+      this.unset("receiver");
+    } else {
+      this.set("receiver", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get punk(): string | null {
+    let value = this.get("punk");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set punk(value: string | null) {
+    if (value === null) {
+      this.unset("punk");
+    } else {
+      this.set("punk", Value.fromString(value as string));
+    }
+  }
+
+  get transaction(): string | null {
+    let value = this.get("transaction");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set transaction(value: string | null) {
+    if (value === null) {
+      this.unset("transaction");
+    } else {
+      this.set("transaction", Value.fromString(value as string));
+    }
+  }
+}
+
+export class Transaction extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id !== null, "Cannot save Transaction entity without an ID");
+    assert(
+      id.kind == ValueKind.STRING,
+      "Cannot save Transaction entity with non-string ID. " +
+        'Considering using .toHex() to convert the "id" to a string.'
+    );
+    store.set("Transaction", id.toString(), this);
+  }
+
+  static load(id: string): Transaction | null {
+    return store.get("Transaction", id) as Transaction | null;
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get owner(): string | null {
+    let value = this.get("owner");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set owner(value: string | null) {
+    if (value === null) {
+      this.unset("owner");
+    } else {
+      this.set("owner", Value.fromString(value as string));
+    }
+  }
+
+  get ctoken(): string | null {
+    let value = this.get("ctoken");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set ctoken(value: string | null) {
+    if (value === null) {
+      this.unset("ctoken");
+    } else {
+      this.set("ctoken", Value.fromString(value as string));
+    }
+  }
+
+  get punkTransfers(): string | null {
+    let value = this.get("punkTransfers");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set punkTransfers(value: string | null) {
+    if (value === null) {
+      this.unset("punkTransfers");
+    } else {
+      this.set("punkTransfers", Value.fromString(value as string));
+    }
+  }
+
+  get punk(): string | null {
+    let value = this.get("punk");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set punk(value: string | null) {
+    if (value === null) {
+      this.unset("punk");
+    } else {
+      this.set("punk", Value.fromString(value as string));
+    }
+  }
+
+  get assigned(): string | null {
+    let value = this.get("assigned");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set assigned(value: string | null) {
+    if (value === null) {
+      this.unset("assigned");
+    } else {
+      this.set("assigned", Value.fromString(value as string));
+    }
+  }
+
+  get offer(): string | null {
+    let value = this.get("offer");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set offer(value: string | null) {
+    if (value === null) {
+      this.unset("offer");
+    } else {
+      this.set("offer", Value.fromString(value as string));
+    }
+  }
+
+  get bid(): string | null {
+    let value = this.get("bid");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set bid(value: string | null) {
+    if (value === null) {
+      this.unset("bid");
+    } else {
+      this.set("bid", Value.fromString(value as string));
+    }
+  }
+
+  get date(): BigInt {
+    let value = this.get("date");
+    return value.toBigInt();
+  }
+
+  set date(value: BigInt) {
+    this.set("date", Value.fromBigInt(value));
+  }
+
+  get block(): BigInt {
+    let value = this.get("block");
+    return value.toBigInt();
+  }
+
+  set block(value: BigInt) {
+    this.set("block", Value.fromBigInt(value));
   }
 }
