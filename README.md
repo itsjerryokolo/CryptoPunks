@@ -7,40 +7,48 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 ```graphql
 
 {
-  owners(where:{id: "0x00bd9fd57c423a1b1c969823d409156d90974d77"}) {
+  owners(where: {id: "0x7174039818a41e1ae40fdcfa3e293b0f41592af2"}) {
     id
+    allpunksOwned {
+      id
+    }
     punkPurchased {
       id
-      transaction{
+      transaction {
         id
         date
       }
     }
     punkAssigned {
       id
-      transaction{
+      transaction {
         id
         date
       }
     }
     punkTransfered {
       id
-      transaction{
+      transaction {
         id
         date
       }
     }
-    punkOfferedForSale{
+    punkOfferedForSale {
       id
       amountOffered
     }
-    transaction{
+    punkBid {
+      id
+      bid
+    }
+    transaction {
       date
       block
       id
     }
   }
 }
+
 ```
 ### Query purchases of specific owner
 ```graphql
