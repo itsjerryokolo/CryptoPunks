@@ -35,6 +35,7 @@ export function handleAssign(event: Assign): void {
   let offer = Offer.load(event.params.punkIndex.toString())
   let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
   let ctransfer = CryptoPunkTransfer.load(event.params.punkIndex.toString())
+  let bid = Bid.load(event.params.punkIndex.toString())
 
 
   if (punk == null) {
@@ -43,6 +44,9 @@ export function handleAssign(event: Assign): void {
   if (ctransfer == null) {
     ctransfer = new CryptoPunkTransfer(event.params.punkIndex.toString())
   }
+  if (bid == null) {
+    bid = new Bid(event.params.punkIndex.toString())
+  }
   if (offer == null) {
     offer = new Offer(event.params.punkIndex.toString())
   }
@@ -50,10 +54,10 @@ export function handleAssign(event: Assign): void {
     cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
   }
   if (owner == null) {
-    owner = new Owner(event.params.to.toHexString());
+    owner = new Owner(event.params.to.toHexString())
   }
   if (transaction == null) {
-    transaction = new Transaction(event.transaction.hash.toHexString());
+    transaction = new Transaction(event.transaction.hash.toHexString())
   }
 
   punk.assignedTo = owner.id
@@ -65,14 +69,18 @@ export function handleAssign(event: Assign): void {
   transaction.date = event.block.timestamp
   transaction.block = event.block.number
   transaction.assigned = punk.id
-
+  
+  bid.owner = owner.id
+  bid.transaction = transaction.id
 
   offer.offeredBy = owner.id
   offer.transaction = transaction.id
-  offer.punkOfferedForSale = event.params.punkIndex
+  offer.punkOfferedForSale = cryptopunk.id
 
-  cryptopunk.OwnedBy = owner.id
-
+  cryptopunk.assignedTo = owner.id
+  cryptopunk.owner = owner.id
+  owner.punk = cryptopunk.id
+  
   ctransfer.ownedBy = owner.id
   ctransfer.transaction = transaction.id
   
@@ -121,8 +129,6 @@ export function handleTransfer(event: Transfer): void {
   ctoken.imageHash = contract.imageHash()
   ctoken.name = contract._name
   ctoken.address = contract._address
-  ctoken.transfers = ctransfer.id
-  ctoken.transaction = transaction.id
 
 
   transaction.date = event.block.timestamp
@@ -141,28 +147,28 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   
   let punk = CryptoPunkTransfer.load(event.params.punkIndex.toString())
   let owner = Owner.load(event.params.to.toHexString())
-  let previousOwner = Owner.load(event.params.from.toHexString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
   let offer = Offer.load(event.params.punkIndex.toString())
   let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
+  let bid = Bid.load(event.params.punkIndex.toString())
 
   if (punk == null) {
     punk = new CryptoPunkTransfer(event.params.punkIndex.toString())
   }
   if (owner == null) {
-    owner = new Owner(event.params.to.toHexString());
+    owner = new Owner(event.params.to.toHexString())
   }
   if (cryptopunk == null) {
     cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
   }
-  if (previousOwner == null) {
-    previousOwner = new Owner(event.params.from.toHexString());
+  if (bid == null) {
+    bid = new Bid(event.params.punkIndex.toString())
   }
   if (offer == null) {
-    offer = new Offer(event.params.punkIndex.toString());
+    offer = new Offer(event.params.punkIndex.toString())
   }
   if (transaction == null) {
-    transaction = new Transaction(event.transaction.hash.toHexString());
+    transaction = new Transaction(event.transaction.hash.toHexString())
   }
   
   punk.punk = cryptopunk.id
@@ -171,12 +177,16 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   punk.ownedBy = owner.id
   punk.transaction = transaction.id
 
-  offer.offeredBy = previousOwner.id
+  bid.owner = owner.id
+  bid.transaction = transaction.id
+
+  offer.offeredBy = owner.id
   offer.transaction = transaction.id
-  offer.punkOfferedForSale = event.params.punkIndex
+  offer.punkOfferedForSale = cryptopunk.id
 
-  cryptopunk.OwnedBy = owner.id
-
+  cryptopunk.transferedTo = owner.id
+  cryptopunk.owner = owner.id
+  owner.punk = cryptopunk.id
 
   transaction.date = event.block.timestamp
   transaction.block = event.block.number
@@ -187,7 +197,6 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   owner.save()
   offer.save()
   cryptopunk.save()
-  previousOwner.save()
   transaction.save()
 
 }
@@ -197,30 +206,35 @@ export function handlePunkOffered(event: PunkOffered): void {
   let punk = Offer.load(event.params.punkIndex.toString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
   let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
-  let owner = Owner.load(event.params.toAddress.toString())
-
+  let owner = Owner.load(event.params.toAddress.toHexString())
+  let bid = Bid.load(event.params.punkIndex.toString())
 
 
   if (punk == null) {
-    punk = new Offer(event.params.punkIndex.toString());
+    punk = new Offer(event.params.punkIndex.toString())
   }
   if (transaction == null) {
-    transaction = new Transaction(event.transaction.hash.toHexString());
+    transaction = new Transaction(event.transaction.hash.toHexString())
   }
   if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString());
+    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
   }
   if (owner == null) {
-    owner = new Owner(event.params.toAddress.toString());
+    owner = new Owner(event.params.toAddress.toHexString())
+  }
+  if (bid == null) {
+    bid = new Bid(event.params.punkIndex.toString())
   }
 
 
   punk.amountOffered = event.params.minValue
-  punk.punkOfferedForSale = event.params.punkIndex
   punk.offeredBy = owner.id
-  punk.punk = cryptopunk.id
+  punk.punkOfferedForSale = cryptopunk.id
   punk.transaction = transaction.id
 
+  bid.owner = owner.id
+  bid.transaction = transaction.id
+  
 
   transaction.date = event.block.timestamp
   transaction.block = event.block.number
@@ -236,7 +250,6 @@ export function handlePunkOffered(event: PunkOffered): void {
 export function handlePunkBidEntered(event: PunkBidEntered): void {
 
   let punk = Bid.load(event.params.punkIndex.toString())
-  let owner = Owner.load(event.params.fromAddress.toHexString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
   let bidwithdrawn = WithdrawnBid.load(event.params.punkIndex.toString())
   let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
@@ -245,16 +258,13 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
     punk = new Bid(event.params.punkIndex.toString())
   }
   if (transaction == null) {
-    transaction = new Transaction(event.transaction.hash.toHexString());
-  }
-  if (owner == null) {
-    owner = new Owner(event.params.fromAddress.toHexString());
+    transaction = new Transaction(event.transaction.hash.toHexString())
   }
   if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString());
+    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
   }
   if (bidwithdrawn == null) {
-    bidwithdrawn = new WithdrawnBid(event.params.punkIndex.toString());
+    bidwithdrawn = new WithdrawnBid(event.params.punkIndex.toString())
   }
 
   punk.bid = event.params.value
@@ -262,7 +272,6 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   punk.punk = cryptopunk.id
   punk.bidWithdrawn = bidwithdrawn.id
   punk.bidder = event.params.fromAddress
-  punk.punk = cryptopunk.id
 
   bidwithdrawn.transaction = transaction.id
 
@@ -274,8 +283,6 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bidwithdrawn.save()
   transaction.save()
   cryptopunk.save()
-  owner.save()
-
 
 
 }
@@ -292,16 +299,16 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
     punk = new WithdrawnBid(event.params.punkIndex.toString())
   }
   if (transaction == null) {
-    transaction = new Transaction(event.transaction.hash.toHexString());
+    transaction = new Transaction(event.transaction.hash.toHexString())
   }
   if (bid == null) {
-    bid = new Bid(event.params.punkIndex.toString());
+    bid = new Bid(event.params.punkIndex.toString())
   }
   if (owner == null) {
-    owner = new Owner(event.params.fromAddress.toHexString());
+    owner = new Owner(event.params.fromAddress.toHexString())
   }
   if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString());
+    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
   }
 
   punk.amountWithdrawn = event.params.value
@@ -309,6 +316,9 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   punk.punk = cryptopunk.id
   punk.bid = bid.id
   punk.withdrawnBy = owner.id
+
+  bid.owner = owner.id
+  bid.transaction = transaction.id
 
 
   transaction.date = event.block.timestamp
@@ -327,39 +337,35 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 export function handlePunkBought(event: PunkBought): void {
 
   let punk = Purchase.load(event.params.punkIndex.toString())
-  let owner = new Owner(event.params.toAddress.toHexString())
+  let owner = Owner.load(event.params.toAddress.toHexString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
   let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
   let offer = Offer.load(event.params.punkIndex.toString())
   let bid = Bid.load(event.params.punkIndex.toString())
   let withdrawn = WithdrawnBid.load(event.params.punkIndex.toString())
-  let ctransfer = CryptoPunkTransfer.load(event.params.punkIndex.toString())
   
 
 
   if (punk == null) {
       punk = new Purchase(event.params.punkIndex.toString())
   }
-  if (ctransfer == null) {
-      ctransfer = new CryptoPunkTransfer(event.params.punkIndex.toString())
-   }
   if (offer == null) {
     offer = new Offer(event.params.punkIndex.toString())
   }
   if (bid == null) {
-    bid = new Bid(event.params.punkIndex.toString());
+    bid = new Bid(event.params.punkIndex.toString())
   }
   if (owner == null) {
-    owner = new Owner(event.params.toAddress.toHexString());
+    owner = new Owner(event.params.toAddress.toHexString())
   }
   if (withdrawn == null) {
-    withdrawn = new WithdrawnBid(event.params.punkIndex.toString());
+    withdrawn = new WithdrawnBid(event.params.punkIndex.toString())
   }
   if (transaction == null) {
-    transaction = new Transaction(event.transaction.hash.toHexString());
+    transaction = new Transaction(event.transaction.hash.toHexString())
   }
   if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString());
+    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
   }
 
   punk.punk = cryptopunk.id
@@ -374,14 +380,14 @@ export function handlePunkBought(event: PunkBought): void {
   withdrawn.withdrawnBy = owner.id
   withdrawn.transaction = transaction.id
 
-
-  ctransfer.ownedBy = owner.id
-  ctransfer.transaction = transaction.id
+  owner.punk = cryptopunk.id
+  cryptopunk.purchasedBy = owner.id
+  cryptopunk.owner = owner.id
 
 
   offer.offeredBy = owner.id
   offer.transaction = transaction.id
-  offer.punkOfferedForSale = event.params.punkIndex
+  offer.punkOfferedForSale = cryptopunk.id
  
 
   transaction.date = event.block.timestamp
@@ -390,16 +396,12 @@ export function handlePunkBought(event: PunkBought): void {
   transaction.block = event.block.number
 
 
-  cryptopunk.OwnedBy = owner.id
-
-
 
   punk.save()
   owner.save()
   bid.save()
   offer.save()
   transaction.save()
-  ctransfer.save()
   withdrawn.save()
   cryptopunk.save()
 
@@ -414,7 +416,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
     punk = new NotForSale(event.params.punkIndex.toString())
   }
   if (transaction == null) {
-    transaction = new Transaction(event.transaction.hash.toHexString());
+    transaction = new Transaction(event.transaction.hash.toHexString())
   }
 
   punk.punkIndex = event.params.punkIndex
