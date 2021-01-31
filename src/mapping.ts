@@ -100,16 +100,13 @@ export function handleTransfer(event: Transfer): void {
   let owner = new Owner(event.params.to.toHexString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
   let contract = cryptopunks.bind(event.address)
-  let ctoken = cToken.load(event.params.to.toHexString())
+  let ctoken = new cToken(event.params.to.toHexString())
   
   if (ctransfer == null) {
     ctransfer = new cTokenTransfer(event.params.from.toHexString())
   }
   if (transaction == null) {
     transaction = new Transaction(event.transaction.hash.toHexString())
-  }
-  if (ctoken == null) {
-    ctoken = new cToken(event.params.to.toHexString())
   }
   if (owner == null) {
     owner = new Owner(event.params.to.toHexString())
@@ -244,7 +241,7 @@ export function handlePunkOffered(event: PunkOffered): void {
   owner.save()
   cryptopunk.save()
   transaction.save()
-
+  
 }
 
 export function handlePunkBidEntered(event: PunkBidEntered): void {
