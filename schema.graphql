@@ -1,71 +1,85 @@
-type Owner @entity {
+type Account @entity {
   "Ethereum Address"
   id: ID!
 
-  "Punk data"
-  punk: CryptoPunk
+  "Nft data"
+  nft: Nft
 
-  "All punks owned by Owner"
-  allpunksOwned: [CryptoPunk!] @derivedFrom(field: "owner")
+  "All nfts owned by Account"
+  allnftsOwned: [Nft!] @derivedFrom(field: "account")
 
-  "Purchases by Owner"
-  punkPurchased: [Purchase!]! @derivedFrom(field: "buyer")
+  "Purchases by Account"
+  nftPurchased: [Purchase!]! @derivedFrom(field: "buyer")
 
-  "Punks assigned to owner (if any)"
-  punkAssigned: [Assigned!]! @derivedFrom(field: "assignedTo")
+  "Nfts assigned to account (if any)"
+  nftAssigned: [Assigned!]! @derivedFrom(field: "assignedTo")
 
-  "Punk transfer by Owner"
-  punkTransfered: [CryptoPunkTransfer!]! @derivedFrom(field: "ownedBy")
+  "Nft transfer by Account"
+  nftTransfered: [NftTransfer!]! @derivedFrom(field: "ownedBy")
 
-  "Query Bids to Owner or by Owner"
-  punkBid: [Bid!]! @derivedFrom(field: "owner")
+  "Query Bids to Account or by Account"
+  nftBid: [Bid!]! @derivedFrom(field: "account")
 
-  "Punks offered for sale by Owner"
-  punkOfferedForSale: [Offer]! @derivedFrom(field: "offeredBy")
+  "Nfts offered for sale by Account"
+  nftOfferedForSale: [Offer]! @derivedFrom(field: "offeredBy")
 
-  "cToken transfers by Owner"
+  "cToken transfers by Account"
   cTokenTransfered: [cTokenTransfer!]! @derivedFrom(field: "ownedBy")
 
-  "Owner transaction data"
-  transaction: [Transaction!]! @derivedFrom(field: "owner")
+  "Account "
+  transaction: [Transaction!]! @derivedFrom(field: "account")
 }
 
-type CryptoPunk @entity {
-  "Punk"
+type Nft @entity {
+  "Nft"
   id: ID!
 
-  "Punk owner"
-  owner: Owner!
+  "Nft account"
+  account: Account!
 
-  "Punk holder"
-  transferedTo: Owner
+  "Nft holder"
+  transferedTo: Account
 
   "Assigned"
-  assignedTo: Owner
+  assignedTo: Account
 
-  "Punk buyer"
-  purchasedBy: Owner
+  "Nft buyer"
+  purchasedBy: Account
 
-  "Bid for Punk"
-  bid: [Bid!] @derivedFrom(field: "punk")
+  "Bid for Nft"
+  bid: [Bid!] @derivedFrom(field: "nft")
 
-  "Offer for punk"
-  offer: [Offer!]! @derivedFrom(field: "punkOfferedForSale")
+  "Offer for nft"
+  offer: [Offer!]! @derivedFrom(field: "nftOfferedForSale")
 
-  "Purchase of punk"
-  purchase: [Purchase!]! @derivedFrom(field: "punk")
+  "Purchase of nft"
+  purchase: [Purchase!]! @derivedFrom(field: "nft")
 
-  "Punk transfer"
-  punkTransfer: [CryptoPunkTransfer!]! @derivedFrom(field: "punk")
+  "Nft transfer"
+  nftTransfer: [NftTransfer!]! @derivedFrom(field: "nft")
 
   "Transaction data"
-  transaction: [Transaction!]! @derivedFrom(field: "punk")
+  transaction: [Transaction!]! @derivedFrom(field: "nft")
 }
 
 type cToken @entity {
-  "Owner"
+  "Account"
   id: ID! #Used transferedTo address from cTokenTransfer as ID
   "Token symbol"
+
+  contract: Contract
+
+  "cToken Transfer data"
+  transfers: [cTokenTransfer!]! @derivedFrom(field: "ctoken")
+
+  "Transaction date"
+  transaction: [Transaction!]! @derivedFrom(field: "ctoken")
+}
+
+type Contract @entity {
+  id: ID!
+
+  "Token Symbol"
   symbol: String
 
   "Token name"
@@ -74,47 +88,41 @@ type cToken @entity {
   "Contract Address"
   address: Bytes
 
-  "True/False if all Cryptopunks have been assigned"
-  allPunksAssigned: Boolean
-
-  "cToken Transfer data"
-  transfers: [cTokenTransfer!]! @derivedFrom(field: "ctoken")
-
-  "Total supply of CryptoPunk tokens"
+  "Total supply of Nft tokens"
   totalSupply: BigInt
 
-  "The hash of the composite image of all the Cryptopunks"
+  "The hash of the composite image of all the Nfts"
   imageHash: String
-
-  "Transaction date"
-  transaction: [Transaction!]! @derivedFrom(field: "ctoken")
+  
+  "True/False if all Nfts have been assigned"
+  allNftsAssigned: Boolean
 }
 
 type Assigned @entity {
-  "Punk"
+  "Nft"
   id: ID!
 
-  "Owner"
-  assignedTo: Owner!
+  "Account"
+  assignedTo: Account!
 
-  "CryptoPunk assigned"
-  punk: CryptoPunk
+  "Nft assigned"
+  nft: Nft
 
-  "Cryptopunks remaining to assign"
-  punksRemainingToAssign: BigInt!
+  "Nfts remaining to assign"
+  nftsRemainingToAssign: BigInt!
 
   "Transaction data"
   transaction: Transaction
 }
 
 type Purchase @entity {
-  "Punk"
+  "Nft"
   id: ID!
 
-  "Owner"
-  buyer: Owner #Used the buyer address below as owner ID
-  "Punk purchased"
-  punk: CryptoPunk
+  "Account"
+  buyer: Account #Used the buyer address below as account ID
+  "Nft purchased"
+  nft: Nft
 
   "amount in ETH"
   amount: BigInt!
@@ -127,14 +135,14 @@ type Purchase @entity {
 }
 
 type Offer @entity {
-  "Punk Index"
+  "Nft Index"
   id: ID!
 
-  "Offer by Owner"
-  offeredBy: Owner!
+  "Offer by Account"
+  offeredBy: Account!
 
-  "Punk being offered for Sale"
-  punkOfferedForSale: CryptoPunk
+  "Nft being offered for Sale"
+  nftOfferedForSale: Nft
 
   "Amount offered"
   amountOffered: BigInt
@@ -144,14 +152,14 @@ type Offer @entity {
 }
 
 type Bid @entity {
-  "Punk"
+  "Nft"
   id: ID!
 
-  "Owner of punk bidded"
-  owner: Owner
+  "Account of nft bidded"
+  account: Account
 
-  "punk bidded"
-  punk: CryptoPunk
+  "nft bidded"
+  nft: Nft
 
   "Bids Withdrawn"
   bidWithdrawn: WithdrawnBid
@@ -167,13 +175,13 @@ type Bid @entity {
 }
 
 type WithdrawnBid @entity {
-  "Punk"
+  "Nft"
   id: ID!
 
-  "Owner"
-  withdrawnBy: Owner #Used withdrawnFrom address in Withdrawn as owner ID
-  "Punk data"
-  punk: CryptoPunk
+  "Account"
+  withdrawnBy: Account #Used withdrawnFrom address in Withdrawn as account ID
+  "Nft data"
+  nft: Nft
 
   "Amount withdrawn"
   amountWithdrawn: BigInt
@@ -186,26 +194,26 @@ type WithdrawnBid @entity {
 }
 
 type NotForSale @entity {
-  "Punk"
+  "Nft"
   id: ID!
 
-  "punk"
-  punkIndex: BigInt!
+  "nft"
+  nft: BigInt!
 
   "Transaction data"
   transaction: Transaction
 }
 
 type cTokenTransfer @entity {
-  "Owner"
+  "Account"
   id: ID! #Used transferedTo address below as ID
-  "Address of Receiver as Owner ID"
-  ownedBy: Owner
+  "Address of Receiver as Account ID"
+  ownedBy: Account
 
   "cToken data"
-  ctoken: cToken #Used transferedTo address as cToken owner ID
-  "Punk data"
-  punk: CryptoPunk
+  ctoken: cToken #Used transferedTo address as cToken account ID
+  "Nft data"
+  nft: Nft
 
   "Sender"
   transferedFrom: Bytes!
@@ -213,27 +221,28 @@ type cTokenTransfer @entity {
   "Receiver"
   transferedTo: Bytes!
 
-  "Amount of punk transfered"
+  "Amount of nft transfered"
   amountTransfered: BigInt!
 
   "Transaction data"
   transaction: Transaction
 }
 
-type CryptoPunkTransfer @entity {
-  "Punk"
+type NftTransfer @entity {
+  "Nft"
   id: ID!
 
-  "Owner"
-  ownedBy: Owner #Used receiver address as Owner ID
+  "Account"
+  ownedBy: Account #Used receiver address as Account ID
+
   "Sender"
   sender: Bytes
 
   "Receiver"
   receiver: Bytes
 
-  "Punk transfered"
-  punk: CryptoPunk
+  "Nft transfered"
+  nft: Nft
 
   "Transaction data"
   transaction: Transaction
@@ -243,25 +252,25 @@ type Transaction @entity {
   "Transaction Hash"
   id: ID!
 
-  "Owner transaction data"
-  owner: Owner
+  "Account "
+  account: Account
 
   "cToken Transaction data"
   ctoken: cToken
 
-  "CryptoPunkTransfer transaction data"
-  punkTransfers: CryptoPunkTransfer
+  "NftTransfer "
+  nftTransfers: NftTransfer
 
-  "Punk transaction data"
-  punk: CryptoPunk
+  "Nft "
+  nft: Nft
 
-  "Assign transaction data"
+  "Assign "
   assigned: Assigned
 
-  "Offer transaction data"
+  "Offer "
   offer: Offer
 
-  "Bid transaction data"
+  "Bid "
   bid: Bid
 
   "Transaction date"
