@@ -11,38 +11,38 @@ import {
   PunkNoLongerForSale,
   cryptopunks__punkBidsResult
 } from "../generated/cryptopunks/cryptopunks"
+
 import { 
   cTokenTransfer,
-  Owner,
+  Account,
   Assigned,
-  CryptoPunkTransfer,
-  CryptoPunk,
+  NftTransfer,
+  Nft,
   Transaction,
   NotForSale,
   cToken,
   Offer,
   Bid,
   WithdrawnBid,
+  Contract,
   Purchase
 } from "../generated/schema"
 
 export function handleAssign(event: Assign): void {
 
-  let punk = Assigned.load(event.params.punkIndex.toHexString())
-  let owner = Owner.load(event.params.to.toHexString())
+  let assign = Assigned.load(event.params.punkIndex.toHexString())
+  let account = Account.load(event.params.to.toHexString())
   let remainingPunks = cryptopunks.bind(event.address)
   let transaction = Transaction.load(event.transaction.hash.toHexString())
   let offer = Offer.load(event.params.punkIndex.toString())
-  let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
-  let ctransfer = CryptoPunkTransfer.load(event.params.punkIndex.toString())
+  let nft = Nft.load(event.params.punkIndex.toString())
+  let ctransfer = NftTransfer.load(event.params.punkIndex.toString())
   let bid = Bid.load(event.params.punkIndex.toString())
-
-
-  if (punk == null) {
-    punk = new Assigned(event.params.punkIndex.toString())
+  if (assign == null) {
+    assign = new Assigned(event.params.punkIndex.toString())
   }
   if (ctransfer == null) {
-    ctransfer = new CryptoPunkTransfer(event.params.punkIndex.toString())
+    ctransfer = new NftTransfer(event.params.punkIndex.toString())
   }
   if (bid == null) {
     bid = new Bid(event.params.punkIndex.toString())
@@ -50,44 +50,44 @@ export function handleAssign(event: Assign): void {
   if (offer == null) {
     offer = new Offer(event.params.punkIndex.toString())
   }
-  if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
+  if (nft == null) {
+    nft = new Nft(event.params.punkIndex.toString())
   }
-  if (owner == null) {
-    owner = new Owner(event.params.to.toHexString())
+  if (account == null) {
+    account = new Account(event.params.to.toHexString())
   }
   if (transaction == null) {
     transaction = new Transaction(event.transaction.hash.toHexString())
   }
 
-  punk.assignedTo = owner.id
-  punk.transaction = transaction.id
-  punk.punk = cryptopunk.id
-  punk.punksRemainingToAssign = remainingPunks.punksRemainingToAssign()
+  assign.assignedTo = account.id
+  assign.transaction = transaction.id
+  assign.nft = nft.id
+  assign.nftsRemainingToAssign = remainingPunks.punksRemainingToAssign()
 
 
   transaction.date = event.block.timestamp
   transaction.block = event.block.number
-  transaction.assigned = punk.id
+  transaction.assigned = nft.id
   
-  bid.owner = owner.id
+  bid.account = account.id
   bid.transaction = transaction.id
 
-  offer.offeredBy = owner.id
+  offer.offeredBy = account.id
   offer.transaction = transaction.id
-  offer.punkOfferedForSale = cryptopunk.id
+  offer.nftOfferedForSale = nft.id
 
-  cryptopunk.assignedTo = owner.id
-  cryptopunk.owner = owner.id
-  owner.punk = cryptopunk.id
+  nft.assignedTo = account.id
+  nft.account = account.id
+  account.nft = nft.id
   
-  ctransfer.ownedBy = owner.id
+  ctransfer.ownedBy = account.id
   ctransfer.transaction = transaction.id
   
 
-  punk.save()
-  owner.save()
-  cryptopunk.save()
+  nft.save()
+  account.save()
+  assign.save()
   offer.save()
   ctransfer.save()
   transaction.save()
@@ -97,9 +97,10 @@ export function handleAssign(event: Assign): void {
 export function handleTransfer(event: Transfer): void {
   
   let ctransfer = cTokenTransfer.load(event.params.to.toHexString())
-  let owner = new Owner(event.params.to.toHexString())
+  let account = new Account(event.params.to.toHexString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
-  let contract = cryptopunks.bind(event.address)
+  let punk = cryptopunks.bind(event.address)
+  let contract = new Contract(event.params.from.toHexString())
   let ctoken = new cToken(event.params.to.toHexString())
   
   if (ctransfer == null) {
@@ -108,24 +109,23 @@ export function handleTransfer(event: Transfer): void {
   if (transaction == null) {
     transaction = new Transaction(event.transaction.hash.toHexString())
   }
-  if (owner == null) {
-    owner = new Owner(event.params.to.toHexString())
-}
 
-  ctransfer.ownedBy = owner.id
+  ctransfer.ownedBy = account.id
   ctransfer.ctoken = ctoken.id
   ctransfer.transferedFrom = event.params.from
   ctransfer.transferedTo = event.params.to
   ctransfer.amountTransfered = event.params.value
   ctransfer.transaction = transaction.id
 
+  ctoken.contract = contract.id
 
-  ctoken.allPunksAssigned = contract.allPunksAssigned()
-  ctoken.symbol = contract.symbol()
-  ctoken.totalSupply = contract.totalSupply()
-  ctoken.imageHash = contract.imageHash()
-  ctoken.name = contract._name
-  ctoken.address = contract._address
+
+  contract.allNftsAssigned = punk.allPunksAssigned()
+  contract.symbol = punk.symbol()
+  contract.totalSupply = punk.totalSupply()
+  contract.imageHash = punk.imageHash()
+  contract.name = punk._name
+  contract.address = punk._address
 
 
   transaction.date = event.block.timestamp
@@ -134,7 +134,8 @@ export function handleTransfer(event: Transfer): void {
 
 
   ctoken.save()
-  owner.save()
+  account.save()
+  contract.save()
   transaction.save()
   ctransfer.save()
 
@@ -142,21 +143,21 @@ export function handleTransfer(event: Transfer): void {
 
 export function handlePunkTransfer(event: PunkTransfer): void {
   
-  let punk = CryptoPunkTransfer.load(event.params.punkIndex.toString())
-  let owner = Owner.load(event.params.to.toHexString())
+  let nftTransfer = NftTransfer.load(event.params.punkIndex.toString())
+  let account = Account.load(event.params.to.toHexString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
   let offer = Offer.load(event.params.punkIndex.toString())
-  let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
+  let nft = Nft.load(event.params.punkIndex.toString())
   let bid = Bid.load(event.params.punkIndex.toString())
 
-  if (punk == null) {
-    punk = new CryptoPunkTransfer(event.params.punkIndex.toString())
+  if (nftTransfer == null) {
+    nftTransfer = new NftTransfer(event.params.punkIndex.toString())
   }
-  if (owner == null) {
-    owner = new Owner(event.params.to.toHexString())
+  if (account == null) {
+    account = new Account(event.params.to.toHexString())
   }
-  if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
+  if (nft == null) {
+    nft = new Nft(event.params.punkIndex.toString())
   }
   if (bid == null) {
     bid = new Bid(event.params.punkIndex.toString())
@@ -168,132 +169,134 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     transaction = new Transaction(event.transaction.hash.toHexString())
   }
   
-  punk.punk = cryptopunk.id
-  punk.sender = event.params.from
-  punk.receiver = event.params.to
-  punk.ownedBy = owner.id
-  punk.transaction = transaction.id
+  nftTransfer.nft = nft.id
+  nftTransfer.sender = event.params.from
+  nftTransfer.receiver = event.params.to
+  nftTransfer.ownedBy = account.id
+  nftTransfer.transaction = transaction.id
 
-  bid.owner = owner.id
+  bid.account = account.id
   bid.transaction = transaction.id
 
-  offer.offeredBy = owner.id
+  offer.offeredBy = account.id
   offer.transaction = transaction.id
-  offer.punkOfferedForSale = cryptopunk.id
+  offer.nftOfferedForSale = nft.id
 
-  cryptopunk.transferedTo = owner.id
-  cryptopunk.owner = owner.id
-  owner.punk = cryptopunk.id
+  nft.transferedTo = account.id
+  nft.account = account.id
+  account.nft = nft.id
 
   transaction.date = event.block.timestamp
   transaction.block = event.block.number
-  transaction.punkTransfers = punk.id
+  transaction.nftTransfers = nft.id
 
   
-  punk.save()
-  owner.save()
+  nft.save()
+  account.save()
+  bid.save()
   offer.save()
-  cryptopunk.save()
+  nftTransfer.save()
   transaction.save()
 
 }
 
 export function handlePunkOffered(event: PunkOffered): void {
 
-  let punk = Offer.load(event.params.punkIndex.toString())
+  let offer = Offer.load(event.params.punkIndex.toString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
-  let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
-  let owner = Owner.load(event.params.toAddress.toHexString())
+  let nft = Nft.load(event.params.punkIndex.toString())
+  let account = Account.load(event.params.toAddress.toHexString())
   let bid = Bid.load(event.params.punkIndex.toString())
 
 
-  if (punk == null) {
-    punk = new Offer(event.params.punkIndex.toString())
+  if (offer == null) {
+    offer = new Offer(event.params.punkIndex.toString())
   }
   if (transaction == null) {
     transaction = new Transaction(event.transaction.hash.toHexString())
   }
-  if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
+  if (nft == null) {
+    nft = new Nft(event.params.punkIndex.toString())
   }
-  if (owner == null) {
-    owner = new Owner(event.params.toAddress.toHexString())
+  if (account == null) {
+    account = new Account(event.params.toAddress.toHexString())
   }
   if (bid == null) {
     bid = new Bid(event.params.punkIndex.toString())
   }
 
 
-  punk.amountOffered = event.params.minValue
-  punk.offeredBy = owner.id
-  punk.punkOfferedForSale = cryptopunk.id
-  punk.transaction = transaction.id
+  offer.amountOffered = event.params.minValue
+  offer.offeredBy = account.id
+  offer.nftOfferedForSale = nft.id
+  offer.transaction = transaction.id
 
-  bid.owner = owner.id
+  bid.account = account.id
   bid.transaction = transaction.id
   
 
   transaction.date = event.block.timestamp
   transaction.block = event.block.number
-  transaction.offer = punk.id
+  transaction.offer = nft.id
 
-  punk.save()
-  owner.save()
-  cryptopunk.save()
+  nft.save()
+  account.save()
+  offer.save()
+  bid.save()
   transaction.save()
   
 }
 
 export function handlePunkBidEntered(event: PunkBidEntered): void {
 
-  let punk = Bid.load(event.params.punkIndex.toString())
+  let bid = Bid.load(event.params.punkIndex.toString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
   let bidwithdrawn = WithdrawnBid.load(event.params.punkIndex.toString())
-  let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
+  let nft = Nft.load(event.params.punkIndex.toString())
 
-  if (punk == null) {
-    punk = new Bid(event.params.punkIndex.toString())
+  if (bid == null) {
+    bid = new Bid(event.params.punkIndex.toString())
   }
   if (transaction == null) {
     transaction = new Transaction(event.transaction.hash.toHexString())
   }
-  if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
+  if (nft == null) {
+    nft = new Nft(event.params.punkIndex.toString())
   }
   if (bidwithdrawn == null) {
     bidwithdrawn = new WithdrawnBid(event.params.punkIndex.toString())
   }
 
-  punk.bid = event.params.value
-  punk.transaction = transaction.id
-  punk.punk = cryptopunk.id
-  punk.bidWithdrawn = bidwithdrawn.id
-  punk.bidder = event.params.fromAddress
+  bid.bid = event.params.value
+  bid.transaction = transaction.id
+  bid.nft = nft.id
+  bid.bidWithdrawn = bidwithdrawn.id
+  bid.bidder = event.params.fromAddress
 
   bidwithdrawn.transaction = transaction.id
 
   transaction.date = event.block.timestamp
-  transaction.bid = punk.id
+  transaction.bid = nft.id
   transaction.block = event.block.number
 
-  punk.save()
+  nft.save()
   bidwithdrawn.save()
   transaction.save()
-  cryptopunk.save()
+  nft.save()
 
 
 }
 
 export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 
-  let punk = WithdrawnBid.load(event.params.punkIndex.toString())
+  let withdrawnbid = WithdrawnBid.load(event.params.punkIndex.toString())
   let bid = Bid.load(event.params.punkIndex.toString())
-  let owner = Owner.load(event.params.fromAddress.toHexString())
+  let account = Account.load(event.params.fromAddress.toHexString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
-  let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
+  let nft = Nft.load(event.params.punkIndex.toString())
 
-  if (punk == null) {
-    punk = new WithdrawnBid(event.params.punkIndex.toString())
+  if (withdrawnbid == null) {
+    withdrawnbid = new WithdrawnBid(event.params.punkIndex.toString())
   }
   if (transaction == null) {
     transaction = new Transaction(event.transaction.hash.toHexString())
@@ -301,20 +304,20 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   if (bid == null) {
     bid = new Bid(event.params.punkIndex.toString())
   }
-  if (owner == null) {
-    owner = new Owner(event.params.fromAddress.toHexString())
+  if (account == null) {
+    account = new Account(event.params.fromAddress.toHexString())
   }
-  if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
+  if (nft == null) {
+    nft = new Nft(event.params.punkIndex.toString())
   }
 
-  punk.amountWithdrawn = event.params.value
-  punk.transaction = transaction.id
-  punk.punk = cryptopunk.id
-  punk.bid = bid.id
-  punk.withdrawnBy = owner.id
+  withdrawnbid.amountWithdrawn = event.params.value
+  withdrawnbid.transaction = transaction.id
+  withdrawnbid.nft = nft.id
+  withdrawnbid.bid = bid.id
+  withdrawnbid.withdrawnBy = account.id
 
-  bid.owner = owner.id
+  bid.account = account.id
   bid.transaction = transaction.id
 
 
@@ -323,28 +326,28 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   
 
 
-  owner.save()
+  account.save()
   transaction.save()
-  cryptopunk.save()
+  withdrawnbid.save()
   bid.save()
-  punk.save()
+  nft.save()
 
 }
 
 export function handlePunkBought(event: PunkBought): void {
 
-  let punk = Purchase.load(event.params.punkIndex.toString())
-  let owner = Owner.load(event.params.toAddress.toHexString())
+  let saleevent = Purchase.load(event.params.punkIndex.toString())
+  let account = Account.load(event.params.toAddress.toHexString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
-  let cryptopunk = CryptoPunk.load(event.params.punkIndex.toString())
+  let nft = Nft.load(event.params.punkIndex.toString())
   let offer = Offer.load(event.params.punkIndex.toString())
   let bid = Bid.load(event.params.punkIndex.toString())
   let withdrawn = WithdrawnBid.load(event.params.punkIndex.toString())
   
 
 
-  if (punk == null) {
-      punk = new Purchase(event.params.punkIndex.toString())
+  if (saleevent == null) {
+    saleevent = new Purchase(event.params.punkIndex.toString())
   }
   if (offer == null) {
     offer = new Offer(event.params.punkIndex.toString())
@@ -352,8 +355,8 @@ export function handlePunkBought(event: PunkBought): void {
   if (bid == null) {
     bid = new Bid(event.params.punkIndex.toString())
   }
-  if (owner == null) {
-    owner = new Owner(event.params.toAddress.toHexString())
+  if (account == null) {
+    account = new Account(event.params.toAddress.toHexString())
   }
   if (withdrawn == null) {
     withdrawn = new WithdrawnBid(event.params.punkIndex.toString())
@@ -361,70 +364,70 @@ export function handlePunkBought(event: PunkBought): void {
   if (transaction == null) {
     transaction = new Transaction(event.transaction.hash.toHexString())
   }
-  if (cryptopunk == null) {
-    cryptopunk = new CryptoPunk(event.params.punkIndex.toString())
+  if (nft == null) {
+    nft = new Nft(event.params.punkIndex.toString())
   }
 
-  punk.punk = cryptopunk.id
-  punk.amount = event.params.value
-  punk.seller = event.params.fromAddress
-  punk.buyer = owner.id
-  punk.transaction = transaction.id
+  saleevent.nft = nft.id
+  saleevent.amount = event.params.value
+  saleevent.seller = event.params.fromAddress
+  saleevent.buyer = account.id
+  saleevent.transaction = transaction.id
 
-  bid.owner = owner.id
+  bid.account = account.id
   bid.transaction = transaction.id
 
-  withdrawn.withdrawnBy = owner.id
+  withdrawn.withdrawnBy = account.id
   withdrawn.transaction = transaction.id
 
-  owner.punk = cryptopunk.id
-  cryptopunk.purchasedBy = owner.id
-  cryptopunk.owner = owner.id
+  account.nft = nft.id
+  nft.purchasedBy = account.id
+  nft.account = account.id
 
 
-  offer.offeredBy = owner.id
+  offer.offeredBy = account.id
   offer.transaction = transaction.id
-  offer.punkOfferedForSale = cryptopunk.id
+  offer.nftOfferedForSale = nft.id
  
 
   transaction.date = event.block.timestamp
-  transaction.owner = owner.id
-  transaction.punk = cryptopunk.id
+  transaction.account = account.id
+  transaction.nft = nft.id
   transaction.block = event.block.number
 
 
 
-  punk.save()
-  owner.save()
+  nft.save()
+  account.save()
   bid.save()
   offer.save()
   transaction.save()
   withdrawn.save()
-  cryptopunk.save()
+  saleevent.save()
 
 
 }
 
 export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
 
-  let punk = NotForSale.load(event.params.punkIndex.toString())
+  let nft = NotForSale.load(event.params.punkIndex.toString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
-  if (punk == null) {
-    punk = new NotForSale(event.params.punkIndex.toString())
+  if (nft == null) {
+    nft = new NotForSale(event.params.punkIndex.toString())
   }
   if (transaction == null) {
     transaction = new Transaction(event.transaction.hash.toHexString())
   }
 
-  punk.punkIndex = event.params.punkIndex
-  punk.transaction = transaction.id
+  nft.nft = event.params.punkIndex
+  nft.transaction = transaction.id
 
 
   transaction.date = event.block.timestamp
   transaction.block = event.block.number
 
 
-  punk.save()
+  nft.save()
   transaction.save()
 
 }
