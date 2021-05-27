@@ -5,26 +5,26 @@ type Account @entity {
   "Nft data"
   nft: Nft
 
-  "All nfts owned by Account"
-  allnftsOwned: [Nft!] @derivedFrom(field: "account")
+  "All Nfts owned by Account"
+  nftsOwned: [Nft!] @derivedFrom(field: "account")
 
   "Purchases by Account"
-  nftPurchased: [Purchase!]! @derivedFrom(field: "buyer")
+  nftsBought: [SaleEvent!]! @derivedFrom(field: "buyer")
 
   "Nfts assigned to account (if any)"
-  nftAssigned: [Assigned!]! @derivedFrom(field: "assignedTo")
+  nftsAssigned: [AssignEvent!]! @derivedFrom(field: "assignedTo")
 
   "Nft transfer by Account"
-  nftTransfered: [NftTransfer!]! @derivedFrom(field: "ownedBy")
+  nftsTransfered: [NftTransferEvent!]! @derivedFrom(field: "ownedBy")
 
   "Query Bids to Account or by Account"
-  nftBid: [Bid!]! @derivedFrom(field: "account")
+  nftBids: [BidEvent!]! @derivedFrom(field: "account")
 
   "Nfts offered for sale by Account"
-  nftOfferedForSale: [Offer]! @derivedFrom(field: "offeredBy")
+  nftsOfferedForSale: [OfferEvent]! @derivedFrom(field: "offeredBy")
 
   "cToken transfers by Account"
-  cTokenTransfered: [cTokenTransfer!]! @derivedFrom(field: "ownedBy")
+  cTokenTransfered: [cTokenTransferEvent!]! @derivedFrom(field: "ownedBy")
 
   "Account "
   transaction: [Transaction!]! @derivedFrom(field: "account")
@@ -47,16 +47,16 @@ type Nft @entity {
   purchasedBy: Account
 
   "Bid for Nft"
-  bid: [Bid!] @derivedFrom(field: "nft")
+  bid: [BidEvent!] @derivedFrom(field: "nft")
 
   "Offer for nft"
-  offer: [Offer!]! @derivedFrom(field: "nftOfferedForSale")
+  offer: [OfferEvent!]! @derivedFrom(field: "nftOfferedForSale")
 
-  "Purchase of nft"
-  purchase: [Purchase!]! @derivedFrom(field: "nft")
+  "Sale events of nft"
+  saleEvents: [SaleEvent!]! @derivedFrom(field: "nft")
 
   "Nft transfer"
-  nftTransfer: [NftTransfer!]! @derivedFrom(field: "nft")
+  nftTransfer: [NftTransferEvent!]! @derivedFrom(field: "nft")
 
   "Transaction data"
   transaction: [Transaction!]! @derivedFrom(field: "nft")
@@ -64,13 +64,12 @@ type Nft @entity {
 
 type cToken @entity {
   "Account"
-  id: ID! #Used transferedTo address from cTokenTransfer as ID
-  "Token symbol"
+  id: ID! #Used transferedTo address from cTokenTransferEvent as ID
 
   contract: Contract
 
   "cToken Transfer data"
-  transfers: [cTokenTransfer!]! @derivedFrom(field: "ctoken")
+  transfers: [cTokenTransferEvent!]! @derivedFrom(field: "ctoken")
 
   "Transaction date"
   transaction: [Transaction!]! @derivedFrom(field: "ctoken")
@@ -98,7 +97,7 @@ type Contract @entity {
   allNftsAssigned: Boolean
 }
 
-type Assigned @entity {
+type AssignEvent @entity {
   "Nft"
   id: ID!
 
@@ -115,7 +114,7 @@ type Assigned @entity {
   transaction: Transaction
 }
 
-type Purchase @entity {
+type SaleEvent @entity {
   "Nft"
   id: ID!
 
@@ -134,7 +133,7 @@ type Purchase @entity {
   transaction: Transaction
 }
 
-type Offer @entity {
+type OfferEvent @entity {
   "Nft Index"
   id: ID!
 
@@ -151,7 +150,7 @@ type Offer @entity {
   transaction: Transaction
 }
 
-type Bid @entity {
+type BidEvent @entity {
   "Nft"
   id: ID!
 
@@ -187,13 +186,13 @@ type WithdrawnBid @entity {
   amountWithdrawn: BigInt
 
   "Bid withdrawn"
-  bid: Bid
+  bid: BidEvent
 
   "Transaction data"
   transaction: Transaction
 }
 
-type NotForSale @entity {
+type NotForSaleEvent @entity {
   "Nft"
   id: ID!
 
@@ -204,7 +203,7 @@ type NotForSale @entity {
   transaction: Transaction
 }
 
-type cTokenTransfer @entity {
+type cTokenTransferEvent @entity {
   "Account"
   id: ID! #Used transferedTo address below as ID
   "Address of Receiver as Account ID"
@@ -212,6 +211,7 @@ type cTokenTransfer @entity {
 
   "cToken data"
   ctoken: cToken #Used transferedTo address as cToken account ID
+  
   "Nft data"
   nft: Nft
 
@@ -228,7 +228,7 @@ type cTokenTransfer @entity {
   transaction: Transaction
 }
 
-type NftTransfer @entity {
+type NftTransferEvent @entity {
   "Nft"
   id: ID!
 
@@ -259,19 +259,21 @@ type Transaction @entity {
   ctoken: cToken
 
   "NftTransfer "
-  nftTransfers: NftTransfer
+  nftTransfers: NftTransferEvent
+
+  notForSale: NotForSaleEvent
 
   "Nft "
   nft: Nft
 
   "Assign "
-  assigned: Assigned
+  assigned: AssignEvent
 
   "Offer "
-  offer: Offer
+  offer: OfferEvent
 
   "Bid "
-  bid: Bid
+  bid: BidEvent
 
   "Transaction date"
   date: BigInt!
