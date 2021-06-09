@@ -12,6 +12,8 @@ import {
   cryptopunks__punkBidsResult
 } from "../generated/cryptopunks/cryptopunks"
 
+import { getTrait } from './traits'
+
 import { 
   cTokenTransferEvent,
   Account,
@@ -29,6 +31,15 @@ import {
 } from "../generated/schema"
 
 export function handleAssign(event: Assign): void {
+  log.info("handleAssign {}", [event.params.punkIndex.toString()]);
+
+  let trait = getTrait(event.params.punkIndex.toI32());
+
+  if (trait == null) {
+    log.info("Punk {}, traits: none", [event.params.punkIndex.toString()])
+  } else {
+    log.info("Punk {}, traits: {}", [event.params.punkIndex.toString(), traits[event.params.punkIndex.toI32()].type])
+  }
 
   let assign = AssignEvent.load(event.params.punkIndex.toHexString())
   let account = Account.load(event.params.to.toHexString())
@@ -102,6 +113,7 @@ export function handleAssign(event: Assign): void {
 }
 
 export function handleTransfer(event: Transfer): void {
+  log.debug("handleTransfer", []);
   
   let ctransfer = cTokenTransferEvent.load(event.params.to.toHexString())
   let account = new Account(event.params.to.toHexString())
@@ -149,7 +161,8 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handlePunkTransfer(event: PunkTransfer): void {
-  
+  log.debug("handlePunkTransfer", []);
+
   let nftTransfer = NftTransferEvent.load(event.params.punkIndex.toString())
   let account = Account.load(event.params.to.toHexString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
@@ -208,6 +221,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 }
 
 export function handlePunkOffered(event: PunkOffered): void {
+  log.debug("handlePunkOffered", []);
 
   let offer = OfferEvent.load(event.params.punkIndex.toString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
@@ -255,6 +269,7 @@ export function handlePunkOffered(event: PunkOffered): void {
 }
 
 export function handlePunkBidEntered(event: PunkBidEntered): void {
+  log.debug("handlePunkBidEntered", []);
 
   let bid = BidEvent.load(event.params.punkIndex.toString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
@@ -295,6 +310,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 }
 
 export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
+  log.debug("handlePunkBidWithdrawn", []);
 
   let withdrawnbid = WithdrawnBid.load(event.params.punkIndex.toString())
   let bid = BidEvent.load(event.params.punkIndex.toString())
@@ -342,6 +358,7 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 }
 
 export function handlePunkBought(event: PunkBought): void {
+  log.debug("handlePunkBought", []);
 
   let saleevent = SaleEvent.load(event.params.punkIndex.toString())
   let account = Account.load(event.params.toAddress.toHexString())
@@ -416,6 +433,7 @@ export function handlePunkBought(event: PunkBought): void {
 }
 
 export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
+  log.debug("handlePunkNoLongerForSale", []);
 
   let nft = NotForSaleEvent.load(event.params.punkIndex.toString())
   let transaction = Transaction.load(event.transaction.hash.toHexString())
