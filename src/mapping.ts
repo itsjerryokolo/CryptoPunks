@@ -38,7 +38,7 @@ export function handleAssign(event: Assign): void {
   if (trait == null) {
     log.info("Punk {}, traits: none", [event.params.punkIndex.toString()])
   } else {
-    log.info("Punk {}, traits: {}", [event.params.punkIndex.toString(), trait[event.params.punkIndex.toI32()].type])
+    log.info("Punk {}, traits: {}", [event.params.punkIndex.toString(), trait.accessories.join(', ')])
   }
 
   let assign = AssignEvent.load(event.params.punkIndex.toHexString())
