@@ -34,7 +34,7 @@ export let traits: Trait[] = [
   new Trait("female", ["clown eyes blue", "spots", "wild white hair"]),
 
   //8
-  new Trait("male,accessories", ["luxurious beard", "messy hair"]),
+  new Trait("male", ["luxurious beard", "messy hair"]),
 
   //9
   new Trait("male", ["big beard", "clown nose", "police cap"]),
@@ -83,10 +83,10 @@ export let traits: Trait[] = [
   new Trait("female", ["pilot helmet", "purple lipstick"]),
 
   //23
-  new Trait("male,accessories", ["do-rag", "earring", "handlebars"]),
+  new Trait("male", ["do-rag", "earring", "handlebars"]),
 
   //24
-  new Trait("male,accessories", ["mohawk dark", "smile"]),
+  new Trait("male", ["mohawk dark", "smile"]),
 
   //25
   new Trait("female", ["wild white hair"]),
@@ -95,7 +95,7 @@ export let traits: Trait[] = [
   new Trait("female", ["dark hair"]),
 
   //27
-  new Trait("male,accessories", ["earring", "peak spike"]),
+  new Trait("male", ["earring", "peak spike"]),
 
   //28
   new Trait("male", ["big shades", "crazy hair"]),
@@ -107,7 +107,7 @@ export let traits: Trait[] = [
   new Trait("male", ["cap", "normal beard black"]),
 
   //31
-  new Trait("female ,accessories", ["stringy hair"]),
+  new Trait("female", ["stringy hair"]),
 
   //32
   new Trait("male", ["frown", "vr"]),
@@ -116,10 +116,10 @@ export let traits: Trait[] = [
   new Trait("male", ["peak spike"]),
 
   //34
-  new Trait("female,accessories", ["frumpy hair", "purple lipstick"]),
+  new Trait("female", ["frumpy hair", "purple lipstick"]),
 
   //35
-  new Trait("male,accessories", [
+  new Trait("male", [
     "cigarette",
     "earring",
     "horned rim glasses",
@@ -128,54 +128,54 @@ export let traits: Trait[] = [
   ]),
 
   //36
-  new Trait("female,accessories", ["red mohawk"]),
+  new Trait("female", ["red mohawk"]),
 
   //37
-  new Trait("female", ["cap,clown eyes blue"]),
+  new Trait("female", ["cap","clown eyes blue"]),
 
   //38
-  new Trait("female,accessories", [
+  new Trait("female", [
     "classic shades",
     "frumpy hair",
     "purple lipstick",
   ]),
 
   //39
-  new Trait("male,accessories", ["frown,regular shades", "shaved head"]),
+  new Trait("male", ["frown", "regular shades", "shaved head"]),
 
   //40
-  new Trait("male,accessories", ["bandana,chinstrap", "smile"]),
+  new Trait("male", ["bandana", "chinstrap", "smile"]),
 
   //41
-  new Trait("male,accessories", [
+  new Trait("male", [
     "clown eyes green",
     "muttonchops",
     "wild hair",
   ]),
 
   //42
-  new Trait("female,accessories", ["cigarette", "wild hair"]),
+  new Trait("female", ["cigarette", "wild hair"]),
 
   //43
   new Trait("female", ["half shaved"]),
 
   //44
-  new Trait("male,accessories", ["messy hair"]),
+  new Trait("male", ["messy hair"]),
 
   //45
-  new Trait("male,accessories", ["earring", "mole"]),
+  new Trait("male", ["earring", "mole"]),
 
   //46
-  new Trait("female,accessories", ["purple lipstick", "straight hair dark"]),
+  new Trait("female", ["purple lipstick", "straight hair dark"]),
 
   //47
   new Trait("male", ["knitted cap"]),
 
   //48
-  new Trait("male,accessories", ["knitted cap"]),
+  new Trait("male", ["knitted cap"]),
 
   //49
-  new Trait("female,accessories", ["bandana", "purple eye shadow"]),
+  new Trait("female", ["bandana", "purple eye shadow"]),
 
   //50
   new Trait("male", ["fedora", "spots"]),
@@ -184,7 +184,7 @@ export let traits: Trait[] = [
   new Trait("male", ["earring", "muttonchops", "wild hair"]),
 
   //52
-  new Trait("male,accessories", [
+  new Trait("male", [
     "earring",
     "knitted cap",
     "nerd glasses",
@@ -192,7 +192,7 @@ export let traits: Trait[] = [
   ]),
 
   //53
-  new Trait("female,accessories", ["big shades", "straight hair"]),
+  new Trait("female", ["big shades", "straight hair"]),
 
   //54
   new Trait("male", ["hoodie"]),
@@ -227,7 +227,7 @@ export let traits: Trait[] = [
   ]),
 
   //63
-  new Trait("male,accessories", ["earring", "shaved head", "small shades"]),
+  new Trait("male", ["earring", "shaved head", "small shades"]),
 
   //64
   new Trait("female", ["purple lipstick", "straight hair blonde"]),
@@ -934,7 +934,7 @@ export let traits: Trait[] = [
   new Trait("male", ["earring"]),
   //280 ,),
 
-  new Trait("male", [""]),
+  new Trait("male", []),
   //281 ,),
 
   new Trait("female", ["classic shades", "straight hair dark"]),
@@ -1662,7 +1662,7 @@ export let traits: Trait[] = [
   new Trait("female", ["regular shades", "wild hair"]),
   //509 ,),
 
-  new Trait("male", [""]),
+  new Trait("male", []),
   //510 ,),
 
   new Trait("male", ["bandana", "mole"]),
@@ -2101,7 +2101,7 @@ export let traits: Trait[] = [
   new Trait("male", ["knitted cap", "pipe"]),
   //640 ,),
 
-  new Trait("female", [""]),
+  new Trait("female", []),
   //641 ,),
 
   new Trait("female", ["pink with hat", "purple lipstick"]),
@@ -2426,7 +2426,7 @@ export let traits: Trait[] = [
   new Trait("male", ["mohawk", "shadow beard"]),
   //740 ,),
 
-  new Trait("male", [""]),
+  new Trait("male", []),
   //741 ,),
 
   new Trait("male", ["bandana"]),
@@ -3445,7 +3445,7 @@ export let traits: Trait[] = [
   new Trait("male", ["crazy hair", "smile"]),
   //1049 ,),
 
-  new Trait("female", [""]),
+  new Trait("female", []),
   //1050 ,),
 
   new Trait("female", ["hot lipstick", "mole", "tassle hat"]),
@@ -5456,7 +5456,7 @@ export let traits: Trait[] = [
   new Trait("male", ["cap", "horned rim glasses"]),
   //1657 ,),
 
-  new Trait("zombie ", ["stringy hair"]),
+  new Trait("zombie", ["stringy hair"]),
   //1658 ,),
 
   new Trait("female", ["purple eye shadow", "straight hair"]),
@@ -7267,7 +7267,7 @@ export let traits: Trait[] = [
   new Trait("female", ["clown hair green", "earring", "green eye shadow"]),
   //2203 ,),
 
-  new Trait("female", [""]),
+  new Trait("female", []),
   //2204 ,),
 
   new Trait("male", ["knitted cap", "mole"]),
@@ -7399,7 +7399,7 @@ export let traits: Trait[] = [
   new Trait("male", ["knitted cap", "smile"]),
   //2242 ,),
 
-  new Trait("ape ", ["bandana", "nerd glasses"]),
+  new Trait("zombie", ["bandana", "nerd glasses"]),
   //2243 ,),
 
   new Trait("female", ["nerd glasses", "pink with hat"]),
@@ -7609,7 +7609,7 @@ export let traits: Trait[] = [
   new Trait("female", ["cigarette", "frumpy hair"]),
   //2305 ,),
 
-  new Trait("zombie ", ["cigarette", "earring", "mohawk thin"]),
+  new Trait("zombie", ["cigarette", "earring", "mohawk thin"]),
   //2306 ,),
 
   new Trait("male", ["cap", "frown"]),
@@ -7684,7 +7684,7 @@ export let traits: Trait[] = [
   new Trait("female", ["eye patch", "mohawk thin"]),
   //2328 ,),
 
-  new Trait("zombie ", ["earring", "peak spike"]),
+  new Trait("zombie", ["earring", "peak spike"]),
   //2329 ,),
 
   new Trait("female", ["black lipstick", "mohawk", "mole"]),
@@ -7711,7 +7711,7 @@ export let traits: Trait[] = [
   new Trait("male", ["earring", "mohawk"]),
   //2337 ,),
 
-  new Trait("zombie ", ["mohawk thin"]),
+  new Trait("zombie", ["mohawk thin"]),
   //2338 ,),
 
   new Trait("female", ["black lipstick", "mohawk thin"]),
@@ -7870,7 +7870,7 @@ export let traits: Trait[] = [
   new Trait("male", ["classic shades", "pipe", "shadow beard"]),
   //2385 ,),
 
-  new Trait("ape ", ["headband", "small shades"]),
+  new Trait("zombie", ["headband", "small shades"]),
   //2386 ,),
 
   new Trait("female", ["bandana", "hot lipstick", "rosy cheeks"]),
@@ -8120,7 +8120,7 @@ export let traits: Trait[] = [
   new Trait("male", ["big shades", "goat", "knitted cap"]),
   //2459 ,),
 
-  new Trait("ape ", ["bandana", "vr"]),
+  new Trait("zombie", ["bandana", "vr"]),
   //2460 ,),
 
   new Trait("female", ["clown eyes blue", "crazy hair", "earring"]),
@@ -8192,7 +8192,7 @@ export let traits: Trait[] = [
   new Trait("male", ["earring", "horned rim glasses", "mohawk dark"]),
   //2483 ,),
 
-  new Trait("zombie ", ["classic shades", "wild hair"]),
+  new Trait("zombie", ["classic shades", "wild hair"]),
   //2484 ,),
 
   new Trait("male", ["cigarette", "purple hair"]),
@@ -8213,7 +8213,7 @@ export let traits: Trait[] = [
   new Trait("male", ["pipe", "shadow beard", "small shades", "vampire hair"]),
   //2490 ,),
 
-  new Trait("ape ", ["cap"]),
+  new Trait("zombie", ["cap"]),
   //2491 ,),
 
   new Trait("male", ["big beard", "do-rag", "horned rim glasses"]),
@@ -8457,7 +8457,7 @@ export let traits: Trait[] = [
   new Trait("male", ["mohawk thin", "regular shades", "shadow beard"]),
   //2565 ,),
 
-  new Trait("zombie ", ["messy hair", "normal beard"]),
+  new Trait("zombie", ["messy hair", "normal beard"]),
   //2566 ,),
 
   new Trait("male", ["cigarette", "fedora", "mustache"]),
@@ -10941,7 +10941,7 @@ export let traits: Trait[] = [
   new Trait("male", ["earring", "normal beard", "wild hair"]),
   //3306"]),
 
-  new Trait("male", [""]),
+  new Trait("male", []),
   //3307"]),
 
   new Trait("female", ["hot lipstick", "pilot helmet"]),
@@ -21865,7 +21865,7 @@ export let traits: Trait[] = [
   new Trait("female", ["mole", "welding goggles", "wild hair"]),
   //6486"]),
 
-  new Trait("female", [""]),
+  new Trait("female", []),
   //6487"]),
 
   new Trait("male", ["headband", "normal beard black"]),
@@ -21877,7 +21877,7 @@ export let traits: Trait[] = [
   new Trait("female", ["black lipstick", "tiara"]),
   //6490"]),
 
-  new Trait("zombie ", ["cap forward", "earring", "shadow beard"]),
+  new Trait("zombie", ["cap forward", "earring", "shadow beard"]),
   //6491"]),
 
   new Trait("male", ["clown eyes green", "stringy hair"]),
@@ -30261,7 +30261,7 @@ export let traits: Trait[] = [
   new Trait("male", ["front beard", "mohawk thin", "small shades", "smile"]),
   //8908"]),
 
-  new Trait("zombie ", ["luxurious beard", "police cap", "regular shades"]),
+  new Trait("zombie", ["luxurious beard", "police cap", "regular shades"]),
   //8909"]),
 
   new Trait("male", ["nerd glasses", "police cap"]),

@@ -96,6 +96,10 @@ export function handleAssign(event: Assign): void {
 
   nft.assignedTo = account.id
   nft.account = account.id
+  if (trait != null) {
+    nft.type = trait.type;
+    nft.accessories = trait.accessories;
+  }
   account.nft = nft.id
   
 
