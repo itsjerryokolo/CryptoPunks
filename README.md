@@ -69,3 +69,8 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 }
 ```
 
+## Run your local Graph Node
+
+```bash
+ETHEREUM_RPC=mainnet:https://eth-mainnet.alchemyapi.io/v2/${YOUR_API_KEY} docker compose up 
+```
