@@ -20,7 +20,7 @@ import {
   OwnershipTransferred,
   Paused,
   ProxyRegistered,
-  Transfer as WrappedPunksTransfer,
+  Transfer as WrappedPunkTransfer,
   Unpaused,
 } from "../generated/WrappedPunks/WrappedPunks"
 
@@ -554,7 +554,7 @@ export function handleProxyRegistered(event: ProxyRegistered): void {
   
 }
 
-export function handleWrappedPunksTransfer(event: WrappedPunksTransfer): void {
+export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
   log.info("handleWrappedPunksTransfer {}", [event.params.tokenId.toString()]);
 
   let wrappedPunk = WrappedPunk.load(event.params.tokenId.toString())
