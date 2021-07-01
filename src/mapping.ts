@@ -39,7 +39,8 @@ import {
   BidEvent,
   WithdrawnBid,
   Contract,
-  SaleEvent
+  SaleEvent,
+  WrappedPunk
 } from "../generated/schema"
 
 export function handleAssign(event: Assign): void {
@@ -553,8 +554,22 @@ export function handleProxyRegistered(event: ProxyRegistered): void {
   
 }
 
-export function handleWrappedPunksTransfer(event: Transfer): void {
-  
+export function handleWrappedPunksTransfer(event: WrappedPunksTransfer): void {
+  log.info("handleWrappedPunksTransfer {}", [event.params.tokenId.toString()]);
+
+  let wrappedPunk = WrappedPunk.load(event.params.tokenId.toString())
+  let account = Account.load(event.params.to.toHexString())
+
+  if (wrappedPunk == null) {
+    wrappedPunk = new WrappedPunk(event.params.tokenId.toString())
+  }
+  if (account == null) {
+    account = new Account(event.params.to.toHexString())
+  }
+
+  wrappedPunk.nft = event.params.tokenId.toString()
+  wrappedPunk.account = account.id;
+  wrappedPunk.save()
 }
 
 export function handleUnpaused(event: Unpaused): void {

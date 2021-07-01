@@ -106,6 +106,9 @@ type Account @entity {
   "All Nfts owned by Account"
   nftsOwned: [Nft!] @derivedFrom(field: "account")
 
+  "All Wrapped Punks owned by Account"
+  wrappedPunksOwned: [WrappedPunk!] @derivedFrom(field: "account")
+
   "Purchases by Account"
   nftsBought: [SaleEvent!]! @derivedFrom(field: "buyer")
 
@@ -382,4 +385,12 @@ type Transaction @entity {
 
   "Transaction block"
   block: BigInt!
+}
+
+type WrappedPunk @entity {
+  id: ID!
+  nft: Nft!
+
+  "Nft account"
+  account: Account!
 }
