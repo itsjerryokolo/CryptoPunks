@@ -45,3 +45,41 @@ dataSources:
         - event: PunkNoLongerForSale(indexed uint256)
           handler: handlePunkNoLongerForSale
       file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: WrappedPunks
+    network: mainnet
+    source:
+      address: "0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6"
+      abi: WrappedPunks
+      startBlock: 10821737 
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - ApprovalForAll
+        - OwnershipTransferred
+        - Paused
+        - ProxyRegistered
+        - Transfer
+        - Unpaused
+      abis:
+        - name: WrappedPunks
+          file: ./abis/WrappedPunks.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Paused(address)
+          handler: handlePaused
+        - event: ProxyRegistered(address,address)
+          handler: handleProxyRegistered
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleWrappedPunkTransfer
+        - event: Unpaused(address)
+          handler: handleUnpaused
+      file: ./src/mapping.ts
