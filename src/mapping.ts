@@ -113,8 +113,6 @@ export function handleAssign(event: Assign): void {
     nft.type = trait.type;
     nft.accessories = trait.accessories;
   }
-  account.nft = nft.id
-  
 
   ctransfer.ownedBy = account.id
   ctransfer.transaction = transaction.id
@@ -221,7 +219,6 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
   nft.transferedTo = account.id
   nft.account = account.id
-  account.nft = nft.id
 
   transaction.date = event.block.timestamp
   transaction.block = event.block.number
@@ -421,7 +418,6 @@ export function handlePunkBought(event: PunkBought): void {
   withdrawn.withdrawnBy = account.id
   withdrawn.transaction = transaction.id
 
-  account.nft = nft.id
   nft.purchasedBy = account.id
   nft.account = account.id
 
@@ -555,7 +551,7 @@ export function handleProxyRegistered(event: ProxyRegistered): void {
 }
 
 export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
-  log.info("handleWrappedPunksTransfer {}", [event.params.tokenId.toString()]);
+  log.info("handleWrappedPunksTransfer tokenId: {} to: {}", [event.params.tokenId.toString(), event.params.to.toHexString()]);
 
   let wrappedPunk = WrappedPunk.load(event.params.tokenId.toString())
   let account = Account.load(event.params.to.toHexString())
@@ -570,6 +566,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
   wrappedPunk.nft = event.params.tokenId.toString()
   wrappedPunk.account = account.id;
   wrappedPunk.save()
+  account.save()
 }
 
 export function handleUnpaused(event: Unpaused): void {

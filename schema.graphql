@@ -100,9 +100,6 @@ type Account @entity {
   "Ethereum Address"
   id: ID!
 
-  "Nft data"
-  nft: Nft
-
   "All Nfts owned by Account"
   nftsOwned: [Nft!] @derivedFrom(field: "account")
 
