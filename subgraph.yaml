@@ -1,9 +1,9 @@
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
-graft:
-  base: Qmf9kah4dfYmaEBrRiqXEuHXMGRUCKNHcytYSasCygAF9K
-  block: 10821737
+#graft:
+#  base: Qmf9kah4dfYmaEBrRiqXEuHXMGRUCKNHcytYSasCygAF9K
+#  block: 10821737
 dataSources:
   - kind: ethereum/contract
     name: cryptopunks
