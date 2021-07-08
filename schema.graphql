@@ -1,9 +1,24 @@
-enum Type {
+enum PunkType {
   male
   female
   alien
   zombie
   ape
+}
+
+enum EventType{
+  ASSIGN
+  TRANSFER
+  ASK_CREATED
+  ASK_REMOVED
+  BID_CREATED
+  BID_REMOVED
+  SALE
+}
+
+enum OfferType{
+  BID 
+  ASK
 }
 
 # enum Accessory {
@@ -100,81 +115,108 @@ type Account @entity {
   "Ethereum Address"
   id: ID!
 
-  "All Nfts owned by Account"
-  nftsOwned: [Nft!] @derivedFrom(field: "account")
+  "All Punks owned by Account"
+  punksOwned: [Punk!] @derivedFrom(field: "account")
 
   "All Wrapped Punks owned by Account"
   wrappedPunksOwned: [WrappedPunk!] @derivedFrom(field: "account")
 
   "Purchases by Account"
-  nftsBought: [SaleEvent!]! @derivedFrom(field: "buyer")
+  bought: [Sale!]! @derivedFrom(field: "to")
 
-  "Nfts assigned to account (if any)"
-  nftsAssigned: [AssignEvent!]! @derivedFrom(field: "assignedTo")
+  nftsOwned: [NFT!]! @derivedFrom(field: "owner")
+  "Punks assigned to account (if any)"
+  assigned: [Assign!]! @derivedFrom(field: "to")
 
-  "Nft transfer by Account"
-  nftsTransfered: [NftTransferEvent!]! @derivedFrom(field: "ownedBy")
+  "Punk transfer by Account"
+  sent: [Transfer!]! @derivedFrom(field: "from")
+
+  received: [Transfer!]! @derivedFrom(field: "to")
 
   "Query Bids to Account or by Account"
-  nftBids: [BidEvent!]! @derivedFrom(field: "account")
+  bids: [Bid!]! @derivedFrom(field: "from")
 
-  "Nfts offered for sale by Account"
-  nftsOfferedForSale: [OfferEvent]! @derivedFrom(field: "offeredBy")
+  "Punks offered for sale by Account"
+  asks: [Ask!]! @derivedFrom(field: "from")
 
-  "cToken transfers by Account"
-  cTokenTransfered: [cTokenTransferEvent!]! @derivedFrom(field: "ownedBy")
-
-  "Account "
-  transaction: [Transaction!]! @derivedFrom(field: "account")
 }
 
-type Nft @entity {
-  "Nft"
+type Punk implements NFT @entity{
+  "Punk"
   id: ID!
 
-  "Nft account"
-  account: Account!
+  "Punk account"
+  account: Account
 
-  "Nft holder"
+  "Punk holder"
   transferedTo: Account
 
   "Assigned"
   assignedTo: Account
 
-  "Nft buyer"
+  "Punk buyer"
   purchasedBy: Account
 
-  "Bid for Nft"
-  bid: [BidEvent!] @derivedFrom(field: "nft")
+  punk: Punk!
 
-  "Offer for nft"
-  offer: [OfferEvent!]! @derivedFrom(field: "nftOfferedForSale")
+  wrappedPunk: WrappedPunk!
 
-  "Sale events of nft"
-  saleEvents: [SaleEvent!]! @derivedFrom(field: "nft")
-
-  "Nft transfer"
-  nftTransfer: [NftTransferEvent!]! @derivedFrom(field: "nft")
-
-  "Transaction data"
-  transaction: [Transaction!]! @derivedFrom(field: "nft")
-
-  "Traits"
-  type: Type
-  accessories: [String!]!
 }
 
-type cToken @entity {
-  "Account"
-  id: ID! #Used transferedTo address from cTokenTransferEvent as ID
+interface Offer{
+  id: ID!
+  from: Account!
+  open: Boolean!
+  nft: NFT!
+  created: Event!
+  removed: Event
+  offerType: OfferType!
+}
 
-  contract: Contract
+type Ask implements Offer @entity{
+  id: ID!
+  from: Account!
+  open: Boolean!
+  nft: NFT!
+  created: AskCreated!
+  removed: AskRemoved
+  offerType: OfferType!
+}
 
-  "cToken Transfer data"
-  transfers: [cTokenTransferEvent!]! @derivedFrom(field: "ctoken")
+type Bid implements Offer @entity{
+  id: ID!
+  from: Account!
+  open: Boolean!
+  nft: NFT!
+  created: BidCreated!
+  removed: BidRemoved
+  offerType: OfferType!
+}
 
-  "Transaction date"
-  transaction: [Transaction!]! @derivedFrom(field: "ctoken")
+interface NFT{
+  id: ID! 
+  uri: String! 
+  contract: Contract! 
+  tokenId: BigInt! 
+  owner: Account! 
+  events: [Event!]! @derivedFrom(field: "nft") 
+   "Traits"
+  type: PunkType
+  accessories: [String!]
+}
+
+interface Event {
+  id: ID!
+  contract: Contract!
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType!
+  from: Account
+  to: Account
+  amount: BigInt
 }
 
 type Contract @entity {
@@ -189,205 +231,156 @@ type Contract @entity {
   "Contract Address"
   address: Bytes
 
-  "Total supply of Nft tokens"
+  "Total supply of Punk tokens"
   totalSupply: BigInt
 
-  "The hash of the composite image of all the Nfts"
+  "The hash of the composite image of all the Punks"
   imageHash: String
   
-  "True/False if all Nfts have been assigned"
-  allNftsAssigned: Boolean
+  "True/False if all Punks have been assigned"
+  allPunksAssigned: Boolean
 }
 
-type AssignEvent @entity {
-  "Nft"
+type Assign implements Event @entity {
+  "Punk"
+  id: ID!
+
+  "Punks remaining to assign"
+  punksRemainingToAssign: BigInt!
+
+
+  contract: Contract!
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType
+  to: Account!
+}
+
+type Sale implements Event @entity {
+  "Punk"
   id: ID!
 
   "Account"
-  assignedTo: Account!
-
-  "Nft assigned"
-  nft: Nft
-
-  "Nfts remaining to assign"
-  nftsRemainingToAssign: BigInt!
-
-  "Transaction data"
-  transaction: Transaction
-}
-
-type SaleEvent @entity {
-  "Nft"
-  id: ID!
-
-  "Account"
-  buyer: Account #Used the buyer address below as account ID
-  "Nft purchased"
-  nft: Nft
+  to: Account!
 
   "amount in ETH"
   amount: BigInt!
 
   "Seller"
-  seller: Bytes!
+  from: Account!
 
-  "Transaction data"
-  transaction: Transaction
+  contract: Contract!
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType
+
 }
 
-type OfferEvent @entity {
-  "Nft Index"
+type AskCreated implements Event @entity {
+  "Punk Index"
   id: ID!
 
-  "Offer by Account"
-  offeredBy: Account!
-
-  "Nft being offered for Sale"
-  nftOfferedForSale: Nft
+  "AskedBy Account"
+  from: Account!
 
   "Amount offered"
-  amountOffered: BigInt
+  amount: BigInt!
 
-  "Transaction data"
-  transaction: Transaction
+  contract: Contract!
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType
+
 }
 
-type BidEvent @entity {
-  "Nft"
+type BidCreated implements Event@entity {
+  "Punk"
   id: ID!
-
-  "Account of nft bidded"
-  account: Account
-
-  "nft bidded"
-  nft: Nft
-
-  "Bids Withdrawn"
-  bidWithdrawn: WithdrawnBid
 
   "Address of Bidder"
-  bidder: Bytes
+  from: Account!
 
   "Amount bidded"
-  bid: BigInt
-
-  "Transaction data"
-  transaction: Transaction
+  amount: BigInt!
+  contract: Contract!
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType
 }
 
-type WithdrawnBid @entity {
-  "Nft"
+type BidRemoved implements Event @entity {
+  "Punk"
   id: ID!
 
-  "Account"
-  withdrawnBy: Account #Used withdrawnFrom address in Withdrawn as account ID
-  "Nft data"
-  nft: Nft
-
-  "Amount withdrawn"
-  amountWithdrawn: BigInt
+  "RemovedBy"
+  from: Account! #Used withdrawnFrom address in Withdrawn as account ID
 
   "Bid withdrawn"
-  bid: BidEvent
+  bid: BidCreated!
 
-  "Transaction data"
-  transaction: Transaction
+  contract: Contract!
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType
 }
 
-type NotForSaleEvent @entity {
-  "Nft"
+type AskRemoved implements Event @entity {
+  "Punk"
   id: ID!
+  from: Account!
+  ask: AskCreated!
 
-  "nft"
-  nft: BigInt!
-
-  "Transaction data"
-  transaction: Transaction
+  contract: Contract!
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType
 }
 
-type cTokenTransferEvent @entity {
-  "Account"
-  id: ID! #Used transferedTo address below as ID
-  "Address of Receiver as Account ID"
-  ownedBy: Account
-
-  "cToken data"
-  ctoken: cToken #Used transferedTo address as cToken account ID
-  
-  "Nft data"
-  nft: Nft
+type Transfer implements Event @entity {
+  "Punk"
+  id: ID!
 
   "Sender"
-  transferedFrom: Bytes!
+  from: Account
 
   "Receiver"
-  transferedTo: Bytes!
+  to: Account!
 
-  "Amount of nft transfered"
-  amountTransfered: BigInt!
+  contract: Contract!
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType
 
-  "Transaction data"
-  transaction: Transaction
+
 }
 
-type NftTransferEvent @entity {
-  "Nft"
+type WrappedPunk implements NFT @entity{
   id: ID!
-
-  "Account"
-  ownedBy: Account #Used receiver address as Account ID
-
-  "Sender"
-  sender: Bytes
-
-  "Receiver"
-  receiver: Bytes
-
-  "Nft transfered"
-  nft: Nft
-
-  "Transaction data"
-  transaction: Transaction
-}
-
-type Transaction @entity {
-  "Transaction Hash"
-  id: ID!
-
-  "Account "
-  account: Account
-
-  "cToken Transaction data"
-  ctoken: cToken
-
-  "NftTransfer "
-  nftTransfers: NftTransferEvent
-
-  notForSale: NotForSaleEvent
-
-  "Nft "
-  nft: Nft
-
-  "Assign "
-  assigned: AssignEvent
-
-  "Offer "
-  offer: OfferEvent
-
-  "Bid "
-  bid: BidEvent
-
-  "Transaction date"
-  date: BigInt!
-
-  "Transaction block"
-  block: BigInt!
-}
-
-type WrappedPunk @entity {
-  id: ID!
-  nft: Nft!
-
-  "Nft account"
+  punk: Punk!
+  wrappedPunk: WrappedPunk!
+  "Punk account"
   account: Account!
+  
 }
+
