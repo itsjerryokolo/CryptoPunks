@@ -158,8 +158,15 @@ type Punk implements NFT @entity{
   purchasedBy: Account
 
   punk: Punk!
-
   wrappedPunk: WrappedPunk!
+
+  contract: Contract 
+  tokenId: BigInt! 
+  owner: Account! 
+  events: [Event!]! @derivedFrom(field: "nft") 
+   "Traits"
+  type: PunkType
+  accessories: [String!]
 
 }
 
@@ -195,8 +202,7 @@ type Bid implements Offer @entity{
 
 interface NFT{
   id: ID! 
-  uri: String! 
-  contract: Contract! 
+  contract: Contract 
   tokenId: BigInt! 
   owner: Account! 
   events: [Event!]! @derivedFrom(field: "nft") 
@@ -207,7 +213,7 @@ interface NFT{
 
 interface Event {
   id: ID!
-  contract: Contract!
+  contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
@@ -249,7 +255,7 @@ type Assign implements Event @entity {
   punksRemainingToAssign: BigInt!
 
 
-  contract: Contract!
+  contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
@@ -272,7 +278,7 @@ type Sale implements Event @entity {
   "Seller"
   from: Account!
 
-  contract: Contract!
+  contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
@@ -292,7 +298,7 @@ type AskCreated implements Event @entity {
   "Amount offered"
   amount: BigInt!
 
-  contract: Contract!
+  contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
@@ -311,7 +317,7 @@ type BidCreated implements Event@entity {
 
   "Amount bidded"
   amount: BigInt!
-  contract: Contract!
+  contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
@@ -330,7 +336,7 @@ type BidRemoved implements Event @entity {
   "Bid withdrawn"
   bid: BidCreated!
 
-  contract: Contract!
+  contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
@@ -342,10 +348,9 @@ type BidRemoved implements Event @entity {
 type AskRemoved implements Event @entity {
   "Punk"
   id: ID!
-  from: Account!
   ask: AskCreated!
 
-  contract: Contract!
+  contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
@@ -364,7 +369,7 @@ type Transfer implements Event @entity {
   "Receiver"
   to: Account!
 
-  contract: Contract!
+  contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
