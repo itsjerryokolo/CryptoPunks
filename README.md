@@ -2,20 +2,56 @@
 The CryptoPunks are 10,000 uniquely generated characters. 
 No two are exactly alike, and each one of them can be officially owned by a single person on the Ethereum blockchain.
 
-## Query purchases from account
-#### Example Query
+## Query account
 ```graphql
 {
-  sales(where: {to: "0x00bd9fd57c423a1b1c969823d409156d90974d77"}) {
+  {
+  accounts(where: {id: "0x94de7e2c73529ebf3206aa3459e699fbcdfcd49b"}) {
     id
-    from{id}
-    to{id}
-    amount
-    txHash
-    timestamp
-    blockNumber
+    nftsOwned {
+      id
+    }
+    wrappedPunksOwned{
+      id
+    }
+    bought{
+      id
+      timestamp
+      txHash
+    }
+    assigned{
+      id
+      timestamp
+      txHash
+    }
+    received{
+      id
+      timestamp
+      txHash
+    }
+    bids{
+      id
+      offerType
+      created{
+        id
+        amount
+        type
+        timestamp
+        txHash
+      }
+      removed{
+        id
+        type
+        timestamp
+        txHash
+      }
+    }
+    asks{
+      id
+    }
   }
 }
+
 ```
 ## Query Punk data
 ```graphql
