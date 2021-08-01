@@ -3,71 +3,46 @@ The CryptoPunks are 10,000 uniquely generated characters.
 No two are exactly alike, and each one of them can be officially owned by a single person on the Ethereum blockchain.
 
 ## Example Query
-### Query Owner data
+### Purchases from account
 ```graphql
-
 {
-  owners(where: {id: "0x7174039818a41e1ae40fdcfa3e293b0f41592af2"}) {
+  sales(where: {to: "0x00bd9fd57c423a1b1c969823d409156d90974d77"}) {
     id
-    allpunksOwned {
-      id
-    }
-    punkPurchased {
-      id
-      transaction {
-        id
-        date
-      }
-    }
-    punkAssigned {
-      id
-      transaction {
-        id
-        date
-      }
-    }
-    punkTransfered {
-      id
-      transaction {
-        id
-        date
-      }
-    }
-    punkOfferedForSale {
-      id
-      amountOffered
-    }
-    punkBid {
-      id
-      bid
-    }
-    transaction {
-      date
-      block
-      id
-    }
+    from{id}
+    to{id}
+    amount
+    txHash
+    timestamp
+    blockNumber
   }
 }
-
 ```
-### Query purchases of specific owner
+### Query Punk
 ```graphql
 {
-  purchases(where:{purchaseBy: "0x00bd9fd57c423a1b1c969823d409156d90974d77"}) {
+  punks(where:{tokenid: "1000"}) {
     id
-    punkIndex
-    buyer
-    seller
-    purchaseBy{
-      id
+    accessories
     }
-    amount
-    transaction{
-      id
-    }
-}
 }
 ```
+### Available Enums & Example Query
+-male
+-female
+-zombie
+-alien
+-ape
+
+Query male Punks
+```graphql
+{
+punks(where:{type:male}){
+  id
+  accessories
+  type
+}
+}
+
 
 ## Run your local Graph Node
 
