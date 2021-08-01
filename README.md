@@ -2,7 +2,7 @@
 The CryptoPunks are 10,000 uniquely generated characters. 
 No two are exactly alike, and each one of them can be officially owned by a single person on the Ethereum blockchain.
 
-## Purchases from account
+## Query purchases from account
 #### Example Query
 ```graphql
 {
@@ -17,7 +17,7 @@ No two are exactly alike, and each one of them can be officially owned by a sing
   }
 }
 ```
-## Query Punk
+## Query Punk data
 ```graphql
 {
   punks(where:{tokenid: "1000"}) {
