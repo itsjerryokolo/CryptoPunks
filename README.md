@@ -5,7 +5,6 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 ## Query account
 ```graphql
 {
-  {
   accounts(where: {id: "0x94de7e2c73529ebf3206aa3459e699fbcdfcd49b"}) {
     id
     nftsOwned {
@@ -51,6 +50,7 @@ No two are exactly alike, and each one of them can be officially owned by a sing
     }
   }
 }
+
 
 ```
 ## Query Punk data
