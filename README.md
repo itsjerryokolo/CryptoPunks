@@ -27,7 +27,7 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 }
 ```
 ### Available Enums for Punk
--
+--
 - male
 - female
 - zombie
