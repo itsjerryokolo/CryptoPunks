@@ -27,13 +27,13 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 }
 ```
 ### Available Enums & Example Query
--male
--female
--zombie
--alien
--ape
+- male
+- female
+- zombie
+- alien
+- ape
 
-Query male Punks
+### Query male Punks
 ```graphql
 {
 punks(where:{type:male}){
@@ -42,9 +42,9 @@ punks(where:{type:male}){
   type
 }
 }
+```
 
-
-## Run your local Graph Node
+### Run your local Graph Node
 
 ```bash
 ETHEREUM_RPC=mainnet:https://eth-mainnet.alchemyapi.io/v2/${YOUR_API_KEY} docker compose up 
