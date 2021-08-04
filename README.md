@@ -2,69 +2,80 @@
 The CryptoPunks are 10,000 uniquely generated characters. 
 No two are exactly alike, and each one of them can be officially owned by a single person on the Ethereum blockchain.
 
-## Example Query
-### Query Owner data
+## Query account
 ```graphql
-
 {
-  owners(where: {id: "0x7174039818a41e1ae40fdcfa3e293b0f41592af2"}) {
+  accounts(where: {id: "0x94de7e2c73529ebf3206aa3459e699fbcdfcd49b"}) {
     id
-    allpunksOwned {
+    nftsOwned {
       id
     }
-    punkPurchased {
+    wrappedPunksOwned{
       id
-      transaction {
+    }
+    bought{
+      id
+      timestamp
+      txHash
+    }
+    assigned{
+      id
+      timestamp
+      txHash
+    }
+    received{
+      id
+      timestamp
+      txHash
+    }
+    bids{
+      id
+      offerType
+      created{
         id
-        date
+        amount
+        type
+        timestamp
+        txHash
+      }
+      removed{
+        id
+        type
+        timestamp
+        txHash
       }
     }
-    punkAssigned {
-      id
-      transaction {
-        id
-        date
-      }
-    }
-    punkTransfered {
-      id
-      transaction {
-        id
-        date
-      }
-    }
-    punkOfferedForSale {
-      id
-      amountOffered
-    }
-    punkBid {
-      id
-      bid
-    }
-    transaction {
-      date
-      block
+    asks{
       id
     }
   }
 }
 
+
 ```
-### Query purchases of specific owner
+## Query Punk data
 ```graphql
 {
-  purchases(where:{purchaseBy: "0x00bd9fd57c423a1b1c969823d409156d90974d77"}) {
+  punks(where:{tokenid: "1000"}) {
     id
-    punkIndex
-    buyer
-    seller
-    purchaseBy{
-      id
+    accessories
     }
-    amount
-    transaction{
-      id
-    }
+}
+```
+## Available Enums for Punk
+- male
+- female
+- zombie
+- alien
+- ape
+
+## Query male Punks
+```graphql
+{
+punks(where:{type:male}){
+  id
+  accessories
+  type
 }
 }
 ```
