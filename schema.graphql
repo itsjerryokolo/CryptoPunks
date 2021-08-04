@@ -124,7 +124,9 @@ type Account @entity {
   "Purchases by Account"
   bought: [Sale!]! @derivedFrom(field: "to")
 
+  "All Punks owned by Account"
   nftsOwned: [NFT!]! @derivedFrom(field: "owner")
+
   "Punks assigned to account (if any)"
   assigned: [Assign!]! @derivedFrom(field: "to")
 
@@ -133,7 +135,7 @@ type Account @entity {
 
   received: [Transfer!]! @derivedFrom(field: "to")
 
-  "Query Bids to Account or by Account"
+  "Query bids to Account or by Account"
   bids: [Bid!]! @derivedFrom(field: "from")
 
   "Punks offered for sale by Account"
@@ -144,25 +146,15 @@ type Account @entity {
 type Punk implements NFT @entity{
   "Punk"
   id: ID!
-
-  "Punk account"
   account: Account
-
-  "Punk holder"
   transferedTo: Account
-
-  "Assigned"
   assignedTo: Account
-
-  "Punk buyer"
   purchasedBy: Account
-
   punk: Punk!
   wrappedPunk: WrappedPunk!
-
   contract: Contract 
   tokenId: BigInt! 
-  owner: Account! 
+  owner: Account!
   events: [Event!]! @derivedFrom(field: "nft") 
    "Traits"
   type: PunkType
@@ -185,8 +177,8 @@ type Ask implements Offer @entity{
   from: Account!
   open: Boolean!
   nft: NFT!
-  created: AskCreated!
-  removed: AskRemoved
+  created: Event!
+  removed: Event
   offerType: OfferType!
 }
 
@@ -195,8 +187,8 @@ type Bid implements Offer @entity{
   from: Account!
   open: Boolean!
   nft: NFT!
-  created: BidCreated!
-  removed: BidRemoved
+  created: Event!
+  removed: Event
   offerType: OfferType!
 }
 
@@ -226,6 +218,7 @@ interface Event {
 }
 
 type Contract @entity {
+  "Contract Address"
   id: ID!
 
   "Token Symbol"
@@ -233,9 +226,6 @@ type Contract @entity {
 
   "Token name"
   name: String
-
-  "Contract Address"
-  address: Bytes
 
   "Total supply of Punk tokens"
   totalSupply: BigInt
@@ -248,134 +238,113 @@ type Contract @entity {
 }
 
 type Assign implements Event @entity {
-  "Punk"
+  "Punk + Entity name"
   id: ID!
-
-  "Punks remaining to assign"
   punksRemainingToAssign: BigInt!
-
-
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
-  type: EventType
-  to: Account!
+  type: EventType!
+  to: Account
+  amount: BigInt
+  from: Account
 }
 
 type Sale implements Event @entity {
-  "Punk"
+  "Punk + Entity name"
   id: ID!
-
-  "Account"
-  to: Account!
-
-  "amount in ETH"
-  amount: BigInt!
-
-  "Seller"
-  from: Account!
-
+  to: Account
+  amount: BigInt
+  from: Account
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
-  type: EventType
+  type: EventType!
 
 }
 
 type AskCreated implements Event @entity {
-  "Punk Index"
+  "Punk + Entity name"
   id: ID!
-
-  "AskedBy Account"
-  from: Account!
-
-  "Amount offered"
-  amount: BigInt!
-
+  from: Account
+  to: Account
+  amount: BigInt
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
-  type: EventType
+  type: EventType!
 
 }
 
-type BidCreated implements Event@entity {
-  "Punk"
+type BidCreated implements Event @entity {
+  "Punk + Entity name"
   id: ID!
-
-  "Address of Bidder"
-  from: Account!
-
-  "Amount bidded"
-  amount: BigInt!
+  from: Account
+  to: Account
+  amount: BigInt
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
-  type: EventType
+  type: EventType!
 }
 
 type BidRemoved implements Event @entity {
-  "Punk"
+  "Punk + Entity name"
   id: ID!
-
-  "RemovedBy"
-  from: Account! #Used withdrawnFrom address in Withdrawn as account ID
-
-  "Bid withdrawn"
+  from: Account
+  to: Account
+  amount: BigInt
   bid: BidCreated!
-
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
-  type: EventType
+  type: EventType!
 }
 
 type AskRemoved implements Event @entity {
-  "Punk"
+  "Punk + Entity name"
   id: ID!
   ask: AskCreated!
-
+  from: Account
+  to: Account
+  amount: BigInt
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
-  type: EventType
+  type: EventType!
 }
 
 type Transfer implements Event @entity {
   "Punk"
   id: ID!
-
-  "Sender"
   from: Account
-
-  "Receiver"
-  to: Account!
-
+  to: Account
+  amount: BigInt
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
   blockHhash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
-  type: EventType
+  type: EventType!
 
 
 }
@@ -384,8 +353,13 @@ type WrappedPunk implements NFT @entity{
   id: ID!
   punk: Punk!
   wrappedPunk: WrappedPunk!
-  "Punk account"
   account: Account!
+  contract: Contract
+  tokenId: BigInt!
+  owner: Account!
+  events: [Event!]! @derivedFrom(field: "nft")
+  type: PunkType
+  accessories: [String!]
   
 }
 
