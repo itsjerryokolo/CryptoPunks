@@ -1,12 +1,9 @@
-enum PunkType {
-  male
-  female
-  alien
-  zombie
-  ape
+enum TraitType {
+  TYPE
+  ACCESSORY
 }
 
-enum EventType{
+enum EventType {
   ASSIGN
   TRANSFER
   ASK_CREATED
@@ -16,8 +13,8 @@ enum EventType{
   SALE
 }
 
-enum OfferType{
-  BID 
+enum OfferType {
+  BID
   ASK
 }
 
@@ -111,15 +108,38 @@ enum OfferType{
 #   wild white hair
 # }
 
+interface NFT {
+  id: ID!
+  contract: Contract
+  tokenId: BigInt!
+  owner: Account!
+  events: [Event!]! @derivedFrom(field: "nft")
+  traits: [Trait!]!
+}
+
+interface Event {
+  id: ID!
+  contract: Contract
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType!
+  from: Account
+  to: Account
+  amount: BigInt
+}
+
 type Account @entity {
   "Ethereum Address"
   id: ID!
 
   "All Punks owned by Account"
-  punksOwned: [Punk!] @derivedFrom(field: "account")
+  punksOwned: [Punk!] @derivedFrom(field: "owner")
 
   "All Wrapped Punks owned by Account"
-  wrappedPunksOwned: [WrappedPunk!] @derivedFrom(field: "account")
+  wrappedPunksOwned: [WrappedPunk!] @derivedFrom(field: "owner")
 
   "Purchases by Account"
   bought: [Sale!]! @derivedFrom(field: "to")
@@ -141,80 +161,69 @@ type Account @entity {
   "Punks offered for sale by Account"
   asks: [Ask!]! @derivedFrom(field: "from")
 
+  numberOfPunksOwned: BigInt!
+
+  numberOfWrappedPunksOwned: BigInt!
 }
 
-type Punk implements NFT @entity{
+type Punk implements NFT @entity {
   "Punk"
   id: ID!
-  account: Account
   transferedTo: Account
   assignedTo: Account
   purchasedBy: Account
-  punk: Punk!
-  wrappedPunk: WrappedPunk!
-  contract: Contract 
-  tokenId: BigInt! 
-  owner: Account!
-  events: [Event!]! @derivedFrom(field: "nft") 
-   "Traits"
-  type: PunkType
-  accessories: [String!]
-
-}
-
-interface Offer{
-  id: ID!
-  from: Account!
-  open: Boolean!
-  nft: NFT!
-  created: Event!
-  removed: Event
-  offerType: OfferType!
-}
-
-type Ask implements Offer @entity{
-  id: ID!
-  from: Account!
-  open: Boolean!
-  nft: NFT!
-  created: Event!
-  removed: Event
-  offerType: OfferType!
-}
-
-type Bid implements Offer @entity{
-  id: ID!
-  from: Account!
-  open: Boolean!
-  nft: NFT!
-  created: Event!
-  removed: Event
-  offerType: OfferType!
-}
-
-interface NFT{
-  id: ID! 
-  contract: Contract 
-  tokenId: BigInt! 
-  owner: Account! 
-  events: [Event!]! @derivedFrom(field: "nft") 
-   "Traits"
-  type: PunkType
-  accessories: [String!]
-}
-
-interface Event {
-  id: ID!
+  wrappedPunk: WrappedPunk
+  metadata: Metadata
   contract: Contract
+  tokenId: BigInt!
+  owner: Account!
+  events: [Event!]! @derivedFrom(field: "nft")
+  traits: [Trait!]!
+}
+
+type Metadata @entity {
+  id: ID!
+  tokenId: BigInt!
+  tokenURI: String!
+  imageURI: String!
+  contractURI: String!
+  punk: Punk!
+}
+
+type Trait @entity {
+  id: ID!
+  nfts: [NFT!]! @derivedFrom(field: "traits")
+  numberOfNfts: BigInt!
+}
+
+interface Offer {
+  id: ID!
+  from: Account!
+  open: Boolean!
   nft: NFT!
-  blockNumber: BigInt!
-  blockHhash: Bytes!
-  txHash: Bytes!
-  timestamp: BigInt!
-  type: EventType!
-  from: Account
-  to: Account
-  amount: BigInt
+  created: Event!
+  removed: Event
+  offerType: OfferType!
+}
+
+type Ask implements Offer @entity {
+  id: ID!
+  from: Account!
+  open: Boolean!
+  nft: NFT!
+  created: Event!
+  removed: Event
+  offerType: OfferType!
+}
+
+type Bid implements Offer @entity {
+  id: ID!
+  from: Account!
+  open: Boolean!
+  nft: NFT!
+  created: Event!
+  removed: Event
+  offerType: OfferType!
 }
 
 type Contract @entity {
@@ -227,12 +236,16 @@ type Contract @entity {
   "Token name"
   name: String
 
-  "Total supply of Punk tokens"
+  "Total supply of tokens"
   totalSupply: BigInt
+
+  totalSales: BigInt!
+
+  totalAmountTraded: BigInt!
 
   "The hash of the composite image of all the Punks"
   imageHash: String
-  
+
   "True/False if all Punks have been assigned"
   allPunksAssigned: Boolean
 }
@@ -266,7 +279,6 @@ type Sale implements Event @entity {
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
-
 }
 
 type AskCreated implements Event @entity {
@@ -282,7 +294,6 @@ type AskCreated implements Event @entity {
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
-
 }
 
 type BidCreated implements Event @entity {
@@ -345,21 +356,14 @@ type Transfer implements Event @entity {
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
-
-
 }
 
-type WrappedPunk implements NFT @entity{
+type WrappedPunk implements NFT @entity {
   id: ID!
   punk: Punk!
-  wrappedPunk: WrappedPunk!
-  account: Account!
   contract: Contract
   tokenId: BigInt!
   owner: Account!
   events: [Event!]! @derivedFrom(field: "nft")
-  type: PunkType
-  accessories: [String!]
-  
+  traits: [Trait!]!
 }
-
