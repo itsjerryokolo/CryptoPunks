@@ -152,14 +152,32 @@ export function handleAssign(event: Assigned): void {
   punk.metadata = metadata.id;
 
   if (trait != null) {
+    let traits = [];
     let type = Trait.load(trait.type);
     if (type == null) {
       type = new Trait(trait.type);
+      type.type = "TYPE";
       type.numberOfNfts = BigInt.fromI32(0);
     }
     type.numberOfNfts = type.numberOfNfts.plus(BigInt.fromI32(1));
-    punk.traits = [trait.type];
     type.save();
+    traits.push(type.id);
+
+    for (let accessory of trait.accessories) {
+      let acessory = Trait.load(accessory);
+      if (acessory == null) {
+        acessory = new Trait(accessory);
+        acessory.type = "ACCESSORY";
+        acessory.numberOfNfts = BigInt.fromI32(0);
+      }
+      acessory.numberOfNfts = acessory.numberOfNfts.plus(
+        BigInt.fromI32(1)
+      );
+      acessory.save();
+      traits.push(acessory.id);
+    }
+
+    punk.traits = traits;
   }
 
   account.save();

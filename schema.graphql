@@ -192,6 +192,7 @@ type Metadata @entity {
 
 type Trait @entity {
   id: ID!
+  type: TraitType!
   nfts: [NFT!]! @derivedFrom(field: "traits")
   numberOfNfts: BigInt!
 }
