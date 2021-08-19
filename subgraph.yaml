@@ -18,14 +18,16 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Account
-        - CryptoPunk
+        - Punk
         - NFT
-        - Transaction
-        - Sale
+        - Transfer
+        - Metadata
+        - Trait
+        - WrappedPunk
         - Assign
         - Offer
         - Transfer
-        - Purchase
+        - Sale
       abis:
         - name: cryptopunks
           file: ./abis/cryptopunks.json

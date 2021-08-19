@@ -161,9 +161,9 @@ type Account @entity {
   "Punks offered for sale by Account"
   asks: [Ask!]! @derivedFrom(field: "from")
 
-  numberOfPunksOwned: BigInt!
+  numberOfPunksOwned: BigInt
 
-  numberOfWrappedPunksOwned: BigInt!
+  numberOfWrappedPunksOwned: BigInt
 }
 
 type Punk implements NFT @entity {
@@ -239,9 +239,9 @@ type Contract @entity {
   "Total supply of tokens"
   totalSupply: BigInt
 
-  totalSales: BigInt!
+  totalSales: BigInt
 
-  totalAmountTraded: BigInt!
+  totalAmountTraded: BigInt
 
   "The hash of the composite image of all the Punks"
   imageHash: String

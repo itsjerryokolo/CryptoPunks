@@ -86,6 +86,11 @@ export function handleAssign(event: Assigned): void {
   if (punk == null) {
     punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
   }
+  if (metadata == null) {
+    metadata = new Metadata(
+      event.params.punkIndex.toString() + "-" + "METADATA"
+    );
+  }
 
   let symbolCall = cryptopunk.try_symbol();
   if (!symbolCall.reverted) {
@@ -172,7 +177,8 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   let transfer = Transfer.load(
     event.params.punkIndex.toString() + "-" + "TRANSFER"
   );
-  let account = Account.load(event.params.to.toHexString());
+  let toAccount = Account.load(event.params.to.toHexString());
+  let fromAccount = Account.load(event.params.from.toHexString());
   let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK");
   let contract = new Contract(event.address.toHexString());
 
@@ -181,11 +187,19 @@ export function handlePunkTransfer(event: PunkTransfer): void {
       event.params.punkIndex.toString() + "-" + "TRANSFER"
     );
   }
-  if (account == null) {
-    account = new Account(event.params.to.toHexString());
+  if (toAccount == null) {
+    toAccount = new Account(event.params.to.toHexString());
+    toAccount.numberOfPunksOwned = BigInt.fromI32(0);
   }
+
   if (punk == null) {
     punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
   }
 
   transfer.type = "TRANSFER";
@@ -202,7 +216,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   transfer.contract = contract.id;
 
   transfer.save();
-  account.save();
+  toAccount.save();
   punk.save();
   contract.save();
 }
@@ -293,24 +307,16 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
       event.params.punkIndex.toString() + "-" + "BIDREMOVED"
     );
   }
+
+  if (account == null) {
+    account = new Account(event.params.fromAddress.toHexString());
+  }
+
   if (punk == null) {
     punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
-    if (account.numberOfPunksOwned != BigInt.fromI32(0)) {
-      account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
-        BigInt.fromI32(1)
-      );
-    } else {
-      account.numberOfPunksOwned = BigInt.fromI32(0);
-      account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
-        BigInt.fromI32(1)
-      );
-    }
   }
   if (bid == null) {
     bid = new Bid(event.params.punkIndex.toString() + "-" + "BID");
-  }
-  if (account == null) {
-    account = new Account(event.params.fromAddress.toHexString());
   }
 
   if (bid != null) {
@@ -567,11 +573,6 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
   wrappedPunk.owner = account.id;
   wrappedPunk.tokenId = event.params.tokenId;
   wrappedPunk.contract = contract.id;
-
-  if (trait != null) {
-    wrappedPunk.type = trait.type;
-    wrappedPunk.accessories = trait.accessories;
-  }
 
   wrappedPunk.save();
   account.save();
