@@ -18,96 +18,6 @@ enum OfferType {
   ASK
 }
 
-# enum Accessory {
-#   3d glasses
-#   bandana
-#   beanie
-#   big beard
-#   big shades
-#   black lipstick
-#   blonde bob
-#   blonde short
-#   blue eye shadow
-#   buck teeth
-#   cap forward
-#   cap
-#   chinstrap
-#   choker
-#   cigarette
-#   classic shades
-#   clown eyes blue
-#   clown eyes green
-#   clown hair green
-#   clown nose
-#   cowboy hat
-#   crazy hair
-#   dark hair
-#   do-rag
-#   earring
-#   eye mask
-#   eye patch
-#   fedora
-#   front beard dark
-#   front beard
-#   frown
-#   frumpy hair
-#   goat
-#   gold chain
-#   green eye shadow
-#   half shaved
-#   handlebars
-#   headband
-#   hoodie
-#   horned rim glasses
-#   hot lipstick
-#   knitted cap
-#   luxurious beard
-#   medical mask
-#   messy hair
-#   mohawk dark
-#   mohawk thin
-#   mohawk
-#   mole
-#   mustache
-#   muttonchops
-#   nerd glasses
-#   normal beard black
-#   normal beard
-#   orange side
-#   peak spike
-#   pigtails
-#   pilot helmet
-#   pink with hat
-#   pipe
-#   police cap
-#   purple eye shadow
-#   purple hair
-#   purple lipstick
-#   red mohawk
-#   regular shades
-#   rosy cheeks
-#   shadow beard
-#   shaved head
-#   silver chain
-#   small shades
-#   smile
-#   spots
-#   straight hair blonde
-#   straight hair dark
-#   straight hair
-#   stringy hair
-#   tassle hat
-#   tiara
-#   top hat
-#   vampire hair
-#   vape
-#   vr
-#   welding goggles
-#   wild blonde
-#   wild hair
-#   wild white hair
-# }
-
 interface NFT {
   id: ID!
   contract: Contract
@@ -192,6 +102,7 @@ type Metadata @entity {
 
 type Trait @entity {
   id: ID!
+  type: TraitType!
   nfts: [NFT!]! @derivedFrom(field: "traits")
   numberOfNfts: BigInt!
 }
