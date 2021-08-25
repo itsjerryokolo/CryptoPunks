@@ -91,7 +91,7 @@ dataSources:
     name: CryptopunksMetadata
     network: mainnet
     source:
-      address: "0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6"
+      address: "0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2"
       abi: CryptopunksMetadata
       startBlock: 10821736 
     mapping:
