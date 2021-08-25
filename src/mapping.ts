@@ -30,6 +30,11 @@ import {
   Unpaused,
 } from "../generated/WrappedPunks/WrappedPunks";
 
+import {
+  CryptopunksMetadata,
+  SetPaletteCall,
+} from "../generated/CryptopunksMetadata/CryptopunksMetadata";
+
 import { getTrait, traits } from "./traits";
 
 import {
@@ -72,6 +77,7 @@ export function handleAssign(event: Assigned): void {
   let metadata = Metadata.load(
     event.params.punkIndex.toString() + "-" + "METADATA"
   );
+  let contractMetadata = CryptopunksMetadata.bind(event.address);
   let account = Account.load(event.params.to.toHexString());
   let cryptopunk = cryptopunks.bind(event.address);
   let contract = new Contract(event.address.toHexString());
@@ -90,6 +96,47 @@ export function handleAssign(event: Assigned): void {
     metadata = new Metadata(
       event.params.punkIndex.toString() + "-" + "METADATA"
     );
+  }
+
+  let attributeCall = contractMetadata.try_punkAttributes(
+    event.params.punkIndex.toI32()
+  );
+  if (!attributeCall.reverted) {
+    metadata.punkTraits = attributeCall.value.split(", ");
+  } else {
+    log.warning("attributeCall Reverted", []);
+  }
+
+  /*   let punkIndex = new Array<string>();
+  for (let i = 0; i < punkIndex.length; i++) {
+    punkIndex = metadata.punkImage;
+    let imageCall = contractMetadata.try_punkImage(
+      event.params.punkIndex.toI32()
+    );
+    if (!imageCall.reverted) {
+      punkIndex.push(imageCall.value.toString());
+      metadata.punkImage = punkIndex;
+    } else {
+      log.warning("imageCall Reverted", []);
+    }
+  } */
+
+  let imageCallSvg = contractMetadata.try_punkImageSvg(
+    event.params.punkIndex.toI32()
+  );
+  if (!imageCallSvg.reverted) {
+    metadata.punkImageSvg = imageCallSvg.value;
+  } else {
+    log.warning("imageCallSvg Reverted", []);
+  }
+
+  let imageCall = contractMetadata.try_punkImage(
+    event.params.punkIndex.toI32()
+  );
+  if (!imageCall.reverted) {
+    metadata.punkImage = imageCall.value;
+  } else {
+    log.warning("imageCall Reverted", []);
   }
 
   let symbolCall = cryptopunk.try_symbol();
@@ -152,34 +199,62 @@ export function handleAssign(event: Assigned): void {
   punk.metadata = metadata.id;
 
   if (trait != null) {
-    let traits = [];
+    let traits = new Array<string>();
     let type = Trait.load(trait.type);
     if (type == null) {
       type = new Trait(trait.type);
       type.type = "TYPE";
       type.numberOfNfts = BigInt.fromI32(0);
     }
+    /*     let attributeCall = contractMetadata.try_punkAttributes(
+      event.params.punkIndex.toHexString()
+    );
+    if (!attributeCall.reverted) {
+      type.punkTraits = attributeCall.value;
+    } else {
+      log.warning("attributeCall Reverted", []);
+    }
+
+    let imageCall = contractMetadata.try_punkImage(
+      event.params.punkIndex.toHexString()
+    );
+    if (!imageCall.reverted) {
+      type.punkImage = imageCall.value;
+    } else {
+      log.warning("imageCall Reverted", []);
+    }
+
+      let imageCallSvg = contractMetadata.try_punkImageSvg([i]);
+      if (!imageCallSvg.reverted) {
+        type.punkImageSvg = imageCallSvg.value;
+      } else {
+        log.warning("imageCallSvg Reverted", []);
+      }
+
+    }*/
+
     type.numberOfNfts = type.numberOfNfts.plus(BigInt.fromI32(1));
     type.save();
     traits.push(type.id);
-
-    for (let accessory of trait.accessories) {
-      let acessory = Trait.load(accessory);
+    /* 
+    for (let i = 0; i++; i < trait.accessories.length) {
+      let accessoryName = BigDecimal.fromString(trait.accessories[i]);
+      let acessoryId = accessoryName.toHexString();
+      let acessory = Trait.load(acessoryId);
       if (acessory == null) {
-        acessory = new Trait(accessory);
+        acessory = new Trait(acessoryId);
         acessory.type = "ACCESSORY";
         acessory.numberOfNfts = BigInt.fromI32(0);
       }
-      acessory.numberOfNfts = acessory.numberOfNfts.plus(
-        BigInt.fromI32(1)
-      );
+      acessory.numberOfNfts = acessory.numberOfNfts.plus(BigInt.fromI32(1));
       acessory.save();
       traits.push(acessory.id);
     }
 
     punk.traits = traits;
   }
-
+ */
+  }
   account.save();
   assign.save();
   contract.save();
@@ -235,6 +310,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
   transfer.save();
   toAccount.save();
+  fromAccount.save();
   punk.save();
   contract.save();
 }
@@ -529,6 +605,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   askRemoved.save();
   contract.save();
 }
+
 export function handleProxyRegistered(event: ProxyRegistered): void {}
 
 export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
@@ -548,22 +625,16 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 
   if (account == null) {
     account = new Account(event.params.to.toHexString());
+    account.numberOfWrappedPunksOwned = BigInt.fromI32(0);
   }
 
   if (wrappedPunk == null) {
     wrappedPunk = new WrappedPunk(
       event.params.tokenId.toString() + "-" + "WRAPPEDPUNK"
     );
-    if (account.numberOfWrappedPunksOwned != BigInt.fromI32(0)) {
-      account.numberOfWrappedPunksOwned = account.numberOfWrappedPunksOwned.plus(
-        BigInt.fromI32(1)
-      );
-    } else {
-      account.numberOfWrappedPunksOwned = BigInt.fromI32(0);
-      account.numberOfWrappedPunksOwned = account.numberOfWrappedPunksOwned.plus(
-        BigInt.fromI32(1)
-      );
-    }
+    account.numberOfWrappedPunksOwned = account.numberOfWrappedPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
   }
 
   let symbolCall = wrappedPunkContract.try_symbol();
@@ -606,3 +677,5 @@ export function handleApprovalForAll(event: ApprovalForAll): void {}
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
 
 export function handlePaused(event: Paused): void {}
+
+export function handleSetPalette(call: SetPaletteCall): void {}

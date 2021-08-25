@@ -87,3 +87,23 @@ dataSources:
         - event: Unpaused(address)
           handler: handleUnpaused
       file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: CryptopunksMetadata
+    network: mainnet
+    source:
+      address: "0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6"
+      abi: CryptopunksMetadata
+      startBlock: 10821736 
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+      abis:
+        - name: CryptopunksMetadata
+          file: ./abis/CryptopunksMetadata.json
+      callHandlers:
+        - function: setPalette(bytes)
+          handler: handleSetPalette
+      file: ./src/mapping.ts
