@@ -21,7 +21,7 @@ dataSources:
         - Punk
         - NFT
         - Transfer
-        - Metadata
+        - MetaData
         - Trait
         - WrappedPunk
         - Assign
@@ -31,6 +31,8 @@ dataSources:
       abis:
         - name: cryptopunks
           file: ./abis/cryptopunks.json
+        - name: CryptopunksMetadata
+          file: ./abis/CryptopunksMetadata.json
       eventHandlers:
         - event: Assign(indexed address,uint256)
           handler: handleAssign
@@ -87,23 +89,4 @@ dataSources:
         - event: Unpaused(address)
           handler: handleUnpaused
       file: ./src/mapping.ts
-  - kind: ethereum/contract
-    name: CryptopunksMetadata
-    network: mainnet
-    source:
-      address: "0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2"
-      abi: CryptopunksMetadata
-      startBlock: 10821736 
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - Approval
-      abis:
-        - name: CryptopunksMetadata
-          file: ./abis/CryptopunksMetadata.json
-      callHandlers:
-        - function: setPalette(bytes)
-          handler: handleSetPalette
-      file: ./src/mapping.ts
+      

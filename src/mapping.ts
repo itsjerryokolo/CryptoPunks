@@ -33,7 +33,7 @@ import {
 import {
   CryptopunksMetadata,
   SetPaletteCall,
-} from "../generated/CryptopunksMetadata/CryptopunksMetadata";
+} from "../generated/cryptopunks/CryptopunksMetadata";
 
 import { getTrait, traits } from "./traits";
 
@@ -51,7 +51,7 @@ import {
   AskRemoved,
   WrappedPunk,
   Contract,
-  Metadata,
+  MetaData,
   Bid,
 } from "../generated/schema";
 
@@ -74,7 +74,7 @@ export function handleAssign(event: Assigned): void {
   }
 
   let assign = Assign.load(event.params.punkIndex.toString() + "-" + "ASSIGN");
-  let metadata = Metadata.load(
+  let metadata = MetaData.load(
     event.params.punkIndex.toString() + "-" + "METADATA"
   );
   let contractMetadata = CryptopunksMetadata.bind(event.address);
@@ -93,9 +93,10 @@ export function handleAssign(event: Assigned): void {
     punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
   }
   if (metadata == null) {
-    metadata = new Metadata(
+    metadata = new MetaData(
       event.params.punkIndex.toString() + "-" + "METADATA"
     );
+    metadata.punkTraits = new Array<string>();
   }
 
   let attributeCall = contractMetadata.try_punkAttributes(
@@ -635,6 +636,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     account.numberOfWrappedPunksOwned = account.numberOfWrappedPunksOwned.plus(
       BigInt.fromI32(1)
     );
+    wrappedPunk.traits = new Array<string>();
   }
 
   let symbolCall = wrappedPunkContract.try_symbol();
