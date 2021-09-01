@@ -24,7 +24,7 @@ interface NFT {
   tokenId: BigInt!
   owner: Account!
   events: [Event!]! @derivedFrom(field: "nft")
-  traits: [Trait!]!
+  #traits: [Trait!]!
 }
 
 interface Event {
@@ -88,7 +88,6 @@ type Punk implements NFT @entity {
   tokenId: BigInt!
   owner: Account!
   events: [Event!]! @derivedFrom(field: "nft")
-  traits: [Trait!]!
 }
 
 type Metadata @entity {
@@ -96,9 +95,9 @@ type Metadata @entity {
   tokenId: BigInt!
   tokenURI: String!
   imageURI: String!
-  punkImage: Bytes!
-  punkImageSvg: String!
-  punkTraits: [String!]!
+  punkImage: Bytes
+  punkImageSvg: String
+  punkTraits: [String!]
   contractURI: String!
   punk: Punk!
 }
@@ -109,7 +108,7 @@ type Trait @entity {
   punkImage: Bytes!
   punkImageSvg: String
   punkTraits: String!
-  nfts: [NFT!]! @derivedFrom(field: "traits")
+  #nfts: [NFT!]! @derivedFrom(field: "traits")
   numberOfNfts: BigInt!
 }
 
@@ -282,5 +281,4 @@ type WrappedPunk implements NFT @entity {
   tokenId: BigInt!
   owner: Account!
   events: [Event!]! @derivedFrom(field: "nft")
-  traits: [Trait!]!
 }
