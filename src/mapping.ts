@@ -33,9 +33,9 @@ import {
 import {
   CryptopunksMetadata,
   SetPaletteCall,
-} from "../generated/CryptopunksMetadata/CryptopunksMetadata";
+} from "../generated/cryptopunks/CryptopunksMetadata";
 
-import { getTrait, traits } from "./traits";
+// import { getTrait, traits } from "./traits";
 
 import {
   Ask,
@@ -51,7 +51,7 @@ import {
   AskRemoved,
   WrappedPunk,
   Contract,
-  Metadata,
+  MetaData,
   Bid,
 } from "../generated/schema";
 
@@ -62,19 +62,19 @@ let IMAGE_URI = "https://www.larvalabs.com/public/images/cryptopunks/punk";
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
 
-  let trait = getTrait(event.params.punkIndex.toI32());
+  // let trait = getTrait(event.params.punkIndex.toI32());
 
-  if (!trait) {
-    log.info("Punk {}, traits: none", [event.params.punkIndex.toString()]);
-  } else {
-    log.info("Punk {}, traits: {}", [
-      event.params.punkIndex.toString(),
-      trait.accessories.join(", "),
-    ]);
-  }
+  // if (!trait) {
+  //   log.info("Punk {}, traits: none", [event.params.punkIndex.toString()]);
+  // } else {
+  //   log.info("Punk {}, traits: {}", [
+  //     event.params.punkIndex.toString(),
+  //     trait.accessories.join(", "),
+  //   ]);
+  // }
 
   let assign = Assign.load(event.params.punkIndex.toString() + "-" + "ASSIGN");
-  let metadata = Metadata.load(
+  let metadata = MetaData.load(
     event.params.punkIndex.toString() + "-" + "METADATA"
   );
   let contractMetadata = CryptopunksMetadata.bind(
@@ -95,7 +95,7 @@ export function handleAssign(event: Assigned): void {
     punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
   }
   if (!metadata) {
-    metadata = new Metadata(
+    metadata = new MetaData(
       event.params.punkIndex.toString() + "-" + "METADATA"
     );
   }
@@ -624,7 +624,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 
   let wrappedPunkContract = WrappedPunks.bind(event.address);
   let contract = new Contract(event.address.toHexString());
-  let trait = getTrait(event.params.tokenId.toI32());
+  // let trait = getTrait(event.params.tokenId.toI32());
 
   let wrappedPunk = WrappedPunk.load(
     event.params.tokenId.toString() + "-" + "WRAPPEDPUNK"

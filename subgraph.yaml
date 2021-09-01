@@ -21,7 +21,7 @@ dataSources:
         - Punk
         - NFT
         - Transfer
-        - Metadata
+        - MetaData
         - Trait
         - WrappedPunk
         - Assign

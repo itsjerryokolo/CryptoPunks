@@ -71,9 +71,9 @@ type Account @entity {
   "Punks offered for sale by Account"
   asks: [Ask!]! @derivedFrom(field: "from")
 
-  numberOfPunksOwned: BigInt
+  numberOfPunksOwned: BigInt!
 
-  numberOfWrappedPunksOwned: BigInt
+  numberOfWrappedPunksOwned: BigInt!
 }
 
 type Punk implements NFT @entity {
@@ -83,14 +83,14 @@ type Punk implements NFT @entity {
   assignedTo: Account
   purchasedBy: Account
   wrappedPunk: WrappedPunk
-  metadata: Metadata
+  metadata: MetaData
   contract: Contract
   tokenId: BigInt!
   owner: Account!
   events: [Event!]! @derivedFrom(field: "nft")
 }
 
-type Metadata @entity {
+type MetaData @entity {
   id: ID!
   tokenId: BigInt!
   tokenURI: String!
@@ -153,11 +153,11 @@ type Contract @entity {
   name: String
 
   "Total supply of tokens"
-  totalSupply: BigInt
+  totalSupply: BigInt!
 
-  totalSales: BigInt
+  totalSales: BigInt!
 
-  totalAmountTraded: BigInt
+  totalAmountTraded: BigInt!
 
   "The hash of the composite image of all the Punks"
   imageHash: String
