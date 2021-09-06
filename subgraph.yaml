@@ -11,7 +11,7 @@ dataSources:
     source:
       address: "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB"
       abi: cryptopunks
-      startBlock: 3914495 
+      startBlock: 3914495
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -21,7 +21,7 @@ dataSources:
         - Punk
         - NFT
         - Transfer
-        - Metadata
+        - MetaData
         - Trait
         - WrappedPunk
         - Assign
@@ -31,6 +31,8 @@ dataSources:
       abis:
         - name: cryptopunks
           file: ./abis/cryptopunks.json
+        - name: CryptopunksMetadata
+          file: ./abis/CryptopunksMetadata.json
       eventHandlers:
         - event: Assign(indexed address,uint256)
           handler: handleAssign
@@ -55,7 +57,7 @@ dataSources:
     source:
       address: "0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6"
       abi: WrappedPunks
-      startBlock: 10821737 
+      startBlock: 10821737
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -72,38 +74,6 @@ dataSources:
         - name: WrappedPunks
           file: ./abis/WrappedPunks.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: Paused(address)
-          handler: handlePaused
-        - event: ProxyRegistered(address,address)
-          handler: handleProxyRegistered
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleWrappedPunkTransfer
-        - event: Unpaused(address)
-          handler: handleUnpaused
-      file: ./src/mapping.ts
-  - kind: ethereum/contract
-    name: CryptopunksMetadata
-    network: mainnet
-    source:
-      address: "0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2"
-      abi: CryptopunksMetadata
-      startBlock: 10821736 
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - Approval
-      abis:
-        - name: CryptopunksMetadata
-          file: ./abis/CryptopunksMetadata.json
-      callHandlers:
-        - function: setPalette(bytes)
-          handler: handleSetPalette
       file: ./src/mapping.ts

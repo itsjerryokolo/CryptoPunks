@@ -24,7 +24,7 @@ interface NFT {
   tokenId: BigInt!
   owner: Account!
   events: [Event!]! @derivedFrom(field: "nft")
-  traits: [Trait!]!
+  traits: [Trait!]
 }
 
 interface Event {
@@ -48,9 +48,6 @@ type Account @entity {
   "All Punks owned by Account"
   punksOwned: [Punk!] @derivedFrom(field: "owner")
 
-  "All Wrapped Punks owned by Account"
-  wrappedPunksOwned: [WrappedPunk!] @derivedFrom(field: "owner")
-
   "Purchases by Account"
   bought: [Sale!]! @derivedFrom(field: "to")
 
@@ -72,8 +69,6 @@ type Account @entity {
   asks: [Ask!]! @derivedFrom(field: "from")
 
   numberOfPunksOwned: BigInt
-
-  numberOfWrappedPunksOwned: BigInt
 }
 
 type Punk implements NFT @entity {
@@ -82,22 +77,22 @@ type Punk implements NFT @entity {
   transferedTo: Account
   assignedTo: Account
   purchasedBy: Account
-  wrappedPunk: WrappedPunk
-  metadata: Metadata
+  metadata: MetaData
   contract: Contract
   tokenId: BigInt!
   owner: Account!
+  wrapped: Boolean!
   events: [Event!]! @derivedFrom(field: "nft")
-  traits: [Trait!]!
+  traits: [Trait!]
 }
 
-type Metadata @entity {
+type MetaData @entity {
   id: ID!
   tokenId: BigInt!
   tokenURI: String!
   imageURI: String!
-  punkImage: Bytes!
-  punkImageSvg: String!
+  punkImage: Bytes
+  punkImageSvg: String
   punkTraits: [String!]!
   contractURI: String!
   punk: Punk!
@@ -106,9 +101,6 @@ type Metadata @entity {
 type Trait @entity {
   id: ID!
   type: TraitType!
-  punkImage: Bytes!
-  punkImageSvg: String
-  punkTraits: String!
   nfts: [NFT!]! @derivedFrom(field: "traits")
   numberOfNfts: BigInt!
 }
@@ -273,14 +265,4 @@ type Transfer implements Event @entity {
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
-}
-
-type WrappedPunk implements NFT @entity {
-  id: ID!
-  punk: Punk!
-  contract: Contract
-  tokenId: BigInt!
-  owner: Account!
-  events: [Event!]! @derivedFrom(field: "nft")
-  traits: [Trait!]!
 }
