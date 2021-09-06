@@ -106,9 +106,6 @@ type MetaData @entity {
 type Trait @entity {
   id: ID!
   type: TraitType!
-  punkImage: Bytes
-  punkImageSvg: String
-  punkTraits: String
   nfts: [NFT!]! @derivedFrom(field: "traits")
   numberOfNfts: BigInt!
 }
