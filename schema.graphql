@@ -143,11 +143,11 @@ type Contract @entity {
   name: String
 
   "Total supply of tokens"
-  totalSupply: BigInt
+  totalSupply: BigInt!
 
-  totalSales: BigInt
+  totalSales: BigInt!
 
-  totalAmountTraded: BigInt
+  totalAmountTraded: BigInt!
 
   "The hash of the composite image of all the Punks"
   imageHash: String

@@ -55,14 +55,14 @@ export function handleAssign(event: Assigned): void {
 
   let trait = getTrait(event.params.punkIndex);
 
-  if (!trait) {
-    log.info("Punk {}, traits: none", [event.params.punkIndex.toString()]);
-  } else {
-    log.info("Punk {}, traits: {}", [
-      event.params.punkIndex.toString(),
-      trait.accessories.join(", "),
-    ]);
-  }
+  // if (!trait) {
+  //   log.info("Punk {}, traits: none", [event.params.punkIndex.toString()]);
+  // } else {
+  //   log.info("Punk {}, traits: {}", [
+  //     event.params.punkIndex.toString(),
+  //     trait.accessories.join(", "),
+  //   ]);
+  // }
 
   let assign = Assign.load(event.params.punkIndex.toString() + "-" + "ASSIGN");
   let metadata = MetaData.load(
