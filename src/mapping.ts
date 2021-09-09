@@ -9,7 +9,6 @@ import {
 import {
   cryptopunks,
   Assign as Assigned,
-  Transfer as CtokenTransfer,
   PunkTransfer,
   PunkOffered,
   PunkBidEntered,
@@ -19,15 +18,12 @@ import {
   cryptopunks__punkBidsResult,
 } from "../generated/cryptopunks/cryptopunks";
 
+import { CryptopunksMetadata } from "../generated/cryptopunks/CryptopunksMetadata";
+
 import {
   WrappedPunks,
   Approval,
-  ApprovalForAll,
-  OwnershipTransferred,
-  Paused,
-  ProxyRegistered,
   Transfer as WrappedPunkTransfer,
-  Unpaused,
 } from "../generated/WrappedPunks/WrappedPunks";
 
 import { getTrait } from "./traits";
@@ -57,7 +53,7 @@ let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
 
-  let trait = getTrait(event.params.punkIndex.toI32());
+  let trait = getTrait(event.params.punkIndex);
 
   if (trait == null) {
     log.info("Punk {}, traits: none", [event.params.punkIndex.toString()]);

@@ -36,8 +36,6 @@ dataSources:
       eventHandlers:
         - event: Assign(indexed address,uint256)
           handler: handleAssign
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
         - event: PunkTransfer(indexed address,indexed address,uint256)
           handler: handlePunkTransfer
         - event: PunkOffered(indexed uint256,uint256,indexed address)

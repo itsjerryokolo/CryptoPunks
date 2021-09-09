@@ -91,9 +91,6 @@ type MetaData @entity {
   tokenId: BigInt!
   tokenURI: String!
   imageURI: String!
-  punkImage: Bytes
-  punkImageSvg: String
-  punkTraits: [String!]!
   contractURI: String!
   punk: Punk!
 }
