@@ -78,6 +78,7 @@ export function handleAssign(event: Assigned): void {
   }
   if (!account) {
     account = new Account(event.params.to.toHexString());
+    account.numberOfPunksOwned = BigInt.fromI32(1);
   }
   if (!punk) {
     punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
