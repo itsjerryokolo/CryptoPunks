@@ -53,7 +53,7 @@ let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
 
-  let trait = getTrait(event.params.punkIndex);
+  let trait = getTrait(event.params.punkIndex.toI32());
 
   // if (!trait) {
   //   log.info("Punk {}, traits: none", [event.params.punkIndex.toString()]);
@@ -86,7 +86,7 @@ export function handleAssign(event: Assigned): void {
     metadata = new MetaData(
       event.params.punkIndex.toString() + "-" + "METADATA"
     );
-    metadata.punkTraits = new Array<string>();
+    metadata.traits = new Array<string>();
   }
 
   if (contract == null) {
@@ -153,7 +153,7 @@ export function handleAssign(event: Assigned): void {
   punk.metadata = metadata.id;
   punk.wrapped = false;
 
-  if (!trait) {
+  if (trait !== null) {
     let traits = new Array<string>();
     let type = Trait.load(trait.type);
     if (!type) {
@@ -181,7 +181,7 @@ export function handleAssign(event: Assigned): void {
       traits.push(accessory.id);
     }
 
-    punk.traits = traits;
+    metadata.traits = traits;
   }
   account.save();
   assign.save();
@@ -197,8 +197,9 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     event.params.punkIndex.toString() + "-" + "TRANSFER"
   );
   let toAccount = Account.load(event.params.to.toHexString());
-  let fromAccount = Account.load(event.params.from.toHexString());
-  let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK");
+  // There is always a from account, since they were assigned
+  let fromAccount = Account.load(event.params.from.toHexString())!;
+  let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK")!;
   let contract = new Contract(event.address.toHexString());
 
   if (!transfer) {
@@ -214,7 +215,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
     BigInt.fromI32(1)
   );
-  // There is always a from account, since they were assigned
+
   fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
     BigInt.fromI32(1)
   );
@@ -531,10 +532,11 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     event.params.to.toHexString(),
   ]);
 
-  let punk = Punk.load(event.params.tokenId.toString() + "-" + "PUNK");
+  let punk = Punk.load(event.params.tokenId.toString() + "-" + "PUNK")!;
 
   let toAccount = Account.load(event.params.to.toHexString());
-  let fromAccount = Account.load(event.params.from.toHexString());
+  // There is always a from account, since they were assigned
+  let fromAccount = Account.load(event.params.from.toHexString())!;
 
   let wrappedPunkContract = WrappedPunks.bind(event.address);
   let contract = Contract.load(event.address.toHexString());
@@ -547,7 +549,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
   toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
     BigInt.fromI32(1)
   );
-  // There is always a from account, since they were assigned
+
   fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
     BigInt.fromI32(1)
   );
