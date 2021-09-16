@@ -451,6 +451,7 @@ export function handlePunkBought(event: PunkBought): void {
 
   sale.amount = event.params.value;
   sale.to = event.params.toAddress.toHexString();
+  sale.amount = event.params.value;
   sale.from = event.params.fromAddress.toHexString();
   sale.contract = contract.id;
   sale.nft = event.params.punkIndex.toString();
