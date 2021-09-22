@@ -349,6 +349,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bid.offerType = "BID";
 
   bidRemoved.bid = bidCreated.id;
+  bidRemoved.amount = event.params.value;
   bidRemoved.from = account.id;
   bidRemoved.contract = contract.id;
   bidRemoved.nft = event.params.punkIndex.toString();
@@ -412,6 +413,7 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   bidRemoved.bid = bidCreated.id;
   bidRemoved.from = account.id;
   bidRemoved.contract = contract.id;
+  bidRemoved.amount = event.params.value;
   bidRemoved.nft = event.params.punkIndex.toString();
   bidRemoved.timestamp = event.block.timestamp;
   bidRemoved.blockNumber = event.block.number;
@@ -451,7 +453,6 @@ export function handlePunkBought(event: PunkBought): void {
 
   sale.amount = event.params.value;
   sale.to = event.params.toAddress.toHexString();
-  sale.amount = event.params.value;
   sale.from = event.params.fromAddress.toHexString();
   sale.contract = contract.id;
   sale.nft = event.params.punkIndex.toString();
