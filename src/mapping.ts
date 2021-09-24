@@ -49,6 +49,7 @@ let TOKEN_URI = "https://www.larvalabs.com/cryptopunks/details/";
 let CONTRACT_URI = "https://www.larvalabs.com/cryptopunks";
 let IMAGE_URI = "https://www.larvalabs.com/public/images/cryptopunks/punk";
 let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+let WRAPPED_PUNK_ADDRESS = "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6";
 
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
@@ -203,23 +204,25 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK")!;
   let contract = new Contract(event.address.toHexString());
 
-  if (!transfer) {
-    transfer = new Transfer(
-      event.params.punkIndex.toString() + "-" + "TRANSFER"
+  if (event.params.to.toHexString() != WRAPPED_PUNK_ADDRESS) {
+    if (!transfer) {
+      transfer = new Transfer(
+        event.params.punkIndex.toString() + "-" + "TRANSFER"
+      );
+    }
+    if (!toAccount) {
+      toAccount = new Account(event.params.to.toHexString());
+      toAccount.numberOfPunksOwned = BigInt.fromI32(0);
+    }
+
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
     );
   }
-  if (!toAccount) {
-    toAccount = new Account(event.params.to.toHexString());
-    toAccount.numberOfPunksOwned = BigInt.fromI32(0);
-  }
-
-  toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-    BigInt.fromI32(1)
-  );
-
-  fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-    BigInt.fromI32(1)
-  );
 
   transfer.type = "TRANSFER";
 
