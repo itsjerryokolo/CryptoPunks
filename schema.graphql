@@ -105,6 +105,7 @@ interface Offer {
   id: ID!
   from: Account!
   open: Boolean!
+  amount: BigInt!
   nft: NFT!
   created: Event!
   removed: Event
@@ -115,6 +116,7 @@ type Ask implements Offer @entity {
   id: ID!
   from: Account!
   open: Boolean!
+  amount: BigInt!
   nft: NFT!
   created: Event!
   removed: Event
@@ -125,6 +127,7 @@ type Bid implements Offer @entity {
   id: ID!
   from: Account!
   open: Boolean!
+  amount: BigInt!
   nft: NFT!
   created: Event!
   removed: Event

@@ -56,15 +56,6 @@ export function handleAssign(event: Assigned): void {
 
   let trait = getTrait(event.params.punkIndex.toI32());
 
-  // if (!trait) {
-  //   log.info("Punk {}, traits: none", [event.params.punkIndex.toString()]);
-  // } else {
-  //   log.info("Punk {}, traits: {}", [
-  //     event.params.punkIndex.toString(),
-  //     trait.accessories.join(", "),
-  //   ]);
-  // }
-
   let assign = Assign.load(event.params.punkIndex.toString() + "-" + "ASSIGN");
   let metadata = MetaData.load(
     event.params.punkIndex.toString() + "-" + "METADATA"
@@ -200,11 +191,10 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   );
   let toAccount = Account.load(event.params.to.toHexString());
   // There is always a from account, since they were assigned
-  let fromAccount = Account.load(event.params.from.toHexString());
+  let fromAccount = Account.load(event.params.from.toHexString())!;
   let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK")!;
-  let contract = new Contract(event.address.toHexString());
 
-  if (event.params.to.toHexString() != WRAPPED_PUNK_ADDRESS) {
+  if (event.params.to.toHexString() !== WRAPPED_PUNK_ADDRESS) {
     if (!transfer) {
       transfer = new Transfer(
         event.params.punkIndex.toString() + "-" + "TRANSFER"
@@ -213,7 +203,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
     transfer.type = "TRANSFER";
 
-    transfer.contract = contract.id;
+    transfer.contract = event.address.toHexString();
     transfer.to = event.params.to.toHexString();
     transfer.from = event.params.from.toHexString();
 
@@ -222,8 +212,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     transfer.blockNumber = event.block.number;
     transfer.txHash = event.transaction.hash;
     transfer.blockHhash = event.block.hash;
-    transfer.contract = contract.id;
-    transfer.save();
+    transfer.contract = event.address.toHexString();
 
     if (!toAccount) {
       toAccount = new Account(event.params.to.toHexString());
@@ -233,19 +222,17 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BigInt.fromI32(1)
     );
-    toAccount.save();
-    if (!fromAccount) {
-      fromAccount = new Account(event.params.to.toHexString());
-      fromAccount.numberOfPunksOwned = BigInt.fromI32(0);
-    }
+
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BigInt.fromI32(1)
     );
-    fromAccount.save();
+
+    transfer.save();
+    toAccount.save();
   }
 
+  fromAccount.save();
   punk.save();
-  contract.save();
 }
 
 export function handlePunkOffered(event: PunkOffered): void {
@@ -288,8 +275,9 @@ export function handlePunkOffered(event: PunkOffered): void {
   ask.nft = event.params.punkIndex.toString();
   ask.created = askCreated.id;
   ask.removed = askRemoved.id;
-  askCreated.type = "ASK_CREATED";
+  ask.amount = event.params.minValue;
 
+  askCreated.type = "ASK_CREATED";
   askCreated.amount = event.params.minValue;
   askCreated.from = account.id;
   askCreated.to = event.params.toAddress.toHexString();
@@ -303,6 +291,7 @@ export function handlePunkOffered(event: PunkOffered): void {
   punk.tokenId = event.params.punkIndex;
   punk.owner = event.params.toAddress.toHexString();
 
+  ask.save();
   punk.save();
   account.save();
   askCreated.save();
@@ -354,6 +343,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bid.from = account.id;
   bid.nft = event.params.punkIndex.toString();
   bid.offerType = "BID";
+  bid.amount = event.params.value;
 
   bidRemoved.bid = bidCreated.id;
   bidRemoved.amount = event.params.value;
@@ -442,17 +432,16 @@ export function handlePunkBought(event: PunkBought): void {
   log.debug("handlePunkBought", []);
 
   let sale = Sale.load(event.params.punkIndex.toString() + "-" + "SALE");
-  let account = Account.load(event.params.toAddress.toHexString());
   let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK");
   let contract = new Contract(event.address.toHexString());
+  let toAccount = Account.load(event.params.toAddress.toHexString());
+  // There is always a from account, since they were assigned
+  let fromAccount = Account.load(event.params.fromAddress.toHexString())!;
 
   if (!sale) {
     sale = new Sale(event.params.punkIndex.toString() + "-" + "SALE");
     contract.totalAmountTraded = BigInt.fromI32(0);
     contract.totalSales = BigInt.fromI32(0);
-  }
-  if (!account) {
-    account = new Account(event.params.toAddress.toHexString());
   }
   if (!punk) {
     punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
@@ -474,13 +463,27 @@ export function handlePunkBought(event: PunkBought): void {
   );
   contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
 
-  punk.purchasedBy = account.id;
+  if (!toAccount) {
+    toAccount = new Account(event.params.toAddress.toHexString());
+    toAccount.numberOfPunksOwned = BigInt.fromI32(0);
+  }
+
+  toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+    BigInt.fromI32(1)
+  );
+
+  fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+    BigInt.fromI32(1)
+  );
+
+  punk.purchasedBy = toAccount.id;
 
   punk.tokenId = event.params.punkIndex;
   punk.owner = event.params.toAddress.toHexString();
 
   punk.save();
-  account.save();
+  fromAccount.save();
+  toAccount.save();
   contract.save();
   sale.save();
 }
@@ -567,6 +570,8 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
   if (contract === null) {
     contract = new Contract(event.address.toHexString());
     let symbolCall = wrappedPunkContract.try_symbol();
+    contract.totalSupply = BigInt.fromI32(0);
+
     if (!symbolCall.reverted) {
       contract.symbol = symbolCall.value;
     } else {
@@ -581,26 +586,17 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     }
   }
 
-  let totalSupplyCall = wrappedPunkContract.try_totalSupply();
-  if (!totalSupplyCall.reverted) {
-    contract.totalSupply = totalSupplyCall.value;
-  } else {
-    log.warning("totalSupplyCall Reverted", []);
-  }
-
-  contract.save();
-
   // A wrapped punk is minted (wrapped)
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
     punk.wrapped = true;
-    punk.save();
+    contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
     return;
   }
 
   // A wrapped punk is burned (unwrapped)
   if (event.params.to.toHexString() == ZERO_ADDRESS) {
     punk.wrapped = false;
-    punk.save();
+    contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
     return;
   }
 
@@ -626,6 +622,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
   transfer.blockHhash = event.block.hash;
   transfer.contract = contract.id;
 
+  contract.save();
   transfer.save();
   toAccount.save();
   fromAccount.save();
