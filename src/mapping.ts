@@ -275,8 +275,9 @@ export function handlePunkOffered(event: PunkOffered): void {
   ask.nft = event.params.punkIndex.toString();
   ask.created = askCreated.id;
   ask.removed = askRemoved.id;
-  askCreated.type = "ASK_CREATED";
+  ask.amount = event.params.minValue;
 
+  askCreated.type = "ASK_CREATED";
   askCreated.amount = event.params.minValue;
   askCreated.from = account.id;
   askCreated.to = event.params.toAddress.toHexString();
@@ -290,6 +291,7 @@ export function handlePunkOffered(event: PunkOffered): void {
   punk.tokenId = event.params.punkIndex;
   punk.owner = event.params.toAddress.toHexString();
 
+  ask.save();
   punk.save();
   account.save();
   askCreated.save();
@@ -341,6 +343,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bid.from = account.id;
   bid.nft = event.params.punkIndex.toString();
   bid.offerType = "BID";
+  bid.amount = event.params.value;
 
   bidRemoved.bid = bidCreated.id;
   bidRemoved.amount = event.params.value;
