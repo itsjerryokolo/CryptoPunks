@@ -11,8 +11,8 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 itsjerryokolo/cryptopunks"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.22.0-alpha.3",
-    "@graphprotocol/graph-ts": "^0.22.0-alpha.3",
+    "@graphprotocol/graph-cli": "^0.22.0",
+    "@graphprotocol/graph-ts": "^0.22.0",
     "keytar": "^7.4.0"
   }
 }

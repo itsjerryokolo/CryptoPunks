@@ -200,7 +200,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   );
   let toAccount = Account.load(event.params.to.toHexString());
   // There is always a from account, since they were assigned
-  let fromAccount = Account.load(event.params.from.toHexString())!;
+  let fromAccount = Account.load(event.params.from.toHexString());
   let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK")!;
   let contract = new Contract(event.address.toHexString());
 
@@ -210,6 +210,21 @@ export function handlePunkTransfer(event: PunkTransfer): void {
         event.params.punkIndex.toString() + "-" + "TRANSFER"
       );
     }
+
+    transfer.type = "TRANSFER";
+
+    transfer.contract = contract.id;
+    transfer.to = event.params.to.toHexString();
+    transfer.from = event.params.from.toHexString();
+
+    transfer.nft = event.params.punkIndex.toString();
+    transfer.timestamp = event.block.timestamp;
+    transfer.blockNumber = event.block.number;
+    transfer.txHash = event.transaction.hash;
+    transfer.blockHhash = event.block.hash;
+    transfer.contract = contract.id;
+    transfer.save();
+
     if (!toAccount) {
       toAccount = new Account(event.params.to.toHexString());
       toAccount.numberOfPunksOwned = BigInt.fromI32(0);
@@ -218,28 +233,17 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BigInt.fromI32(1)
     );
-
+    toAccount.save();
+    if (!fromAccount) {
+      fromAccount = new Account(event.params.to.toHexString());
+      fromAccount.numberOfPunksOwned = BigInt.fromI32(0);
+    }
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BigInt.fromI32(1)
     );
+    fromAccount.save();
   }
 
-  transfer.type = "TRANSFER";
-
-  transfer.contract = contract.id;
-  transfer.to = event.params.to.toHexString();
-  transfer.from = event.params.from.toHexString();
-
-  transfer.nft = event.params.punkIndex.toString();
-  transfer.timestamp = event.block.timestamp;
-  transfer.blockNumber = event.block.number;
-  transfer.txHash = event.transaction.hash;
-  transfer.blockHhash = event.block.hash;
-  transfer.contract = contract.id;
-
-  transfer.save();
-  toAccount.save();
-  fromAccount.save();
   punk.save();
   contract.save();
 }
@@ -560,7 +564,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     BigInt.fromI32(1)
   );
 
-  if (contract == null) {
+  if (contract === null) {
     contract = new Contract(event.address.toHexString());
     let symbolCall = wrappedPunkContract.try_symbol();
     if (!symbolCall.reverted) {
@@ -605,7 +609,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     event.params.tokenId.toString() + "-" + "TRANSFER"
   );
 
-  if (transfer == null) {
+  if (transfer === null) {
     transfer = new Transfer(event.params.tokenId.toString() + "-" + "TRANSFER");
   }
 
