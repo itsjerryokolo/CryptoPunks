@@ -191,9 +191,8 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   );
   let toAccount = Account.load(event.params.to.toHexString());
   // There is always a from account, since they were assigned
-  let fromAccount = Account.load(event.params.from.toHexString());
+  let fromAccount = Account.load(event.params.from.toHexString())!;
   let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK")!;
-  let contract = new Contract(event.address.toHexString());
 
   if (event.params.to.toHexString() !== WRAPPED_PUNK_ADDRESS) {
     if (!transfer) {
@@ -204,7 +203,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
     transfer.type = "TRANSFER";
 
-    transfer.contract = contract.id;
+    transfer.contract = event.address.toHexString();
     transfer.to = event.params.to.toHexString();
     transfer.from = event.params.from.toHexString();
 
@@ -213,7 +212,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     transfer.blockNumber = event.block.number;
     transfer.txHash = event.transaction.hash;
     transfer.blockHhash = event.block.hash;
-    transfer.contract = contract.id;
+    transfer.contract = event.address.toHexString();
 
     if (!toAccount) {
       toAccount = new Account(event.params.to.toHexString());
@@ -227,13 +226,13 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BigInt.fromI32(1)
     );
+
+    transfer.save();
+    toAccount.save();
   }
 
-  transfer.save();
-  toAccount.save();
   fromAccount.save();
   punk.save();
-  contract.save();
 }
 
 export function handlePunkOffered(event: PunkOffered): void {
@@ -434,7 +433,7 @@ export function handlePunkBought(event: PunkBought): void {
   let contract = new Contract(event.address.toHexString());
   let toAccount = Account.load(event.params.toAddress.toHexString());
   // There is always a from account, since they were assigned
-  let fromAccount = Account.load(event.params.fromAddress.toHexString());
+  let fromAccount = Account.load(event.params.fromAddress.toHexString())!;
 
   if (!sale) {
     sale = new Sale(event.params.punkIndex.toString() + "-" + "SALE");
@@ -462,7 +461,7 @@ export function handlePunkBought(event: PunkBought): void {
   contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
 
   if (!toAccount) {
-    toAccount = new Account(event.params.to.toHexString());
+    toAccount = new Account(event.params.toAddress.toHexString());
     toAccount.numberOfPunksOwned = BigInt.fromI32(0);
   }
 
