@@ -56,28 +56,48 @@ export function handleAssign(event: Assigned): void {
 
   let trait = getTrait(event.params.punkIndex.toI32());
 
-  let assign = Assign.load(event.params.punkIndex.toString() + "-" + "ASSIGN");
+  let assign = Assign.load(
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "ASSIGN"
+  );
   let metadata = MetaData.load(
-    event.params.punkIndex.toString() + "-" + "METADATA"
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "METADATA"
   );
   let account = Account.load(event.params.to.toHexString());
   let cryptopunk = cryptopunks.bind(event.address);
   let contract = Contract.load(event.address.toHexString());
-  let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK");
+  let punk = Punk.load(event.params.punkIndex.toString());
 
   if (!assign) {
-    assign = new Assign(event.params.punkIndex.toString() + "-" + "ASSIGN");
+    assign = new Assign(
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "ASSIGN"
+    );
   }
   if (!account) {
     account = new Account(event.params.to.toHexString());
     account.numberOfPunksOwned = BigInt.fromI32(1);
   }
   if (!punk) {
-    punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
+    punk = new Punk(event.params.punkIndex.toString());
   }
   if (metadata == null) {
     metadata = new MetaData(
-      event.params.punkIndex.toString() + "-" + "METADATA"
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "METADATA"
     );
     metadata.traits = new Array<string>();
   }
@@ -187,22 +207,33 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   log.debug("handlePunkTransfer", []);
 
   let transfer = Transfer.load(
-    event.params.punkIndex.toString() + "-" + "TRANSFER"
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "TRANSFER"
   );
   let toAccount = Account.load(event.params.to.toHexString());
   // There is always a from account, since they were assigned
   let fromAccount = Account.load(event.params.from.toHexString())!;
-  let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK")!;
+  let punk = Punk.load(event.params.punkIndex.toString());
+
+  if (!punk) {
+    punk = new Punk(event.params.punkIndex.toString());
+  }
 
   if (event.params.to.toHexString() !== WRAPPED_PUNK_ADDRESS) {
     if (!transfer) {
       transfer = new Transfer(
-        event.params.punkIndex.toString() + "-" + "TRANSFER"
+        event.transaction.hash.toHexString() +
+          "-" +
+          event.logIndex.toString() +
+          "-" +
+          "TRANSFER"
       );
     }
 
     transfer.type = "TRANSFER";
-
     transfer.contract = event.address.toHexString();
     transfer.to = event.params.to.toHexString();
     transfer.from = event.params.from.toHexString();
@@ -230,7 +261,6 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     transfer.save();
     toAccount.save();
   }
-
   fromAccount.save();
   punk.save();
 }
@@ -239,33 +269,61 @@ export function handlePunkOffered(event: PunkOffered): void {
   log.debug("handlePunkOffered", []);
 
   let askCreated = AskCreated.load(
-    event.params.punkIndex.toString() + "-" + "ASKCREATED"
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "ASKCREATED"
   );
   let askRemoved = AskRemoved.load(
-    event.params.punkIndex.toString() + "-" + "ASKREMOVED"
+    event.transaction.hash.toHexString() +
+      "-" +
+      "-" +
+      event.logIndex.toString() +
+      "ASKREMOVED"
   );
-  let ask = Ask.load(event.params.punkIndex.toString() + "-" + "ASK");
-  let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK");
+  let ask = Ask.load(
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "ASK"
+  );
+  let punk = Punk.load(event.params.punkIndex.toString());
   let contract = new Contract(event.address.toHexString());
   let account = Account.load(event.params.toAddress.toHexString());
 
   if (!askCreated) {
     askCreated = new AskCreated(
-      event.params.punkIndex.toString() + "-" + "ASKCREATED"
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "ASKCREATED"
     );
   }
   if (!punk) {
-    punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
+    punk = new Punk(event.params.punkIndex.toString());
   }
   if (!account) {
     account = new Account(event.params.toAddress.toHexString());
   }
   if (!ask) {
-    ask = new Ask(event.params.punkIndex.toString() + "-" + "ASK");
+    ask = new Ask(
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "ASK"
+    );
   }
   if (!askRemoved) {
     askRemoved = new AskRemoved(
-      event.params.punkIndex.toString() + "-" + "ASKREMOVED"
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "ASKREMOVED"
     );
   }
   ask.from = account.id;
@@ -273,7 +331,9 @@ export function handlePunkOffered(event: PunkOffered): void {
     ask.open = true;
   }
   ask.nft = event.params.punkIndex.toString();
+  ask.from = account.id;
   ask.created = askCreated.id;
+  ask.offerType = "ASK";
   ask.removed = askRemoved.id;
   ask.amount = event.params.minValue;
 
@@ -302,24 +362,49 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   log.debug("handlePunkBidCreatedEntered", []);
 
   let bidCreated = BidCreated.load(
-    event.params.punkIndex.toString() + "-" + "BIDCREATED"
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "-" +
+      "BIDCREATED"
   );
-  let bid = Bid.load(event.params.punkIndex.toString() + "-" + "BID");
+  let bid = Bid.load(
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "BID"
+  );
   let account = Account.load(event.params.fromAddress.toHexString());
   let contract = new Contract(event.address.toHexString());
   let bidRemoved = BidRemoved.load(
-    event.params.punkIndex.toString() + "-" + "BIDREMOVED"
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "BIDREMOVED"
   );
-  let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK");
+  let punk = Punk.load(event.params.punkIndex.toString());
 
   if (!bidCreated) {
     bidCreated = new BidCreated(
-      event.params.punkIndex.toString() + "-" + "BIDCREATED"
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString())
+        .concat("-")
+        .concat("BIDCREATED")
     );
   }
   if (!bidRemoved) {
     bidRemoved = new BidRemoved(
-      event.params.punkIndex.toString() + "-" + "BIDREMOVED"
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString())
+        .concat("-")
+        .concat("BIDREMOVED")
     );
   }
 
@@ -328,10 +413,17 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   }
 
   if (!punk) {
-    punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
+    punk = new Punk(event.params.punkIndex.toString());
   }
   if (!bid) {
-    bid = new Bid(event.params.punkIndex.toString() + "-" + "BID");
+    bid = new Bid(
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString())
+        .concat("-")
+        .concat("BID")
+    );
   }
 
   if (!bid) {
@@ -381,27 +473,47 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   log.debug("handlePunkBidCreatedWithdrawn", []);
 
   let bidRemoved = BidRemoved.load(
-    event.params.punkIndex.toString() + "-" + "BIDREMOVED"
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString())
+      .concat("-")
+      .concat("BIDREMOVED")
   );
   let bidCreated = BidCreated.load(
-    event.params.punkIndex.toString() + "-" + "BIDCREATED"
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString())
+      .concat("-")
+      .concat("BIDCREATED")
   );
   let account = Account.load(event.params.fromAddress.toHexString());
   let contract = new Contract(event.address.toHexString());
-  let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK");
+  let punk = Punk.load(event.params.punkIndex.toString());
 
   if (!bidRemoved) {
     bidRemoved = new BidRemoved(
-      event.params.punkIndex.toString() + "-" + "BIDREMOVED"
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString())
+        .concat("-")
+        .concat("BIDREMOVED")
     );
   }
   if (!bidCreated) {
     bidCreated = new BidCreated(
-      event.params.punkIndex.toString() + "-" + "BIDCREATED"
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString())
+        .concat("-")
+        .concat("BIDCREATED")
     );
   }
   if (!punk) {
-    punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
+    punk = new Punk(event.params.punkIndex.toString());
   }
   if (!account) {
     account = new Account(event.params.fromAddress.toHexString());
@@ -418,6 +530,13 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   bidRemoved.blockHhash = event.block.hash;
   bidRemoved.type = "BID_REMOVED";
 
+  bidCreated.nft = event.params.punkIndex.toString();
+  bidCreated.timestamp = event.block.timestamp;
+  bidCreated.blockNumber = event.block.number;
+  bidCreated.txHash = event.transaction.hash;
+  bidCreated.blockHhash = event.block.hash;
+  bidCreated.type = "BID_CREATED";
+
   punk.tokenId = event.params.punkIndex;
   punk.owner = event.params.fromAddress.toHexString();
 
@@ -431,20 +550,32 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 export function handlePunkBought(event: PunkBought): void {
   log.debug("handlePunkBought", []);
 
-  let sale = Sale.load(event.params.punkIndex.toString() + "-" + "SALE");
-  let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK");
+  let sale = Sale.load(
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "SALE"
+  );
+  let punk = Punk.load(event.params.punkIndex.toString());
   let contract = new Contract(event.address.toHexString());
   let toAccount = Account.load(event.params.toAddress.toHexString());
   // There is always a from account, since they were assigned
   let fromAccount = Account.load(event.params.fromAddress.toHexString())!;
 
   if (!sale) {
-    sale = new Sale(event.params.punkIndex.toString() + "-" + "SALE");
+    sale = new Sale(
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "SALE"
+    );
     contract.totalAmountTraded = BigInt.fromI32(0);
     contract.totalSales = BigInt.fromI32(0);
   }
   if (!punk) {
-    punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
+    punk = new Punk(event.params.punkIndex.toString());
   }
 
   sale.amount = event.params.value;
@@ -492,26 +623,42 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   log.debug("handlePunkNoLongerForSale", []);
 
   let askRemoved = AskRemoved.load(
-    event.params.punkIndex.toString() + "-" + "ASKREMOVED"
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "ASKREMOVED"
   );
   let askCreated = AskCreated.load(
-    event.params.punkIndex.toString() + "-" + "ASKCREATED"
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "ASKCREATED"
   );
   let contract = new Contract(event.address.toHexString());
-  let punk = Punk.load(event.params.punkIndex.toString() + "-" + "PUNK");
+  let punk = Punk.load(event.params.punkIndex.toString());
 
   if (!askCreated) {
     askCreated = new AskCreated(
-      event.params.punkIndex.toString() + "-" + "ASKCREATED"
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "ASKCREATED"
     );
   }
   if (!askRemoved) {
     askRemoved = new AskRemoved(
-      event.params.punkIndex.toString() + "-" + "ASKREMOVED"
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "ASKREMOVED"
     );
   }
   if (!punk) {
-    punk = new Punk(event.params.punkIndex.toString() + "-" + "PUNK");
+    punk = new Punk(event.params.punkIndex.toString());
   }
 
   askCreated.contract = contract.id;
@@ -545,7 +692,10 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     event.params.to.toHexString(),
   ]);
 
-  let punk = Punk.load(event.params.tokenId.toString() + "-" + "PUNK")!;
+  let punk = Punk.load(event.params.tokenId.toString());
+  if (!punk) {
+    punk = new Punk(event.params.tokenId.toString());
+  }
 
   let toAccount = Account.load(event.params.to.toHexString());
   // There is always a from account, since they were assigned
@@ -554,7 +704,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
   let wrappedPunkContract = WrappedPunks.bind(event.address);
   let contract = Contract.load(event.address.toHexString());
 
-  if (toAccount == null) {
+  if (!toAccount) {
     toAccount = new Account(event.params.to.toHexString());
     toAccount.numberOfPunksOwned = BigInt.fromI32(0);
   }
@@ -567,7 +717,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     BigInt.fromI32(1)
   );
 
-  if (contract === null) {
+  if (!contract) {
     contract = new Contract(event.address.toHexString());
     let symbolCall = wrappedPunkContract.try_symbol();
     contract.totalSupply = BigInt.fromI32(0);
@@ -602,11 +752,21 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 
   // We do not want to save a transfer for wrapped punk mints/burns
   let transfer = Transfer.load(
-    event.params.tokenId.toString() + "-" + "TRANSFER"
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "WRAPPEDPUNKTRANSFER"
   );
 
-  if (transfer === null) {
-    transfer = new Transfer(event.params.tokenId.toString() + "-" + "TRANSFER");
+  if (!transfer) {
+    transfer = new Transfer(
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "WRAPPEDPUNKTRANSFER"
+    );
   }
 
   transfer.type = "TRANSFER";
