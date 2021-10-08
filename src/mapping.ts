@@ -86,7 +86,7 @@ export function handleAssign(event: Assigned): void {
   }
   if (!account) {
     account = new Account(event.params.to.toHexString());
-    account.numberOfPunksOwned = BigInt.fromI32(1);
+    account.numberOfPunksOwned = BigInt.fromI32(0);
   }
   if (!punk) {
     punk = new Punk(event.params.punkIndex.toString());
@@ -196,12 +196,10 @@ export function handleAssign(event: Assigned): void {
 
     metadata.traits = traits;
   }
-  //We initialized a new one if it doesn't exist, but if it does, only then do we increment because it has assigned multiple punks to it.
-  if (account.numberOfPunksOwned > BigInt.fromI32(1)) {
-    account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
-      BigInt.fromI32(1)
-    );
-  }
+
+  account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
+    BigInt.fromI32(1)
+  );
 
   account.save();
   assign.save();
@@ -265,9 +263,6 @@ export function handlePunkTransfer(event: PunkTransfer): void {
       BigInt.fromI32(1)
     );
 
-    if (!punk) {
-      punk = new Punk(event.params.punkIndex.toString());
-    }
     //Capture punk transfers and owners if not transfered to WRAPPED PUNK ADDRESS
     punk.owner = toAccount.id;
 
@@ -275,6 +270,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     toAccount.save();
     punk.save();
   }
+
   fromAccount.save();
   punk.save();
 }
