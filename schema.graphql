@@ -11,6 +11,8 @@ enum EventType {
   BID_CREATED
   BID_REMOVED
   SALE
+  WRAP
+  UNWRAP
 }
 
 enum OfferType {
@@ -159,7 +161,6 @@ type Contract @entity {
 }
 
 type Assign implements Event @entity {
-  "Punk + Entity name"
   id: ID!
   punksRemainingToAssign: BigInt!
   contract: Contract
@@ -175,7 +176,6 @@ type Assign implements Event @entity {
 }
 
 type Sale implements Event @entity {
-  "Punk + Entity name"
   id: ID!
   to: Account
   amount: BigInt
@@ -190,7 +190,6 @@ type Sale implements Event @entity {
 }
 
 type AskCreated implements Event @entity {
-  "Punk + Entity name"
   id: ID!
   from: Account
   to: Account
@@ -205,7 +204,6 @@ type AskCreated implements Event @entity {
 }
 
 type BidCreated implements Event @entity {
-  "Punk + Entity name"
   id: ID!
   from: Account
   to: Account
@@ -220,7 +218,6 @@ type BidCreated implements Event @entity {
 }
 
 type BidRemoved implements Event @entity {
-  "Punk + Entity name"
   id: ID!
   from: Account
   to: Account
@@ -236,7 +233,6 @@ type BidRemoved implements Event @entity {
 }
 
 type AskRemoved implements Event @entity {
-  "Punk + Entity name"
   id: ID!
   ask: AskCreated!
   from: Account
@@ -252,7 +248,34 @@ type AskRemoved implements Event @entity {
 }
 
 type Transfer implements Event @entity {
-  "Punk"
+  id: ID!
+  from: Account
+  to: Account
+  amount: BigInt
+  contract: Contract
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType!
+}
+
+type Wrap implements Event @entity {
+  id: ID!
+  from: Account
+  to: Account
+  amount: BigInt
+  contract: Contract
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType!
+}
+
+type Unwrap implements Event @entity {
   id: ID!
   from: Account
   to: Account
