@@ -91,7 +91,7 @@ export function handleAssign(event: Assigned): void {
   if (!punk) {
     punk = new Punk(event.params.punkIndex.toString());
   }
-  if (metadata == null) {
+  if (!metadata) {
     metadata = new MetaData(
       event.transaction.hash.toHexString() +
         "-" +
@@ -102,7 +102,7 @@ export function handleAssign(event: Assigned): void {
     metadata.traits = new Array<string>();
   }
 
-  if (contract == null) {
+  if (!contract) {
     contract = new Contract(event.address.toHexString());
 
     let symbolCall = cryptopunk.try_symbol();
@@ -196,6 +196,13 @@ export function handleAssign(event: Assigned): void {
 
     metadata.traits = traits;
   }
+  //We initialized a new one if it doesn't exist, but if it does, only then do we increment because it has assigned multiple punks to it.
+  if (account.numberOfPunksOwned > BigInt.fromI32(1)) {
+    account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+  }
+
   account.save();
   assign.save();
   contract.save();
@@ -258,8 +265,15 @@ export function handlePunkTransfer(event: PunkTransfer): void {
       BigInt.fromI32(1)
     );
 
+    if (!punk) {
+      punk = new Punk(event.params.punkIndex.toString());
+    }
+    //Capture punk transfers and owners if not transfered to WRAPPED PUNK ADDRESS
+    punk.owner = toAccount.id;
+
     transfer.save();
     toAccount.save();
+    punk.save();
   }
   fromAccount.save();
   punk.save();
@@ -278,8 +292,8 @@ export function handlePunkOffered(event: PunkOffered): void {
   let askRemoved = AskRemoved.load(
     event.transaction.hash.toHexString() +
       "-" +
-      "-" +
       event.logIndex.toString() +
+      "-" +
       "ASKREMOVED"
   );
   let ask = Ask.load(
@@ -365,7 +379,6 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
     event.transaction.hash.toHexString() +
       "-" +
       event.logIndex.toString() +
-      "-" +
       "-" +
       "BIDCREATED"
   );
@@ -542,6 +555,7 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 
   punk.save();
   contract.save();
+  account.save();
   bidRemoved.save();
   bidCreated.save();
   contract.save();
