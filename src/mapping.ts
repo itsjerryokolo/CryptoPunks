@@ -211,23 +211,27 @@ export function handleAssign(event: Assigned): void {
 export function handlePunkTransfer(event: PunkTransfer): void {
   log.debug("handlePunkTransfer", []);
 
-  let transfer = Transfer.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "TRANSFER"
-  );
-  let toAccount = Account.load(event.params.to.toHexString());
-  // There is always a from account, since they were assigned
-  let fromAccount = Account.load(event.params.from.toHexString())!;
-  let punk = Punk.load(event.params.punkIndex.toString());
+  if (
+    event.params.to.toHexString() !== WRAPPED_PUNK_ADDRESS ||
+    event.params.from.toHexString() !== WRAPPED_PUNK_ADDRESS
+  ) {
+    // Regular PunkTransfer
 
-  if (!punk) {
-    punk = new Punk(event.params.punkIndex.toString());
-  }
+    let transfer = Transfer.load(
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "TRANSFER"
+    );
+    let toAccount = Account.load(event.params.to.toHexString());
+    // There is always a from account, since they were assigned
+    let fromAccount = Account.load(event.params.from.toHexString())!;
+    let punk = Punk.load(event.params.punkIndex.toString());
 
-  if (event.params.to.toHexString() !== WRAPPED_PUNK_ADDRESS) {
+    if (!punk) {
+      punk = new Punk(event.params.punkIndex.toString());
+    }
     if (!transfer) {
       transfer = new Transfer(
         event.transaction.hash.toHexString() +
@@ -268,11 +272,32 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
     transfer.save();
     toAccount.save();
+    fromAccount.save();
     punk.save();
-  }
+  } else if (event.params.to.toHexString() == WRAPPED_PUNK_ADDRESS) {
+    // Mint/Wrap
 
-  fromAccount.save();
-  punk.save();
+    let fromAccount = Account.load(event.params.from.toHexString())!;
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
+    fromAccount.save();
+  } else if (event.params.from.toHexString() == WRAPPED_PUNK_ADDRESS) {
+    // Burn/Unwrap
+
+    let punk = Punk.load(event.params.punkIndex.toString())!;
+    let toAccount = Account.load(event.params.to.toHexString());
+    if (!toAccount) {
+      toAccount = new Account(event.params.to.toHexString());
+      toAccount.numberOfPunksOwned = BigInt.fromI32(0);
+    }
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+    punk.owner = toAccount.id;
+    punk.save();
+    toAccount.save();
+  }
 }
 
 export function handlePunkOffered(event: PunkOffered): void {
@@ -696,6 +721,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   contract.save();
 }
 
+// This function is called for three events: Mint (Wrap), Burn (Unwrap) and Transfer
 export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
   log.info("handleWrappedPunksTransfer tokenId: {} to: {}", [
     event.params.tokenId.toString(),
@@ -707,25 +733,8 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     punk = new Punk(event.params.tokenId.toString());
   }
 
-  let toAccount = Account.load(event.params.to.toHexString());
-  // There is always a from account, since they were assigned
-  let fromAccount = Account.load(event.params.from.toHexString())!;
-
   let wrappedPunkContract = WrappedPunks.bind(event.address);
   let contract = Contract.load(event.address.toHexString());
-
-  if (!toAccount) {
-    toAccount = new Account(event.params.to.toHexString());
-    toAccount.numberOfPunksOwned = BigInt.fromI32(0);
-  }
-
-  toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-    BigInt.fromI32(1)
-  );
-
-  fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-    BigInt.fromI32(1)
-  );
 
   if (!contract) {
     contract = new Contract(event.address.toHexString());
@@ -746,55 +755,72 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     }
   }
 
-  // A wrapped punk is minted (wrapped)
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
-    punk.wrapped = true;
+    // A wrapped punk is minted (wrapped)
+
+    let toAccount = Account.load(event.params.to.toHexString());
+    if (!toAccount) {
+      toAccount = new Account(event.params.to.toHexString());
+      toAccount.numberOfPunksOwned = BigInt.fromI32(0);
+    }
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+
     contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
-    return;
-  }
+    punk.owner = toAccount.id;
 
-  // A wrapped punk is burned (unwrapped)
-  if (event.params.to.toHexString() == ZERO_ADDRESS) {
-    punk.wrapped = false;
+    toAccount.save();
+    punk.save();
+  } else if (event.params.to.toHexString() == ZERO_ADDRESS) {
+    // A wrapped punk is burned (unwrapped)
+
     contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
-    return;
-  }
+  } else {
+    // Wrapped Punk Transfer
 
-  // We do not want to save a transfer for wrapped punk mints/burns
-  let transfer = Transfer.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "WRAPPEDPUNKTRANSFER"
-  );
-
-  if (!transfer) {
-    transfer = new Transfer(
+    // We do not want to save a transfer for wrapped punk mints/burns
+    let transfer = Transfer.load(
       event.transaction.hash.toHexString() +
         "-" +
         event.logIndex.toString() +
         "-" +
         "WRAPPEDPUNKTRANSFER"
     );
+
+    if (!transfer) {
+      transfer = new Transfer(
+        event.transaction.hash.toHexString() +
+          "-" +
+          event.logIndex.toString() +
+          "-" +
+          "WRAPPEDPUNKTRANSFER"
+      );
+    }
+
+    transfer.type = "TRANSFER";
+
+    transfer.contract = contract.id;
+    transfer.to = event.params.to.toHexString();
+    transfer.from = event.params.from.toHexString();
+
+    transfer.nft = event.params.tokenId.toString();
+    transfer.timestamp = event.block.timestamp;
+    transfer.blockNumber = event.block.number;
+    transfer.txHash = event.transaction.hash;
+    transfer.blockHhash = event.block.hash;
+    transfer.contract = contract.id;
+    transfer.save();
+
+    // There is always a from account, since they were assigned
+    let fromAccount = Account.load(event.params.from.toHexString())!;
+
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
+    fromAccount.save();
   }
 
-  transfer.type = "TRANSFER";
-
-  transfer.contract = contract.id;
-  transfer.to = event.params.to.toHexString();
-  transfer.from = event.params.from.toHexString();
-
-  transfer.nft = event.params.tokenId.toString();
-  transfer.timestamp = event.block.timestamp;
-  transfer.blockNumber = event.block.number;
-  transfer.txHash = event.transaction.hash;
-  transfer.blockHhash = event.block.hash;
-  transfer.contract = contract.id;
-
   contract.save();
-  transfer.save();
-  toAccount.save();
-  fromAccount.save();
   punk.save();
 }
