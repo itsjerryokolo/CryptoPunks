@@ -1,10 +1,12 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import {
+  assert,
   test,
   newMockEvent,
   createMockedFunction,
 } from "matchstick-as/assembly/index";
 import { log } from "matchstick-as/assembly/log";
+import { logStore } from "matchstick-as/assembly/store";
 import { Assign } from "../generated/cryptopunks/cryptopunks";
 import { handleAssign } from "./mapping";
 
@@ -70,6 +72,17 @@ export function runTests(): void {
       1
     );
     handleAssign(assignEvent);
-    log.debug("It works!", []);
+    assert.fieldEquals(
+      "Account",
+      "0x6f4a2d3a4f47f9c647d86c929755593911ee91ec",
+      "numberOfPunksOwned",
+      "1"
+    );
+    // logStore();
   });
+
+  test("testTransfer", () => {});
+  test("testWrap", () => {});
+  test("testWrappedTransfer", () => {});
+  test("testUnwrap", () => {});
 }
