@@ -18,6 +18,7 @@ export let traits: Trait[] = [
   //2
   new Trait("female", ["wild hair"]),
 
+  /*
   //3
   new Trait("male", ["nerd glasses", "pipe", "wild hair"]),
 
@@ -34121,6 +34122,8 @@ export let traits: Trait[] = [
 
   new Trait("female", ["mohawk", "nerd glasses"]),
   //9999"
+
+  */
 ];
 
 export function getTrait(index: i32): Trait | null {
