@@ -23,10 +23,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@graphprotocol/graph-cli@^0.22.2":
-  version "0.22.2"
-  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.22.2.tgz#f66c5725e730aa18b3459eead529a2e0fb154d40"
-  integrity sha512-1O50KaE2zPIKTeDFipbG1r0CYe7Z54ZhwKB3AbfGA0nDsv+y4BTfTgLL/uiLDDT8FDMRSabK7oXOzIXNY4bKJw==
+"@graphprotocol/graph-cli@^0.22.3":
+  version "0.22.3"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.22.3.tgz#b937e50170381b4002e838f8a235197ff15acac3"
+  integrity sha512-vM5oBieTnAgqzxvaCB/iG6F7eFMOuGfxyDJ/9g+UHGfcEQQhElNV3vWLIk4l06/sShASqAwctOTo+3s5wuWhqg==
   dependencies:
     assemblyscript "0.19.10"
     binary-install-raw "0.0.13"
@@ -51,6 +51,13 @@
     tmp-promise "^3.0.2"
     which "2.0.2"
     yaml "^1.5.1"
+
+"@graphprotocol/graph-ts@0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-ts/-/graph-ts-0.22.0.tgz#5280513d1c8a162077f82ce7f9a492bb5783d6f4"
+  integrity sha512-kJIBL73xBxj0+NJdRABukAtcrc3Mb8jt31s0tCLPe6c57rQXEf7KR9oYrFdzE1ZsJCP6j+MX+A2+sj1Pj3aJtQ==
+  dependencies:
+    assemblyscript "0.19.10"
 
 "@graphprotocol/graph-ts@^0.22.1":
   version "0.22.1"
@@ -243,6 +250,14 @@ assemblyscript@0.19.10:
     binaryen "101.0.0-nightly.20210723"
     long "^4.0.0"
 
+assemblyscript@^0.19.16:
+  version "0.19.17"
+  resolved "https://registry.yarnpkg.com/assemblyscript/-/assemblyscript-0.19.17.tgz#b1dc9842a024a65eaf1f9943b3094e7c98b9f055"
+  integrity sha512-KY80XCUFaocBR9V+Xx9oaG2ftkO1Da13MDcF6ZB25Nlir8SHPQBzR7nqCqmVHxp5FoE3pAnxJMNmQmS3JiTUTA==
+  dependencies:
+    binaryen "101.0.0-nightly.20210904"
+    long "^4.0.0"
+
 assert-plus@1.0.0, assert-plus@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/assert-plus/-/assert-plus-1.0.0.tgz"
@@ -336,6 +351,11 @@ binaryen@101.0.0-nightly.20210723:
   version "101.0.0-nightly.20210723"
   resolved "https://registry.npmjs.org/binaryen/-/binaryen-101.0.0-nightly.20210723.tgz"
   integrity sha512-eioJNqhHlkguVSbblHOtLqlhtC882SOEPKmNFZaDuz1hzQjolxZ+eu3/kaS10n3sGPONsIZsO7R9fR00UyhEUA==
+
+binaryen@101.0.0-nightly.20210904:
+  version "101.0.0-nightly.20210904"
+  resolved "https://registry.yarnpkg.com/binaryen/-/binaryen-101.0.0-nightly.20210904.tgz#58a7990d6d64b16567f376a1fe47d8aea6698b14"
+  integrity sha512-2AvJhErttuoMvgNcYPPpPy7C12PSvDdtZWtEeX/Otm/Vtf4ePvBpT3UIA00hGAh8HNaGr+dzFNstxTUvjNwZTg==
 
 bindings@^1.5.0:
   version "1.5.0"
@@ -1844,6 +1864,14 @@ mafmt@^7.0.0:
   integrity sha512-vpeo9S+hepT3k2h5iFxzEHvvR0GPBx9uKaErmnRzYNcaKb03DgOArjEMlgG4a9LcuZZ89a3I8xbeto487n26eA==
   dependencies:
     multiaddr "^7.3.0"
+
+matchstick-as@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/matchstick-as/-/matchstick-as-0.1.5.tgz#b658d6c4d586b5ceffd41d4f503b60763c46c6df"
+  integrity sha512-ezJ4Sd6zhXkf7lNuxNLwq6qw9NS5iyr/HPua1GkXWi7RkRF4Znlkgyi1cwvjZgnGIqIAGQ4jke++1/6Sai9Qhg==
+  dependencies:
+    "@graphprotocol/graph-ts" "0.22.0"
+    assemblyscript "^0.19.16"
 
 md5.js@^1.3.4:
   version "1.3.5"

@@ -131,14 +131,10 @@ export let traits: Trait[] = [
   new Trait("female", ["red mohawk"]),
 
   //37
-  new Trait("female", ["cap","clown eyes blue"]),
+  new Trait("female", ["cap", "clown eyes blue"]),
 
   //38
-  new Trait("female", [
-    "classic shades",
-    "frumpy hair",
-    "purple lipstick",
-  ]),
+  new Trait("female", ["classic shades", "frumpy hair", "purple lipstick"]),
 
   //39
   new Trait("male", ["frown", "regular shades", "shaved head"]),
@@ -147,11 +143,7 @@ export let traits: Trait[] = [
   new Trait("male", ["bandana", "chinstrap", "smile"]),
 
   //41
-  new Trait("male", [
-    "clown eyes green",
-    "muttonchops",
-    "wild hair",
-  ]),
+  new Trait("male", ["clown eyes green", "muttonchops", "wild hair"]),
 
   //42
   new Trait("female", ["cigarette", "wild hair"]),
@@ -184,12 +176,7 @@ export let traits: Trait[] = [
   new Trait("male", ["earring", "muttonchops", "wild hair"]),
 
   //52
-  new Trait("male", [
-    "earring",
-    "knitted cap",
-    "nerd glasses",
-    "shadow beard",
-  ]),
+  new Trait("male", ["earring", "knitted cap", "nerd glasses", "shadow beard"]),
 
   //53
   new Trait("female", ["big shades", "straight hair"]),

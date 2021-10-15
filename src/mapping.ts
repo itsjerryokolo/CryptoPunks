@@ -47,6 +47,8 @@ import {
   Unwrap,
 } from "../generated/schema";
 
+export { runTests } from "./mapping.test";
+
 let TOKEN_URI = "https://www.larvalabs.com/cryptopunks/details/";
 let CONTRACT_URI = "https://www.larvalabs.com/cryptopunks";
 let IMAGE_URI = "https://www.larvalabs.com/public/images/cryptopunks/punk";
@@ -127,25 +129,17 @@ export function handleAssign(event: Assigned): void {
     } else {
       log.warning("imageHashCall Reverted", []);
     }
+  }
 
-    let allPunksAssignedCall = cryptopunk.try_allPunksAssigned();
-    if (!allPunksAssignedCall.reverted) {
-      contract.allPunksAssigned = allPunksAssignedCall.value;
-    } else {
-      log.warning("allPunkAssignedCall Reverted", []);
-    }
-
-    let totalSupplyCall = cryptopunk.try_totalSupply();
-    if (!totalSupplyCall.reverted) {
-      contract.totalSupply = totalSupplyCall.value;
-    } else {
-      log.warning("totalSupplyCall Reverted", []);
-    }
+  let totalSupplyCall = cryptopunk.try_totalSupply();
+  if (!totalSupplyCall.reverted) {
+    contract.totalSupply = totalSupplyCall.value;
+  } else {
+    log.warning("totalSupplyCall Reverted", []);
   }
 
   assign.to = account.id;
   assign.nft = event.params.punkIndex.toString();
-  assign.punksRemainingToAssign = cryptopunk.punksRemainingToAssign();
   assign.timestamp = event.block.timestamp;
   assign.blockNumber = event.block.number;
   assign.txHash = event.transaction.hash;

@@ -155,14 +155,10 @@ type Contract @entity {
 
   "The hash of the composite image of all the Punks"
   imageHash: String
-
-  "True/False if all Punks have been assigned"
-  allPunksAssigned: Boolean
 }
 
 type Assign implements Event @entity {
   id: ID!
-  punksRemainingToAssign: BigInt!
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
