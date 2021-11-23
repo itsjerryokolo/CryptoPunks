@@ -33,7 +33,7 @@ interface Event {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -162,7 +162,7 @@ type Assign implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -179,7 +179,7 @@ type Sale implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -193,7 +193,7 @@ type AskCreated implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -207,7 +207,7 @@ type BidCreated implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -222,7 +222,7 @@ type BidRemoved implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -237,7 +237,7 @@ type AskRemoved implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -251,7 +251,7 @@ type Transfer implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -265,7 +265,7 @@ type Wrap implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -279,7 +279,7 @@ type Unwrap implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -290,7 +290,7 @@ type UserProxy @entity {
   id: ID!
   user: Account!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
 }

@@ -142,7 +142,7 @@ export function handleAssign(event: Assigned): void {
   assign.timestamp = event.block.timestamp;
   assign.blockNumber = event.block.number;
   assign.txHash = event.transaction.hash;
-  assign.blockHhash = event.block.hash;
+  assign.blockHash = event.block.hash;
   assign.contract = contract.id;
   assign.type = "ASSIGN";
 
@@ -247,7 +247,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     transfer.timestamp = event.block.timestamp;
     transfer.blockNumber = event.block.number;
     transfer.txHash = event.transaction.hash;
-    transfer.blockHhash = event.block.hash;
+    transfer.blockHash = event.block.hash;
     transfer.contract = event.address.toHexString();
 
     if (!toAccount) {
@@ -300,7 +300,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     wrap.timestamp = event.block.timestamp;
     wrap.nft = event.params.punkIndex.toString();
     wrap.blockNumber = event.block.number;
-    wrap.blockHhash = event.block.hash;
+    wrap.blockHash = event.block.hash;
     wrap.txHash = event.transaction.hash;
 
     wrap.save();
@@ -343,7 +343,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     unWrap.timestamp = event.block.timestamp;
     unWrap.nft = event.params.punkIndex.toString();
     unWrap.blockNumber = event.block.number;
-    unWrap.blockHhash = event.block.hash;
+    unWrap.blockHash = event.block.hash;
     unWrap.txHash = event.transaction.hash;
 
     punk.owner = toAccount.id;
@@ -433,7 +433,7 @@ export function handlePunkOffered(event: PunkOffered): void {
   askCreated.timestamp = event.block.timestamp;
   askCreated.blockNumber = event.block.number;
   askCreated.txHash = event.transaction.hash;
-  askCreated.blockHhash = event.block.hash;
+  askCreated.blockHash = event.block.hash;
   askCreated.contract = contract.id;
 
   punk.tokenId = event.params.punkIndex;
@@ -532,7 +532,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bidRemoved.timestamp = event.block.timestamp;
   bidRemoved.blockNumber = event.block.number;
   bidRemoved.txHash = event.transaction.hash;
-  bidRemoved.blockHhash = event.block.hash;
+  bidRemoved.blockHash = event.block.hash;
   bidRemoved.type = "BID_REMOVED";
 
   bidCreated.amount = event.params.value;
@@ -542,7 +542,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bidCreated.timestamp = event.block.timestamp;
   bidCreated.blockNumber = event.block.number;
   bidCreated.txHash = event.transaction.hash;
-  bidCreated.blockHhash = event.block.hash;
+  bidCreated.blockHash = event.block.hash;
   bidCreated.type = "BID_CREATED";
 
   punk.tokenId = event.params.punkIndex;
@@ -614,14 +614,14 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   bidRemoved.timestamp = event.block.timestamp;
   bidRemoved.blockNumber = event.block.number;
   bidRemoved.txHash = event.transaction.hash;
-  bidRemoved.blockHhash = event.block.hash;
+  bidRemoved.blockHash = event.block.hash;
   bidRemoved.type = "BID_REMOVED";
 
   bidCreated.nft = event.params.punkIndex.toString();
   bidCreated.timestamp = event.block.timestamp;
   bidCreated.blockNumber = event.block.number;
   bidCreated.txHash = event.transaction.hash;
-  bidCreated.blockHhash = event.block.hash;
+  bidCreated.blockHash = event.block.hash;
   bidCreated.type = "BID_CREATED";
 
   punk.tokenId = event.params.punkIndex;
@@ -674,7 +674,7 @@ export function handlePunkBought(event: PunkBought): void {
   sale.timestamp = event.block.timestamp;
   sale.blockNumber = event.block.number;
   sale.txHash = event.transaction.hash;
-  sale.blockHhash = event.block.hash;
+  sale.blockHash = event.block.hash;
   sale.type = "SALE";
 
   contract.totalAmountTraded = contract.totalAmountTraded.plus(
@@ -754,7 +754,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   askCreated.timestamp = event.block.timestamp;
   askCreated.blockNumber = event.block.number;
   askCreated.txHash = event.transaction.hash;
-  askCreated.blockHhash = event.block.hash;
+  askCreated.blockHash = event.block.hash;
   askCreated.type = "ASK_CREATED";
 
   askRemoved.ask = askCreated.id;
@@ -763,7 +763,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   askRemoved.timestamp = event.block.timestamp;
   askRemoved.blockNumber = event.block.number;
   askRemoved.txHash = event.transaction.hash;
-  askRemoved.blockHhash = event.block.hash;
+  askRemoved.blockHash = event.block.hash;
   askRemoved.type = "ASK_REMOVED";
 
   punk.tokenId = event.params.punkIndex;
@@ -844,7 +844,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     wrap.timestamp = event.block.timestamp;
     wrap.nft = event.params.tokenId.toString();
     wrap.blockNumber = event.block.number;
-    wrap.blockHhash = event.block.hash;
+    wrap.blockHash = event.block.hash;
     wrap.txHash = event.transaction.hash;
 
     contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
@@ -888,7 +888,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     unWrap.timestamp = event.block.timestamp;
     unWrap.nft = event.params.tokenId.toString();
     unWrap.blockNumber = event.block.number;
-    unWrap.blockHhash = event.block.hash;
+    unWrap.blockHash = event.block.hash;
     unWrap.txHash = event.transaction.hash;
 
     contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
@@ -927,7 +927,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     transfer.timestamp = event.block.timestamp;
     transfer.blockNumber = event.block.number;
     transfer.txHash = event.transaction.hash;
-    transfer.blockHhash = event.block.hash;
+    transfer.blockHash = event.block.hash;
     transfer.contract = contract.id;
     transfer.save();
 
