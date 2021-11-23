@@ -47,8 +47,6 @@ import {
   Unwrap,
 } from "../generated/schema";
 
-export { runTests } from "./mapping.test";
-
 let TOKEN_URI = "https://www.larvalabs.com/cryptopunks/details/";
 let CONTRACT_URI = "https://www.larvalabs.com/cryptopunks";
 let IMAGE_URI = "https://www.larvalabs.com/public/images/cryptopunks/punk";

@@ -7,8 +7,8 @@ import {
 } from "matchstick-as/assembly/index";
 import { log } from "matchstick-as/assembly/log";
 import { logStore } from "matchstick-as/assembly/store";
-import { Assign } from "../generated/cryptopunks/cryptopunks";
-import { handleAssign } from "./mapping";
+import { Assign } from "../../generated/cryptopunks/cryptopunks";
+import { handleAssign } from "../../src/mapping";
 
 const CRYPTOPUNKS_ADDRESS = Address.fromString(
   "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb"
@@ -65,24 +65,22 @@ function createAssign(to: Address, punkIndex: i32): Assign {
   return assignEvent;
 }
 
-export function runTests(): void {
-  test("test handleAssign", () => {
-    let assignEvent = createAssign(
-      Address.fromString("0x6f4a2d3a4f47f9c647d86c929755593911ee91ec"),
-      1
-    );
-    handleAssign(assignEvent);
-    assert.fieldEquals(
-      "Account",
-      "0x6f4a2d3a4f47f9c647d86c929755593911ee91ec",
-      "numberOfPunksOwned",
-      "1"
-    );
-    // logStore();
-  });
+test("test handleAssign", () => {
+  let assignEvent = createAssign(
+    Address.fromString("0x6f4a2d3a4f47f9c647d86c929755593911ee91ec"),
+    1
+  );
+  handleAssign(assignEvent);
+  assert.fieldEquals(
+    "Account",
+    "0x6f4a2d3a4f47f9c647d86c929755593911ee91ec",
+    "numberOfPunksOwned",
+    "1"
+  );
+  // logStore();
+});
 
-  test("testTransfer", () => {});
-  test("testWrap", () => {});
-  test("testWrappedTransfer", () => {});
-  test("testUnwrap", () => {});
-}
+test("testTransfer", () => {});
+test("testWrap", () => {});
+test("testWrappedTransfer", () => {});
+test("testUnwrap", () => {});
