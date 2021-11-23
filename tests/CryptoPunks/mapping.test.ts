@@ -12,10 +12,22 @@ import {
   PunkTransfer,
   Transfer,
 } from "../../generated/cryptopunks/cryptopunks";
-import { handleAssign, handlePunkTransfer } from "../../src/mapping";
+import {
+  ProxyRegistered,
+  Transfer as WrappedPunkTransfer,
+} from "../../generated/WrappedPunks/WrappedPunks";
+import {
+  handleAssign,
+  handleProxyRegistered,
+  handlePunkTransfer,
+  handleWrappedPunkTransfer,
+  WRAPPED_PUNK_ADDRESS,
+  ZERO_ADDRESS,
+} from "../../src/mapping";
 
 const OWNER1 = "0x6f4a2d3a4f47f9c647d86c929755593911ee91ec";
 const OWNER2 = "0xc36817163b7eaef25234e1d18adbfa52105ae510";
+const PROXY2 = "0x674578060c0f07146BcC86D12B8a2efA1e819C38";
 
 const CRYPTOPUNKS_ADDRESS = Address.fromString(
   "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb"
@@ -43,6 +55,24 @@ createMockedFunction(
 
 createMockedFunction(
   CRYPTOPUNKS_ADDRESS,
+  "totalSupply",
+  "totalSupply():(uint256)"
+).returns([ethereum.Value.fromI32(1)]);
+
+createMockedFunction(
+  Address.fromString(WRAPPED_PUNK_ADDRESS),
+  "symbol",
+  "symbol():(string)"
+).returns([ethereum.Value.fromString("WPUNKS")]);
+
+createMockedFunction(
+  Address.fromString(WRAPPED_PUNK_ADDRESS),
+  "name",
+  "name():(string)"
+).returns([ethereum.Value.fromString("Wrapped Cryptopunks")]);
+
+createMockedFunction(
+  Address.fromString(WRAPPED_PUNK_ADDRESS),
   "totalSupply",
   "totalSupply():(uint256)"
 ).returns([ethereum.Value.fromI32(1)]);
@@ -80,10 +110,11 @@ function createAssign(to: Address, punkIndex: i32): Assign {
   return assignEvent;
 }
 
-function createTransfer(
+function createPunkTransferEvent(
   from: Address,
   to: Address,
-  punkIndex: i32
+  punkIndex: i32,
+  blockNumber: i32 = 2
 ): PunkTransfer {
   let mockEvent = newMockEvent();
 
@@ -104,12 +135,73 @@ function createTransfer(
     mockEvent.logIndex,
     mockEvent.transactionLogIndex,
     mockEvent.logType,
-    createBlock(2),
+    createBlock(blockNumber),
     mockEvent.transaction,
     parameters
   );
 
   return transferEvent;
+}
+
+function createWrappedPunkTransfer(
+  from: Address,
+  to: Address,
+  tokenId: i32,
+  blockNumber: i32 = 2
+): WrappedPunkTransfer {
+  let mockEvent = newMockEvent();
+
+  let parameters = new Array<ethereum.EventParam>();
+
+  parameters.push(
+    new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
+  );
+  parameters.push(
+    new ethereum.EventParam("to", ethereum.Value.fromAddress(to))
+  );
+  parameters.push(
+    new ethereum.EventParam("tokenId", ethereum.Value.fromI32(tokenId))
+  );
+
+  let transferEvent = new WrappedPunkTransfer(
+    Address.fromString(WRAPPED_PUNK_ADDRESS),
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    createBlock(blockNumber),
+    mockEvent.transaction,
+    parameters
+  );
+
+  return transferEvent;
+}
+
+function createProxyRegisteredEvent(
+  user: Address,
+  proxy: Address
+): ProxyRegistered {
+  let mockEvent = newMockEvent();
+
+  let parameters = new Array<ethereum.EventParam>();
+
+  parameters.push(
+    new ethereum.EventParam("user", ethereum.Value.fromAddress(user))
+  );
+  parameters.push(
+    new ethereum.EventParam("proxy", ethereum.Value.fromAddress(proxy))
+  );
+
+  let proxyRegisteredEvent = new ProxyRegistered(
+    Address.fromString(WRAPPED_PUNK_ADDRESS),
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    createBlock(3),
+    mockEvent.transaction,
+    parameters
+  );
+
+  return proxyRegisteredEvent;
 }
 
 test("test handleAssign", () => {
@@ -119,7 +211,7 @@ test("test handleAssign", () => {
 });
 
 test("test Transfer", () => {
-  let transferEvent = createTransfer(
+  let transferEvent = createPunkTransferEvent(
     Address.fromString(OWNER1),
     Address.fromString(OWNER2),
     1
@@ -134,13 +226,51 @@ test("test Transfer", () => {
  * Example: https://etherscan.io/tx/0x83f2c4b428b2ee5cf0c317fe72bb39716ca2e4d93597b3d80a8a2e60aa698d22
  * 1. registerProxy
  * 2. send Punk to Proxy
- * 3. transfer Punk from Proxy to wrapped punks
+ * 3.1 transfer Punk from Proxy to wrapped punks
+ * 3.2 transfer WrappedPunk from 0x0 to owner
  * Owner: 0xb4cf0f5f2ffed445ca804898654366316d0a779a
  * User Proxy: 0x674578060c0f07146BcC86D12B8a2efA1e819C38
  *
  */
 test("testWrap", () => {
-  // let wrapEvent = createWrappedTransfer(
+  handleProxyRegistered(
+    createProxyRegisteredEvent(
+      Address.fromString(OWNER2),
+      Address.fromString(PROXY2)
+    )
+  );
+  handlePunkTransfer(
+    createPunkTransferEvent(
+      Address.fromString(OWNER2),
+      Address.fromString(PROXY2),
+      1,
+      4
+    )
+  );
+  handlePunkTransfer(
+    createPunkTransferEvent(
+      Address.fromString(PROXY2),
+      Address.fromString(WRAPPED_PUNK_ADDRESS),
+      1,
+      5
+    )
+  );
+  handleWrappedPunkTransfer(
+    createWrappedPunkTransfer(
+      Address.fromString(ZERO_ADDRESS),
+      Address.fromString(OWNER2),
+      1,
+      5
+    )
+  );
+  assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+  assert.fieldEquals(
+    "Account",
+    WRAPPED_PUNK_ADDRESS,
+    "numberOfPunksOwned",
+    "0"
+  );
+  logStore();
 });
 
 test("testWrappedTransfer", () => {});

@@ -24,6 +24,7 @@ import {
   WrappedPunks,
   Approval,
   Transfer as WrappedPunkTransfer,
+  ProxyRegistered,
 } from "../generated/WrappedPunks/WrappedPunks";
 
 import { getTrait } from "./traits";
@@ -45,6 +46,7 @@ import {
   Bid,
   Wrap,
   Unwrap,
+  UserProxy,
 } from "../generated/schema";
 
 let TOKEN_URI = "https://www.larvalabs.com/cryptopunks/details/";
@@ -947,4 +949,14 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 
   contract.save();
   punk.save();
+}
+
+export function handleProxyRegistered(event: ProxyRegistered): void {
+  let userProxy = new UserProxy(event.params.proxy.toHexString());
+  userProxy.user = event.params.user.toHexString();
+  userProxy.timestamp = event.block.timestamp;
+  userProxy.txHash = event.transaction.hash;
+  userProxy.blockNumber = event.block.number;
+  userProxy.blockHash = event.block.hash;
+  userProxy.save();
 }
