@@ -68,6 +68,8 @@ type Account @entity {
 
   "Punks offered for sale by Account"
   asks: [Ask!]! @derivedFrom(field: "from")
+
+  numberOfPunksOwned: BigInt!
 }
 
 type Punk implements NFT @entity {
