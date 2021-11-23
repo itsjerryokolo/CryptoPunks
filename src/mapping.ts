@@ -47,7 +47,7 @@ import {
   Unwrap,
 } from "../generated/schema";
 
-//export { runTests } from "./mapping.test";
+export { runTests } from "./mapping.test";
 
 let TOKEN_URI = "https://www.larvalabs.com/cryptopunks/details/";
 let CONTRACT_URI = "https://www.larvalabs.com/cryptopunks";
@@ -90,6 +90,7 @@ export function handleAssign(event: Assigned): void {
   }
   if (!account) {
     account = new Account(event.params.to.toHexString());
+    account.numberOfPunksOwned = BigInt.fromI32(0);
   }
   if (!punk) {
     punk = new Punk(event.params.punkIndex.toString());
@@ -192,6 +193,10 @@ export function handleAssign(event: Assigned): void {
     metadata.traits = traits;
   }
 
+  account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
+    BigInt.fromI32(1)
+  );
+
   account.save();
   assign.save();
   contract.save();
@@ -248,7 +253,16 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
     if (!toAccount) {
       toAccount = new Account(event.params.to.toHexString());
+      toAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
+
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
 
     //Capture punk transfers and owners if not transfered to WRAPPED PUNK ADDRESS
     punk.owner = toAccount.id;
@@ -278,6 +292,9 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     }
 
     let fromAccount = Account.load(event.params.from.toHexString())!;
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
 
     wrap.from = fromAccount.id;
     wrap.type = "WRAP";
@@ -296,6 +313,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     let toAccount = Account.load(event.params.to.toHexString());
     if (!toAccount) {
       toAccount = new Account(event.params.to.toHexString());
+      toAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
 
     let unWrap = Unwrap.load(
@@ -315,6 +333,10 @@ export function handlePunkTransfer(event: PunkTransfer): void {
           .concat("UNWRAP")
       );
     }
+
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
 
     unWrap.from = event.params.from.toHexString();
     unWrap.to = toAccount.id;
@@ -663,7 +685,16 @@ export function handlePunkBought(event: PunkBought): void {
 
   if (!toAccount) {
     toAccount = new Account(event.params.toAddress.toHexString());
+    toAccount.numberOfPunksOwned = BigInt.fromI32(0);
   }
+
+  toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+    BigInt.fromI32(1)
+  );
+
+  fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+    BigInt.fromI32(1)
+  );
 
   punk.purchasedBy = toAccount.id;
 
@@ -802,7 +833,11 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let toAccount = Account.load(event.params.to.toHexString());
     if (!toAccount) {
       toAccount = new Account(event.params.to.toHexString());
+      toAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
 
     wrap.from = event.params.from.toHexString();
     wrap.to = toAccount.id;
@@ -842,7 +877,11 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let fromAccount = Account.load(event.params.from.toHexString());
     if (!fromAccount) {
       fromAccount = new Account(event.params.to.toHexString());
+      fromAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
 
     unWrap.from = event.params.from.toHexString();
     unWrap.to = fromAccount.id;
@@ -897,7 +936,12 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let fromAccount = Account.load(event.params.from.toHexString());
     if (!fromAccount) {
       fromAccount = new Account(event.params.to.toHexString());
+      fromAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
+
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
     fromAccount.save();
     transfer.save();
   }
