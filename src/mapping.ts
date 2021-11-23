@@ -24,6 +24,7 @@ import {
   WrappedPunks,
   Approval,
   Transfer as WrappedPunkTransfer,
+  ProxyRegistered,
 } from "../generated/WrappedPunks/WrappedPunks";
 
 import { getTrait } from "./traits";
@@ -45,15 +46,15 @@ import {
   Bid,
   Wrap,
   Unwrap,
+  UserProxy,
 } from "../generated/schema";
-
-//export { runTests } from "./mapping.test";
 
 let TOKEN_URI = "https://www.larvalabs.com/cryptopunks/details/";
 let CONTRACT_URI = "https://www.larvalabs.com/cryptopunks";
 let IMAGE_URI = "https://www.larvalabs.com/public/images/cryptopunks/punk";
-let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-let WRAPPED_PUNK_ADDRESS = "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6";
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const WRAPPED_PUNK_ADDRESS =
+  "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6";
 
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
@@ -90,6 +91,7 @@ export function handleAssign(event: Assigned): void {
   }
   if (!account) {
     account = new Account(event.params.to.toHexString());
+    account.numberOfPunksOwned = BigInt.fromI32(0);
   }
   if (!punk) {
     punk = new Punk(event.params.punkIndex.toString());
@@ -142,7 +144,7 @@ export function handleAssign(event: Assigned): void {
   assign.timestamp = event.block.timestamp;
   assign.blockNumber = event.block.number;
   assign.txHash = event.transaction.hash;
-  assign.blockHhash = event.block.hash;
+  assign.blockHash = event.block.hash;
   assign.contract = contract.id;
   assign.type = "ASSIGN";
 
@@ -191,6 +193,10 @@ export function handleAssign(event: Assigned): void {
 
     metadata.traits = traits;
   }
+
+  account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
+    BigInt.fromI32(1)
+  );
 
   account.save();
   assign.save();
@@ -243,12 +249,21 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     transfer.timestamp = event.block.timestamp;
     transfer.blockNumber = event.block.number;
     transfer.txHash = event.transaction.hash;
-    transfer.blockHhash = event.block.hash;
+    transfer.blockHash = event.block.hash;
     transfer.contract = event.address.toHexString();
 
     if (!toAccount) {
       toAccount = new Account(event.params.to.toHexString());
+      toAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
+
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
 
     //Capture punk transfers and owners if not transfered to WRAPPED PUNK ADDRESS
     punk.owner = toAccount.id;
@@ -278,13 +293,16 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     }
 
     let fromAccount = Account.load(event.params.from.toHexString())!;
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
 
     wrap.from = fromAccount.id;
     wrap.type = "WRAP";
     wrap.timestamp = event.block.timestamp;
     wrap.nft = event.params.punkIndex.toString();
     wrap.blockNumber = event.block.number;
-    wrap.blockHhash = event.block.hash;
+    wrap.blockHash = event.block.hash;
     wrap.txHash = event.transaction.hash;
 
     wrap.save();
@@ -296,6 +314,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     let toAccount = Account.load(event.params.to.toHexString());
     if (!toAccount) {
       toAccount = new Account(event.params.to.toHexString());
+      toAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
 
     let unWrap = Unwrap.load(
@@ -316,13 +335,17 @@ export function handlePunkTransfer(event: PunkTransfer): void {
       );
     }
 
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+
     unWrap.from = event.params.from.toHexString();
     unWrap.to = toAccount.id;
     unWrap.type = "UNWRAP";
     unWrap.timestamp = event.block.timestamp;
     unWrap.nft = event.params.punkIndex.toString();
     unWrap.blockNumber = event.block.number;
-    unWrap.blockHhash = event.block.hash;
+    unWrap.blockHash = event.block.hash;
     unWrap.txHash = event.transaction.hash;
 
     punk.owner = toAccount.id;
@@ -412,7 +435,7 @@ export function handlePunkOffered(event: PunkOffered): void {
   askCreated.timestamp = event.block.timestamp;
   askCreated.blockNumber = event.block.number;
   askCreated.txHash = event.transaction.hash;
-  askCreated.blockHhash = event.block.hash;
+  askCreated.blockHash = event.block.hash;
   askCreated.contract = contract.id;
 
   punk.tokenId = event.params.punkIndex;
@@ -511,7 +534,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bidRemoved.timestamp = event.block.timestamp;
   bidRemoved.blockNumber = event.block.number;
   bidRemoved.txHash = event.transaction.hash;
-  bidRemoved.blockHhash = event.block.hash;
+  bidRemoved.blockHash = event.block.hash;
   bidRemoved.type = "BID_REMOVED";
 
   bidCreated.amount = event.params.value;
@@ -521,7 +544,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bidCreated.timestamp = event.block.timestamp;
   bidCreated.blockNumber = event.block.number;
   bidCreated.txHash = event.transaction.hash;
-  bidCreated.blockHhash = event.block.hash;
+  bidCreated.blockHash = event.block.hash;
   bidCreated.type = "BID_CREATED";
 
   punk.tokenId = event.params.punkIndex;
@@ -593,14 +616,14 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   bidRemoved.timestamp = event.block.timestamp;
   bidRemoved.blockNumber = event.block.number;
   bidRemoved.txHash = event.transaction.hash;
-  bidRemoved.blockHhash = event.block.hash;
+  bidRemoved.blockHash = event.block.hash;
   bidRemoved.type = "BID_REMOVED";
 
   bidCreated.nft = event.params.punkIndex.toString();
   bidCreated.timestamp = event.block.timestamp;
   bidCreated.blockNumber = event.block.number;
   bidCreated.txHash = event.transaction.hash;
-  bidCreated.blockHhash = event.block.hash;
+  bidCreated.blockHash = event.block.hash;
   bidCreated.type = "BID_CREATED";
 
   punk.tokenId = event.params.punkIndex;
@@ -653,7 +676,7 @@ export function handlePunkBought(event: PunkBought): void {
   sale.timestamp = event.block.timestamp;
   sale.blockNumber = event.block.number;
   sale.txHash = event.transaction.hash;
-  sale.blockHhash = event.block.hash;
+  sale.blockHash = event.block.hash;
   sale.type = "SALE";
 
   contract.totalAmountTraded = contract.totalAmountTraded.plus(
@@ -663,7 +686,16 @@ export function handlePunkBought(event: PunkBought): void {
 
   if (!toAccount) {
     toAccount = new Account(event.params.toAddress.toHexString());
+    toAccount.numberOfPunksOwned = BigInt.fromI32(0);
   }
+
+  toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+    BigInt.fromI32(1)
+  );
+
+  fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+    BigInt.fromI32(1)
+  );
 
   punk.purchasedBy = toAccount.id;
 
@@ -724,7 +756,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   askCreated.timestamp = event.block.timestamp;
   askCreated.blockNumber = event.block.number;
   askCreated.txHash = event.transaction.hash;
-  askCreated.blockHhash = event.block.hash;
+  askCreated.blockHash = event.block.hash;
   askCreated.type = "ASK_CREATED";
 
   askRemoved.ask = askCreated.id;
@@ -733,7 +765,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   askRemoved.timestamp = event.block.timestamp;
   askRemoved.blockNumber = event.block.number;
   askRemoved.txHash = event.transaction.hash;
-  askRemoved.blockHhash = event.block.hash;
+  askRemoved.blockHash = event.block.hash;
   askRemoved.type = "ASK_REMOVED";
 
   punk.tokenId = event.params.punkIndex;
@@ -802,7 +834,11 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let toAccount = Account.load(event.params.to.toHexString());
     if (!toAccount) {
       toAccount = new Account(event.params.to.toHexString());
+      toAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
 
     wrap.from = event.params.from.toHexString();
     wrap.to = toAccount.id;
@@ -810,7 +846,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     wrap.timestamp = event.block.timestamp;
     wrap.nft = event.params.tokenId.toString();
     wrap.blockNumber = event.block.number;
-    wrap.blockHhash = event.block.hash;
+    wrap.blockHash = event.block.hash;
     wrap.txHash = event.transaction.hash;
 
     contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
@@ -842,7 +878,11 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let fromAccount = Account.load(event.params.from.toHexString());
     if (!fromAccount) {
       fromAccount = new Account(event.params.to.toHexString());
+      fromAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
 
     unWrap.from = event.params.from.toHexString();
     unWrap.to = fromAccount.id;
@@ -850,7 +890,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     unWrap.timestamp = event.block.timestamp;
     unWrap.nft = event.params.tokenId.toString();
     unWrap.blockNumber = event.block.number;
-    unWrap.blockHhash = event.block.hash;
+    unWrap.blockHash = event.block.hash;
     unWrap.txHash = event.transaction.hash;
 
     contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
@@ -889,7 +929,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     transfer.timestamp = event.block.timestamp;
     transfer.blockNumber = event.block.number;
     transfer.txHash = event.transaction.hash;
-    transfer.blockHhash = event.block.hash;
+    transfer.blockHash = event.block.hash;
     transfer.contract = contract.id;
     transfer.save();
 
@@ -897,11 +937,26 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let fromAccount = Account.load(event.params.from.toHexString());
     if (!fromAccount) {
       fromAccount = new Account(event.params.to.toHexString());
+      fromAccount.numberOfPunksOwned = BigInt.fromI32(0);
     }
+
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
     fromAccount.save();
     transfer.save();
   }
 
   contract.save();
   punk.save();
+}
+
+export function handleProxyRegistered(event: ProxyRegistered): void {
+  let userProxy = new UserProxy(event.params.proxy.toHexString());
+  userProxy.user = event.params.user.toHexString();
+  userProxy.timestamp = event.block.timestamp;
+  userProxy.txHash = event.transaction.hash;
+  userProxy.blockNumber = event.block.number;
+  userProxy.blockHash = event.block.hash;
+  userProxy.save();
 }

@@ -14,7 +14,9 @@
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.22.3",
     "@graphprotocol/graph-ts": "^0.22.1",
-    "keytar": "^7.4.0",
-    "matchstick-as": "^0.1.5"
+    "keytar": "^7.4.0"
+  },
+  "devDependencies": {
+    "matchstick-as": "^0.2.0"
   }
 }

@@ -33,7 +33,7 @@ interface Event {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -68,6 +68,8 @@ type Account @entity {
 
   "Punks offered for sale by Account"
   asks: [Ask!]! @derivedFrom(field: "from")
+
+  numberOfPunksOwned: BigInt!
 }
 
 type Punk implements NFT @entity {
@@ -160,7 +162,7 @@ type Assign implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -177,7 +179,7 @@ type Sale implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -191,7 +193,7 @@ type AskCreated implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -205,7 +207,7 @@ type BidCreated implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -220,7 +222,7 @@ type BidRemoved implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -235,7 +237,7 @@ type AskRemoved implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -249,7 +251,7 @@ type Transfer implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -263,7 +265,7 @@ type Wrap implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
@@ -277,8 +279,18 @@ type Unwrap implements Event @entity {
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
-  blockHhash: Bytes!
+  blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
   type: EventType!
+}
+
+type UserProxy @entity {
+  "Contract Address of UserProxy"
+  id: ID!
+  user: Account!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
 }
