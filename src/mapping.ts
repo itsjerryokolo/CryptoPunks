@@ -50,8 +50,9 @@ import {
 let TOKEN_URI = "https://www.larvalabs.com/cryptopunks/details/";
 let CONTRACT_URI = "https://www.larvalabs.com/cryptopunks";
 let IMAGE_URI = "https://www.larvalabs.com/public/images/cryptopunks/punk";
-let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-let WRAPPED_PUNK_ADDRESS = "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6";
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const WRAPPED_PUNK_ADDRESS =
+  "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6";
 
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);

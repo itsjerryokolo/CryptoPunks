@@ -130,6 +130,18 @@ test("test Transfer", () => {
   logStore();
 });
 
-test("testWrap", () => {});
+/**
+ * Example: https://etherscan.io/tx/0x83f2c4b428b2ee5cf0c317fe72bb39716ca2e4d93597b3d80a8a2e60aa698d22
+ * 1. registerProxy
+ * 2. send Punk to Proxy
+ * 3. transfer Punk from Proxy to wrapped punks
+ * Owner: 0xb4cf0f5f2ffed445ca804898654366316d0a779a
+ * User Proxy: 0x674578060c0f07146BcC86D12B8a2efA1e819C38
+ *
+ */
+test("testWrap", () => {
+  // let wrapEvent = createWrappedTransfer(
+});
+
 test("testWrappedTransfer", () => {});
 test("testUnwrap", () => {});

@@ -284,3 +284,13 @@ type Unwrap implements Event @entity {
   timestamp: BigInt!
   type: EventType!
 }
+
+type UserProxy @entity {
+  "Contract Address of UserProxy"
+  id: ID!
+  user: Account!
+  blockNumber: BigInt!
+  blockHhash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+}

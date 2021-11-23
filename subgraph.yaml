@@ -74,4 +74,6 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleWrappedPunkTransfer
+        - event: ProxyRegistered(address,address)
+          handler: handleProxyRegistered
       file: ./src/mapping.ts
