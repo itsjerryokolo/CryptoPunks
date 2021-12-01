@@ -69,28 +69,25 @@ export function getOrCreatePunk(id: BigInt, account: Address): Punk {
   let punk = Punk.load(id.toString());
   if (!punk) {
     punk = new Punk(id.toString());
-    punk.wrapped = false;
-    punk.tokenId = id;
-    punk.assignedTo = account.toHexString();
-    punk.transferedTo = account.toHexString();
-    punk.owner = account.toHexString();
-    punk.metadata = id
-      .toString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("METADATA");
-    punk.wrapped = false;
-    punk.save();
   }
+  punk.wrapped = false;
+  punk.tokenId = id;
+  punk.assignedTo = account.toHexString();
+  punk.transferedTo = account.toHexString();
+  punk.owner = account.toHexString();
+  punk.metadata = id
+    .toString()
+    .concat("-")
+    .concat(event.logIndex.toString())
+    .concat("-")
+    .concat("METADATA");
+  punk.wrapped = false;
+  punk.save();
 
   return punk as Punk;
 }
 
-export function getOrCreateMetadata(
-  punkId: BigInt,
-  save: boolean = false
-): MetaData {
+export function getOrCreateMetadata(punkId: BigInt): MetaData {
   let event: ethereum.Event;
   let metadata = MetaData.load(
     punkId
