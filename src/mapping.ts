@@ -49,19 +49,27 @@ import {
   UserProxy,
 } from "../generated/schema";
 
-let TOKEN_URI = "https://www.larvalabs.com/cryptopunks/details/";
-let CONTRACT_URI = "https://www.larvalabs.com/cryptopunks";
-let IMAGE_URI = "https://www.larvalabs.com/public/images/cryptopunks/punk";
-export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const WRAPPED_PUNK_ADDRESS =
-  "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6";
+import {
+  TOKEN_URI,
+  ZERO_ADDRESS,
+  IMAGE_URI,
+  WRAPPED_PUNK_ADDRESS,
+  CONTRACT_URI,
+} from "./constant";
 
+import {
+  getOrCreateAccount,
+  getOrCreateAssign,
+  getOrCreateContract,
+  getOrCreateMetadata,
+  getOrCreatePunk,
+} from "./helper";
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
 
   let trait = getTrait(event.params.punkIndex.toI32());
 
-  let assign = Assign.load(
+  /*   let assign = Assign.load(
     event.transaction.hash.toHexString() +
       "-" +
       event.logIndex.toString() +
@@ -74,13 +82,23 @@ export function handleAssign(event: Assigned): void {
       event.logIndex.toString() +
       "-" +
       "METADATA"
+  ); */
+  let assign = getOrCreateAssign(
+    event.transaction.hash,
+    event.params.punkIndex,
+    event.params.to
   );
-  let account = Account.load(event.params.to.toHexString());
+  let account = getOrCreateAccount(event.params.to);
+  let contract = getOrCreateContract();
+  let punk = getOrCreatePunk(event.params.punkIndex, event.params.to);
+  let metadata = getOrCreateMetadata(event.params.punkIndex);
+
+  /*  let account = Account.load(event.params.to.toHexString());
   let cryptopunk = cryptopunks.bind(event.address);
   let contract = Contract.load(event.address.toHexString());
-  let punk = Punk.load(event.params.punkIndex.toString());
+  let punk = Punk.load(event.params.punkIndex.toString()); */
 
-  if (!assign) {
+  /*   if (!assign) {
     assign = new Assign(
       event.transaction.hash.toHexString() +
         "-" +
@@ -105,9 +123,9 @@ export function handleAssign(event: Assigned): void {
         "METADATA"
     );
     metadata.traits = new Array<string>();
-  }
+  } */
 
-  if (!contract) {
+  /*   if (!contract) {
     contract = new Contract(event.address.toHexString());
 
     let symbolCall = cryptopunk.try_symbol();
@@ -139,6 +157,21 @@ export function handleAssign(event: Assigned): void {
     log.warning("totalSupplyCall Reverted", []);
   }
 
+  metadata.tokenURI = TOKEN_URI.concat(event.params.punkIndex.toString());
+  metadata.tokenId = event.params.punkIndex;
+  metadata.punk = punk.id;
+  // metadata.contractURI = CONTRACT_URI;
+  metadata.imageURI = IMAGE_URI.concat(
+    event.params.punkIndex.toString()
+  ).concat(".png"); */
+
+  /*   punk.assignedTo = account.id;
+  punk.transferedTo = account.id;
+  punk.tokenId = event.params.punkIndex;
+  punk.owner = account.id;
+  punk.metadata = metadata.id;
+  punk.wrapped = false; */
+
   assign.to = account.id;
   assign.nft = event.params.punkIndex.toString();
   assign.timestamp = event.block.timestamp;
@@ -147,21 +180,6 @@ export function handleAssign(event: Assigned): void {
   assign.blockHash = event.block.hash;
   assign.contract = contract.id;
   assign.type = "ASSIGN";
-
-  metadata.tokenURI = TOKEN_URI.concat(event.params.punkIndex.toString());
-  metadata.tokenId = event.params.punkIndex;
-  metadata.punk = punk.id;
-  metadata.contractURI = CONTRACT_URI;
-  metadata.imageURI = IMAGE_URI.concat(
-    event.params.punkIndex.toString()
-  ).concat(".png");
-
-  punk.assignedTo = account.id;
-  punk.transferedTo = account.id;
-  punk.tokenId = event.params.punkIndex;
-  punk.owner = account.id;
-  punk.metadata = metadata.id;
-  punk.wrapped = false;
 
   if (trait !== null) {
     let traits = new Array<string>();
@@ -194,9 +212,9 @@ export function handleAssign(event: Assigned): void {
     metadata.traits = traits;
   }
 
-  account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
+  /*   account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
     BigInt.fromI32(1)
-  );
+  ); */
 
   account.save();
   assign.save();
@@ -207,6 +225,12 @@ export function handleAssign(event: Assigned): void {
 
 export function handlePunkTransfer(event: PunkTransfer): void {
   log.debug("handlePunkTransfer", []);
+  let fromIsProxy = UserProxy.load(event.params.from.toHexString());
+  let toIsProxy = UserProxy.load(event.params.to.toHexString());
+
+  if (fromIsProxy !== null || toIsProxy !== null) {
+    return;
+  }
 
   if (
     event.params.to.toHexString() !== WRAPPED_PUNK_ADDRESS ||
