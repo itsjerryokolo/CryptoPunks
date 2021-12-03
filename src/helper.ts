@@ -1,5 +1,12 @@
 import { Address, Bytes, BigInt, log, ethereum } from "@graphprotocol/graph-ts";
-import { Account, Assign, Punk, MetaData, Contract } from "../generated/schema";
+import {
+  Account,
+  Assign,
+  Punk,
+  MetaData,
+  Contract,
+  Transfer,
+} from "../generated/schema";
 import {
   TOKEN_URI,
   CONTRACT_URI,
@@ -20,6 +27,25 @@ export function getOrCreateAccount(address: Address): Account {
   }
 
   return account as Account;
+}
+
+export function fillEvent(
+  event: ethereum.Event,
+  account: Account,
+  contract: Contract,
+  nft: Punk,
+  entityType: Assign | Transfer
+): Assign | Transfer {
+  entity.to = account.id;
+  entity.nft = nft.id;
+  entity.timestamp = event.block.timestamp;
+  entity.blockNumber = event.block.number;
+  entity.txHash = event.transaction.hash;
+  entity.blockHash = event.block.hash;
+  entity.contract = contract.id;
+  entity.type = "ASSIGN";
+
+  return entity;
 }
 
 export function getOrCreateAssign(
