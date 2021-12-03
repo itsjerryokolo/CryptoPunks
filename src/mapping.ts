@@ -232,11 +232,8 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
     let toAccount = getOrCreateAccount(event.params.to);
     let fromAccount = getOrCreateAccount(event.params.from);
-    let punk = Punk.load(event.params.punkIndex.toString());
+    let punk = Punk.load(event.params.punkIndex.toString())!;
 
-    if (!punk) {
-      punk = new Punk(event.params.punkIndex.toString());
-    }
     if (!transfer) {
       transfer = new Transfer(
         event.transaction.hash.toHexString() +
@@ -377,7 +374,7 @@ export function handlePunkOffered(event: PunkOffered): void {
       "-" +
       "ASK"
   );
-  let punk = Punk.load(event.params.punkIndex.toString());
+  let punk = Punk.load(event.params.punkIndex.toString())!;
   let contract = new Contract(event.address.toHexString());
   let account = getOrCreateAccount(event.params.toAddress);
 
@@ -389,9 +386,6 @@ export function handlePunkOffered(event: PunkOffered): void {
         "-" +
         "ASKCREATED"
     );
-  }
-  if (!punk) {
-    punk = new Punk(event.params.punkIndex.toString());
   }
 
   if (!ask) {
