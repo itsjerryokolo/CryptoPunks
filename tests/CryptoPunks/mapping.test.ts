@@ -7,11 +7,7 @@ import {
 } from "matchstick-as/assembly/index";
 import { log } from "matchstick-as/assembly/log";
 import { logStore } from "matchstick-as/assembly/store";
-import {
-  Assign,
-  PunkTransfer,
-  Transfer,
-} from "../../generated/cryptopunks/cryptopunks";
+import { Assign, PunkTransfer } from "../../generated/cryptopunks/cryptopunks";
 import {
   ProxyRegistered,
   Transfer as WrappedPunkTransfer,
@@ -21,12 +17,13 @@ import {
   handleProxyRegistered,
   handlePunkTransfer,
   handleWrappedPunkTransfer,
-  WRAPPED_PUNK_ADDRESS,
-  ZERO_ADDRESS,
 } from "../../src/mapping";
+
+import { WRAPPED_PUNK_ADDRESS, ZERO_ADDRESS } from "../../src/constant";
 
 const OWNER1 = "0x6f4a2d3a4f47f9c647d86c929755593911ee91ec";
 const OWNER2 = "0xc36817163b7eaef25234e1d18adbfa52105ae510";
+const OWNER3 = "0xb4cf0f5f2ffed445ca804898654366316d0a779a";
 const PROXY2 = "0x674578060c0f07146BcC86D12B8a2efA1e819C38";
 
 const CRYPTOPUNKS_ADDRESS = Address.fromString(
@@ -273,5 +270,61 @@ test("testWrap", () => {
   logStore();
 });
 
-test("testWrappedTransfer", () => {});
-test("testUnwrap", () => {});
+test("testWrappedTransfer", () => {
+  handleWrappedPunkTransfer(
+    createWrappedPunkTransfer(
+      Address.fromString(OWNER3),
+      Address.fromString(WRAPPED_PUNK_ADDRESS),
+      1,
+      5
+    )
+  );
+  logStore();
+});
+test("testUnwrap", () => {
+  /*   handleProxyRegistered(
+    createProxyRegisteredEvent(
+      Address.fromString(PROXY2),
+      Address.fromString(OWNER2)
+    )
+  ); */
+  /*   handleWrappedPunkTransfer(
+    //Owner3 initiates a burn event and sends punk to WP contract
+    createWrappedPunkTransfer(
+      Address.fromString(OWNER3),
+      Address.fromString(WRAPPED_PUNK_ADDRESS),
+      1,
+      5
+     )
+  ); */
+
+  handleWrappedPunkTransfer(
+    //Owner3 sends wrapped punk to ZERO_ADDRESS
+    createWrappedPunkTransfer(
+      Address.fromString(OWNER3),
+      Address.fromString(ZERO_ADDRESS),
+      1,
+      5
+    )
+  );
+
+  handlePunkTransfer(
+    createPunkTransferEvent(
+      //Punk get sent in a PunkTransfer event to Owner 2
+      Address.fromString(WRAPPED_PUNK_ADDRESS),
+      Address.fromString(OWNER3),
+      1,
+      5
+    )
+  );
+
+  assert.fieldEquals(
+    "Account",
+    WRAPPED_PUNK_ADDRESS,
+    "numberOfPunksOwned",
+    "0"
+  );
+  assert.fieldEquals("Account", OWNER3, "numberOfPunksOwned", "1");
+
+  logStore();
+});
