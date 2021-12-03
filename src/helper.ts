@@ -11,17 +11,13 @@ import {
 import { cryptopunks } from "../generated/cryptopunks/cryptopunks";
 
 export function getOrCreateAccount(address: Address): Account {
-  let account = Account.load(address.toHex());
+  let id = address.toHexString();
+  let account = Account.load(id);
 
   if (!account) {
-    account = new Account(address.toHexString());
+    account = new Account(id);
     account.numberOfPunksOwned = BigInt.fromI32(0);
   }
-  account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
-    BigInt.fromI32(1)
-  );
-
-  account.save();
 
   return account as Account;
 }
