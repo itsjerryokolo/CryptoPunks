@@ -18,8 +18,6 @@ import {
   cryptopunks__punkBidsResult,
 } from "../generated/cryptopunks/cryptopunks";
 
-import { CryptopunksMetadata } from "../generated/cryptopunks/CryptopunksMetadata";
-
 import {
   WrappedPunks,
   Approval,
@@ -57,19 +55,12 @@ import {
   CONTRACT_URI,
 } from "./constant";
 
-import {
-  getOrCreateAccount,
-  getOrCreateAssign,
-  getOrCreateContract,
-  getOrCreateMetadata,
-  getOrCreatePunk,
-} from "./helper";
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
 
   let trait = getTrait(event.params.punkIndex.toI32());
 
-  /*   let assign = Assign.load(
+  let assign = Assign.load(
     event.transaction.hash.toHexString() +
       "-" +
       event.logIndex.toString() +
@@ -82,23 +73,14 @@ export function handleAssign(event: Assigned): void {
       event.logIndex.toString() +
       "-" +
       "METADATA"
-  ); */
-  let assign = getOrCreateAssign(
-    event.transaction.hash,
-    event.params.punkIndex,
-    event.params.to
   );
-  let account = getOrCreateAccount(event.params.to);
-  let contract = getOrCreateContract();
-  let punk = getOrCreatePunk(event.params.punkIndex, event.params.to);
-  let metadata = getOrCreateMetadata(event.params.punkIndex);
 
-  /*  let account = Account.load(event.params.to.toHexString());
+  let account = Account.load(event.params.to.toHexString());
   let cryptopunk = cryptopunks.bind(event.address);
   let contract = Contract.load(event.address.toHexString());
-  let punk = Punk.load(event.params.punkIndex.toString()); */
+  let punk = Punk.load(event.params.punkIndex.toString());
 
-  /*   if (!assign) {
+  if (!assign) {
     assign = new Assign(
       event.transaction.hash.toHexString() +
         "-" +
@@ -123,9 +105,9 @@ export function handleAssign(event: Assigned): void {
         "METADATA"
     );
     metadata.traits = new Array<string>();
-  } */
+  }
 
-  /*   if (!contract) {
+  if (!contract) {
     contract = new Contract(event.address.toHexString());
 
     let symbolCall = cryptopunk.try_symbol();
@@ -163,14 +145,14 @@ export function handleAssign(event: Assigned): void {
   // metadata.contractURI = CONTRACT_URI;
   metadata.imageURI = IMAGE_URI.concat(
     event.params.punkIndex.toString()
-  ).concat(".png"); */
+  ).concat(".png");
 
-  /*   punk.assignedTo = account.id;
+  punk.assignedTo = account.id;
   punk.transferedTo = account.id;
   punk.tokenId = event.params.punkIndex;
   punk.owner = account.id;
   punk.metadata = metadata.id;
-  punk.wrapped = false; */
+  punk.wrapped = false;
 
   assign.to = account.id;
   assign.nft = event.params.punkIndex.toString();
@@ -212,9 +194,9 @@ export function handleAssign(event: Assigned): void {
     metadata.traits = traits;
   }
 
-  /*   account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
+  account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
     BigInt.fromI32(1)
-  ); */
+  );
 
   account.save();
   assign.save();
