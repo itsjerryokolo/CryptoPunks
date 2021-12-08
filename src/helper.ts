@@ -29,24 +29,40 @@ export function getOrCreateAccount(address: Address): Account {
   return account as Account;
 }
 
-export function fillEvent(
-  event: ethereum.Event,
-  account: Account,
-  contract: Contract,
-  nft: Punk,
-  entityType: Assign | Transfer
-): Assign | Transfer {
-  entity.to = account.id;
-  entity.nft = nft.id;
-  entity.timestamp = event.block.timestamp;
-  entity.blockNumber = event.block.number;
-  entity.txHash = event.transaction.hash;
-  entity.blockHash = event.block.hash;
-  entity.contract = contract.id;
-  entity.type = "ASSIGN";
+// export function fillEvent(
+//   event: ethereum.Event,
+//   account: Account,
+//   contract: Contract,
+//   nft: Punk,
+//   entityType: string // "ASSIGN" | "TRANSFER"
+// ): Assign | Transfer {
+//   let id =
+//     event.transaction.hash.toHexString() +
+//     "-" +
+//     event.logIndex.toString() +
+//     "-" +
+//     entityType;
 
-  return entity;
-}
+//   let entity;
+//   if (entityType == "ASSIGN") {
+//     entity = new Assign(id);
+//   } else if (entityType == "TRANSFER") {
+//     entity = new Transfer(id);
+//   }
+
+//   entity.to = account.id;
+//   entity.nft = nft.id;
+//   entity.timestamp = event.block.timestamp;
+//   entity.blockNumber = event.block.number;
+//   entity.txHash = event.transaction.hash;
+//   entity.blockHash = event.block.hash;
+//   entity.contract = contract.id;
+//   entity.type = entityType;
+
+//   entity.save();
+
+//   return entity;
+// }
 
 export function getOrCreateAssign(
   id: Bytes,
