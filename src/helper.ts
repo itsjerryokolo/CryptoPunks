@@ -127,8 +127,10 @@ export function getOrCreatePunk(id: BigInt, account: Address): Punk {
   return punk as Punk;
 }
 
-export function getOrCreateMetadata(punkId: BigInt): MetaData {
-  let event: ethereum.Event;
+export function getOrCreateMetadata(
+  punkId: BigInt,
+  event: ethereum.Event
+): MetaData {
   let metadata = MetaData.load(
     punkId
       .toString()
@@ -147,16 +149,17 @@ export function getOrCreateMetadata(punkId: BigInt): MetaData {
         .concat("-")
         .concat("METADATA")
     );
+    metadata.tokenURI = TOKEN_URI.concat(punkId.toString());
+    metadata.contractURI = CONTRACT_URI;
+    metadata.tokenId = punkId;
+    metadata.punk = punkId.toString();
+    metadata.contractURI = CONTRACT_URI;
+    metadata.imageURI = IMAGE_URI.concat(punkId.toString()).concat(".png");
 
     metadata.traits = new Array<string>();
-  }
-  metadata.tokenURI = TOKEN_URI.concat(punkId.toString());
-  metadata.tokenId = punkId;
-  metadata.punk = punkId.toString();
-  metadata.contractURI = CONTRACT_URI;
-  metadata.imageURI = IMAGE_URI.concat(punkId.toString()).concat(".png");
 
-  metadata.save();
+    metadata.save();
+  }
 
   return metadata as MetaData;
 }

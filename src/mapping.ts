@@ -58,6 +58,7 @@ import {
   getOrCreateCryptoPunkContract,
   getOrCreateAccount,
   getOrCreateWrappedPunkContract,
+  getOrCreateMetadata,
 } from "./helper";
 
 export function handleAssign(event: Assigned): void {
@@ -72,15 +73,9 @@ export function handleAssign(event: Assigned): void {
       "-" +
       "ASSIGN"
   );
-  let metadata = MetaData.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "METADATA"
-  );
 
   let account = getOrCreateAccount(event.params.to);
+  let metadata = getOrCreateMetadata(event.params.punkIndex, event);
   let contract = getOrCreateCryptoPunkContract(event.address);
   let punk = Punk.load(event.params.punkIndex.toString());
 
@@ -97,24 +92,6 @@ export function handleAssign(event: Assigned): void {
   if (!punk) {
     punk = new Punk(event.params.punkIndex.toString());
   }
-  if (!metadata) {
-    metadata = new MetaData(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "METADATA"
-    );
-    metadata.traits = new Array<string>();
-  }
-
-  metadata.tokenURI = TOKEN_URI.concat(event.params.punkIndex.toString());
-  metadata.tokenId = event.params.punkIndex;
-  metadata.punk = punk.id;
-  // metadata.contractURI = CONTRACT_URI;
-  metadata.imageURI = IMAGE_URI.concat(
-    event.params.punkIndex.toString()
-  ).concat(".png");
 
   punk.assignedTo = account.id;
   punk.transferedTo = account.id;

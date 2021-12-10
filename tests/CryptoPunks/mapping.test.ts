@@ -24,6 +24,7 @@ import {
 } from "../../src/mapping";
 
 import { WRAPPED_PUNK_ADDRESS, ZERO_ADDRESS } from "../../src/constant";
+import { MetaData } from "../../generated/schema";
 
 const OWNER1 = "0x6f4a2d3a4f47f9c647d86c929755593911ee91ec";
 const OWNER2 = "0xc36817163b7eaef25234e1d18adbfa52105ae510";
@@ -223,6 +224,8 @@ test("test handleAssign", () => {
     "name",
     "CryptoPunks"
   );
+
+  assert.fieldEquals("Punk", "1", "metadata", "1-1-METADATA");
 });
 
 test("test Transfer", () => {
