@@ -206,11 +206,16 @@ function createProxyRegisteredEvent(
 }
 
 test("test handleAssign", () => {
+  log.warning("test handleAssign", []);
   let assignEvent = createAssign(Address.fromString(OWNER1), 1);
   createMockedFunction(CRYPTOPUNKS_ADDRESS, "name", "name():(string)").returns([
     ethereum.Value.fromString("CryptoPunks"),
   ]);
+  // logStore();
   handleAssign(assignEvent);
+
+  logStore();
+
   //assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "1");
   assert.fieldEquals(
     "Contract",

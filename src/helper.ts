@@ -161,55 +161,43 @@ export function getOrCreateMetadata(punkId: BigInt): MetaData {
   return metadata as MetaData;
 }
 
-export function getOrCreateContract(address: Address): Contract {
+export function getOrCreateCryptoPunkContract(address: Address): Contract {
   let id = address.toHexString();
   let contract = Contract.load(id);
-  if (!contract) {
-    contract = new Contract(id);
-  }
-
-  contract.save();
-
-  return contract as Contract;
-}
-
-export function fillCryptopunkContractCall(address: Address): Contract {
   let cryptopunk = cryptopunks.bind(address);
 
-  let contract = getOrCreateContract(address);
-
-  /*   let contract = Contract.load(event.address.toHexString());
-
   if (!contract) {
-    contract = new Contract(event.address.toHexString());
-  } */
+    contract = new Contract(id);
 
-  let symbolCall = cryptopunk.try_symbol();
-  if (!symbolCall.reverted) {
-    contract.symbol = symbolCall.value;
-  } else {
-    log.warning("symbolCall Reverted", []);
-  }
+    let symbolCall = cryptopunk.try_symbol();
+    if (!symbolCall.reverted) {
+      contract.symbol = symbolCall.value;
+    } else {
+      log.warning("symbolCall Reverted", []);
+    }
 
-  let nameCall = cryptopunk.try_name();
-  if (!nameCall.reverted) {
-    contract.name = nameCall.value;
-  } else {
-    log.warning("nameCall Reverted", []);
-  }
+    let nameCall = cryptopunk.try_name();
+    if (!nameCall.reverted) {
+      contract.name = nameCall.value;
+    } else {
+      log.warning("nameCall Reverted", []);
+    }
 
-  let imageHashCall = cryptopunk.try_imageHash();
-  if (!imageHashCall.reverted) {
-    contract.imageHash = imageHashCall.value;
-  } else {
-    log.warning("imageHashCall Reverted", []);
-  }
+    let imageHashCall = cryptopunk.try_imageHash();
+    if (!imageHashCall.reverted) {
+      contract.imageHash = imageHashCall.value;
+    } else {
+      log.warning("imageHashCall Reverted", []);
+    }
 
-  let totalSupplyCall = cryptopunk.try_totalSupply();
-  if (!totalSupplyCall.reverted) {
-    contract.totalSupply = totalSupplyCall.value;
-  } else {
-    log.warning("totalSupplyCall Reverted", []);
+    let totalSupplyCall = cryptopunk.try_totalSupply();
+    if (!totalSupplyCall.reverted) {
+      contract.totalSupply = totalSupplyCall.value;
+    } else {
+      log.warning("totalSupplyCall Reverted", []);
+    }
+
+    contract.save();
   }
 
   return contract as Contract;
