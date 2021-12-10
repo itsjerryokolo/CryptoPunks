@@ -226,6 +226,7 @@ test("test handleAssign", () => {
   );
 
   assert.fieldEquals("Punk", "1", "metadata", "1-1-METADATA");
+  assert.fieldEquals("Assign", "1-1-ASSIGN", "type", "ASSIGN");
 });
 
 test("test Transfer", () => {

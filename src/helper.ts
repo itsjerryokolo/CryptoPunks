@@ -67,14 +67,13 @@ export function getOrCreateAccount(address: Address): Account {
 // }
 
 export function getOrCreateAssign(
-  id: Bytes,
   punkId: BigInt,
-  account: Address
+  account: Address,
+  event: ethereum.Event
 ): Assign {
-  let event: ethereum.Event;
   let assign = Assign.load(
-    id
-      .toHexString()
+    punkId
+      .toString()
       .concat("-")
       .concat(event.logIndex.toString())
       .concat("-")
@@ -83,8 +82,8 @@ export function getOrCreateAssign(
 
   if (!assign) {
     assign = new Assign(
-      id
-        .toHexString()
+      punkId
+        .toString()
         .concat("-")
         .concat(event.logIndex.toString())
         .concat("-")
