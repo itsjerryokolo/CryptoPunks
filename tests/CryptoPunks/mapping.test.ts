@@ -7,7 +7,11 @@ import {
 } from "matchstick-as/assembly/index";
 import { log } from "matchstick-as/assembly/log";
 import { logStore } from "matchstick-as/assembly/store";
-import { Assign, PunkTransfer } from "../../generated/cryptopunks/cryptopunks";
+import {
+  Assign,
+  PunkTransfer,
+  cryptopunks,
+} from "../../generated/cryptopunks/cryptopunks";
 import {
   ProxyRegistered,
   Transfer as WrappedPunkTransfer,
@@ -29,32 +33,6 @@ const PROXY2 = "0x674578060c0f07146BcC86D12B8a2efA1e819C38";
 const CRYPTOPUNKS_ADDRESS = Address.fromString(
   "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb"
 );
-
-createMockedFunction(
-  CRYPTOPUNKS_ADDRESS,
-  "symbol",
-  "symbol():(string)"
-).returns([ethereum.Value.fromString("Ͼ")]);
-
-createMockedFunction(CRYPTOPUNKS_ADDRESS, "name", "name():(string)").returns([
-  ethereum.Value.fromString("CryptoPunks"),
-]);
-
-createMockedFunction(
-  CRYPTOPUNKS_ADDRESS,
-  "imageHash",
-  "imageHash():(string)"
-).returns([
-  ethereum.Value.fromString(
-    "ac39af4793119ee46bbff351d8cb6b5f23da60222126add4268e261199a2921b"
-  ),
-]);
-
-createMockedFunction(
-  CRYPTOPUNKS_ADDRESS,
-  "totalSupply",
-  "totalSupply():(uint256)"
-).returns([ethereum.Value.fromI32(1)]);
 
 createMockedFunction(
   Address.fromString(WRAPPED_PUNK_ADDRESS),
@@ -93,6 +71,32 @@ function createAssign(to: Address, punkIndex: i32): Assign {
   parameters.push(
     new ethereum.EventParam("punkIndex", ethereum.Value.fromI32(punkIndex))
   );
+
+  createMockedFunction(
+    CRYPTOPUNKS_ADDRESS,
+    "symbol",
+    "symbol():(string)"
+  ).returns([ethereum.Value.fromString("Ͼ")]);
+
+  createMockedFunction(CRYPTOPUNKS_ADDRESS, "name", "name():(string)").returns([
+    ethereum.Value.fromString("CryptoPunks"),
+  ]);
+
+  createMockedFunction(
+    CRYPTOPUNKS_ADDRESS,
+    "imageHash",
+    "imageHash():(string)"
+  ).returns([
+    ethereum.Value.fromString(
+      "ac39af4793119ee46bbff351d8cb6b5f23da60222126add4268e261199a2921b"
+    ),
+  ]);
+
+  createMockedFunction(
+    CRYPTOPUNKS_ADDRESS,
+    "totalSupply",
+    "totalSupply():(uint256)"
+  ).returns([ethereum.Value.fromI32(1)]);
 
   let assignEvent = new Assign(
     CRYPTOPUNKS_ADDRESS,
@@ -203,8 +207,17 @@ function createProxyRegisteredEvent(
 
 test("test handleAssign", () => {
   let assignEvent = createAssign(Address.fromString(OWNER1), 1);
+  createMockedFunction(CRYPTOPUNKS_ADDRESS, "name", "name():(string)").returns([
+    ethereum.Value.fromString("CryptoPunks"),
+  ]);
   handleAssign(assignEvent);
-  assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "1");
+  //assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "1");
+  assert.fieldEquals(
+    "Contract",
+    CRYPTOPUNKS_ADDRESS.toHexString(),
+    "name",
+    "CryptoPunks"
+  );
 });
 
 test("test Transfer", () => {
