@@ -54,7 +54,11 @@ import {
   WRAPPED_PUNK_ADDRESS,
   CONTRACT_URI,
 } from "./constant";
-import { getOrCreateAccount } from "./helper";
+import {
+  fillCryptopunkContractCall,
+  getOrCreateAccount,
+  getOrCreateContract,
+} from "./helper";
 
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
@@ -77,8 +81,9 @@ export function handleAssign(event: Assigned): void {
   );
 
   let account = getOrCreateAccount(event.params.to);
-  let cryptopunk = cryptopunks.bind(event.address);
-  let contract = Contract.load(event.address.toHexString());
+  //let cryptopunk = cryptopunks.bind(event.address);
+  let contract = getOrCreateContract(event.address);
+  // let contract = Contract.load(event.address.toHexString());
   let punk = Punk.load(event.params.punkIndex.toString());
 
   if (!assign) {
@@ -105,7 +110,8 @@ export function handleAssign(event: Assigned): void {
     metadata.traits = new Array<string>();
   }
 
-  if (!contract) {
+  fillCryptopunkContractCall(event.address);
+  /*   if (!contract) {
     contract = new Contract(event.address.toHexString());
 
     let symbolCall = cryptopunk.try_symbol();
@@ -135,7 +141,7 @@ export function handleAssign(event: Assigned): void {
     contract.totalSupply = totalSupplyCall.value;
   } else {
     log.warning("totalSupplyCall Reverted", []);
-  }
+  } */
 
   metadata.tokenURI = TOKEN_URI.concat(event.params.punkIndex.toString());
   metadata.tokenId = event.params.punkIndex;

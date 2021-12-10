@@ -13,9 +13,11 @@ import {
   IMAGE_URI,
   ZERO_ADDRESS,
   WRAPPED_PUNK_ADDRESS,
+  CRYPTOPUNKS_ADDRESS,
 } from "./constant";
 
 import { cryptopunks } from "../generated/cryptopunks/cryptopunks";
+import { WrappedPunks } from "../generated/WrappedPunks/WrappedPunks";
 
 export function getOrCreateAccount(address: Address): Account {
   let id = address.toHexString();
@@ -159,13 +161,28 @@ export function getOrCreateMetadata(punkId: BigInt): MetaData {
   return metadata as MetaData;
 }
 
-export function getOrCreateContract(): Contract {
-  let event: ethereum.Event;
-  let contract = Contract.load(event.address.toHexString());
+export function getOrCreateContract(address: Address): Contract {
+  let id = address.toHexString();
+  let contract = Contract.load(id);
+  if (!contract) {
+    contract = new Contract(id);
+  }
+
+  contract.save();
+
+  return contract as Contract;
+}
+
+export function fillCryptopunkContractCall(address: Address): Contract {
+  let cryptopunk = cryptopunks.bind(address);
+
+  let contract = getOrCreateContract(address);
+
+  /*   let contract = Contract.load(event.address.toHexString());
+
   if (!contract) {
     contract = new Contract(event.address.toHexString());
-  }
-  let cryptopunk = cryptopunks.bind(event.address);
+  } */
 
   let symbolCall = cryptopunk.try_symbol();
   if (!symbolCall.reverted) {
@@ -194,8 +211,6 @@ export function getOrCreateContract(): Contract {
   } else {
     log.warning("totalSupplyCall Reverted", []);
   }
-
-  contract.save();
 
   return contract as Contract;
 }
