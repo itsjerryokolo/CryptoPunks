@@ -60,6 +60,7 @@ import {
   getOrCreateWrappedPunkContract,
   getOrCreateMetadata,
   getOrCreateAssign,
+  getOrCreatePunk,
 } from "./helper";
 
 export function handleAssign(event: Assigned): void {
@@ -67,46 +68,22 @@ export function handleAssign(event: Assigned): void {
 
   let trait = getTrait(event.params.punkIndex.toI32());
 
-  let assign = getOrCreateAssign(
-    event.params.punkIndex,
-    event.params.to,
-    event
-  );
-
   let account = getOrCreateAccount(event.params.to);
   let metadata = getOrCreateMetadata(event.params.punkIndex, event);
   let contract = getOrCreateCryptoPunkContract(event.address);
-  let punk = Punk.load(event.params.punkIndex.toString());
+  let punk = getOrCreatePunk(
+    event.params.punkIndex,
+    event.params.to,
+    metadata as MetaData
+  );
 
-  /*   if (!assign) {
-    assign = new Assign(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "ASSIGN"
-    );
-  } */
-
-  if (!punk) {
-    punk = new Punk(event.params.punkIndex.toString());
-  }
-
-  punk.assignedTo = account.id;
-  punk.transferedTo = account.id;
-  punk.tokenId = event.params.punkIndex;
-  punk.owner = account.id;
-  punk.metadata = metadata.id;
-  punk.wrapped = false;
-
-  /*   assign.to = account.id;
-  assign.nft = event.params.punkIndex.toString();
-  assign.timestamp = event.block.timestamp;
-  assign.blockNumber = event.block.number;
-  assign.txHash = event.transaction.hash;
-  assign.blockHash = event.block.hash;
-  assign.contract = contract.id;
-  assign.type = "ASSIGN"; */
+  let assign = getOrCreateAssign(
+    event.params.punkIndex,
+    punk as Punk,
+    event.params.to,
+    metadata as MetaData,
+    event
+  );
 
   if (trait !== null) {
     let traits = new Array<string>();

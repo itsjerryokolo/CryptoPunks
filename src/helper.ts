@@ -67,12 +67,14 @@ export function getOrCreateAccount(address: Address): Account {
 // }
 
 export function getOrCreateAssign(
-  punkId: BigInt,
+  id: BigInt,
+  punk: Punk,
   account: Address,
+  metadata: MetaData,
   event: ethereum.Event
 ): Assign {
   let assign = Assign.load(
-    punkId
+    id
       .toString()
       .concat("-")
       .concat(event.logIndex.toString())
@@ -82,7 +84,7 @@ export function getOrCreateAssign(
 
   if (!assign) {
     assign = new Assign(
-      punkId
+      id
         .toString()
         .concat("-")
         .concat(event.logIndex.toString())
@@ -91,36 +93,33 @@ export function getOrCreateAssign(
     );
   }
   assign.to = account.toHexString();
-  assign.nft = punkId.toString();
+  assign.nft = punk.id;
   assign.timestamp = event.block.timestamp;
   assign.contract = event.address.toHexString();
   assign.blockNumber = event.block.number;
   assign.txHash = event.transaction.hash;
   assign.blockHash = event.block.hash;
+  punk.metadata = metadata.id;
+  punk.assignedTo = account.toHexString();
+  punk.transferedTo = account.toHexString();
   assign.type = "ASSIGN";
   assign.save();
 
   return assign as Assign;
 }
 
-export function getOrCreatePunk(id: BigInt, account: Address): Punk {
-  let event: ethereum.Event;
+export function getOrCreatePunk(
+  id: BigInt,
+  account: Address,
+  metadata: MetaData
+): Punk {
   let punk = Punk.load(id.toString());
   if (!punk) {
     punk = new Punk(id.toString());
+    punk.wrapped = false;
   }
-  punk.wrapped = false;
   punk.tokenId = id;
-  punk.assignedTo = account.toHexString();
-  punk.transferedTo = account.toHexString();
   punk.owner = account.toHexString();
-  punk.metadata = id
-    .toString()
-    .concat("-")
-    .concat(event.logIndex.toString())
-    .concat("-")
-    .concat("METADATA");
-  punk.wrapped = false;
   punk.save();
 
   return punk as Punk;

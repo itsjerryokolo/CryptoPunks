@@ -225,8 +225,9 @@ test("test handleAssign", () => {
     "CryptoPunks"
   );
 
+  assert.fieldEquals("MetaData", "1-1-METADATA", "punk", "1");
   assert.fieldEquals("Punk", "1", "metadata", "1-1-METADATA");
-  assert.fieldEquals("Assign", "1-1-ASSIGN", "type", "ASSIGN");
+  assert.fieldEquals("Punk", "1", "tokenId", "1");
 });
 
 test("test Transfer", () => {
@@ -238,7 +239,7 @@ test("test Transfer", () => {
   handlePunkTransfer(transferEvent);
   assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "0");
   assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
-  // logStore();
+  logStore();
 });
 
 /**
