@@ -108,11 +108,7 @@ export function getOrCreateAssign(
   return assign as Assign;
 }
 
-export function getOrCreatePunk(
-  id: BigInt,
-  account: Address,
-  metadata: MetaData
-): Punk {
+export function getOrCreatePunk(id: BigInt, account: Address): Punk {
   let punk = Punk.load(id.toString());
   if (!punk) {
     punk = new Punk(id.toString());

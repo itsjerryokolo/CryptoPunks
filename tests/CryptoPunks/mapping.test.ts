@@ -227,7 +227,7 @@ test("test handleAssign", () => {
 
   assert.fieldEquals("MetaData", "1-1-METADATA", "punk", "1");
   assert.fieldEquals("Punk", "1", "metadata", "1-1-METADATA");
-  assert.fieldEquals("Punk", "1", "tokenId", "1");
+  assert.fieldEquals("Punk", "1", "wrapped", "false");
 });
 
 test("test Transfer", () => {
@@ -239,6 +239,7 @@ test("test Transfer", () => {
   handlePunkTransfer(transferEvent);
   assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "0");
   assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+  assert.fieldEquals("Punk", "1", "tokenId", "1");
   logStore();
 });
 
