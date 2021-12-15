@@ -11,6 +11,7 @@ import {
   Assign,
   PunkTransfer,
   cryptopunks,
+  PunkNoLongerForSale,
 } from "../../generated/cryptopunks/cryptopunks";
 import {
   ProxyRegistered,
@@ -19,6 +20,7 @@ import {
 import {
   handleAssign,
   handleProxyRegistered,
+  handlePunkNoLongerForSale,
   handlePunkTransfer,
   handleWrappedPunkTransfer,
 } from "../../src/mapping";
@@ -178,6 +180,26 @@ function createWrappedPunkTransfer(
   return transferEvent;
 }
 
+function createPunkNoLongerForSaleEvent(punkIndex: i32): PunkNoLongerForSale {
+  let mockEvent = newMockEvent();
+  let parameters = new Array<ethereum.EventParam>();
+
+  parameters.push(
+    new ethereum.EventParam("punkIndex", ethereum.Value.fromI32(punkIndex))
+  );
+
+  let PunkNoLongerForSaleEvent = new PunkNoLongerForSale(
+    CRYPTOPUNKS_ADDRESS,
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    createBlock(3),
+    mockEvent.transaction,
+    parameters
+  );
+  return PunkNoLongerForSaleEvent;
+}
+
 function createProxyRegisteredEvent(
   user: Address,
   proxy: Address
@@ -242,13 +264,19 @@ test("test Transfer", () => {
   //assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
   assert.fieldEquals(
     "Wrap",
-    "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6-1-WRAP",
-    "type",
+    "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6-100-WRAP",
+    "id",
     "WRAP"
   );
   logStore();
 });
 
+test("test PunkNoLongerForSale", () => {
+  let PunkNoLongerForSaleEvent = createPunkNoLongerForSaleEvent(1);
+  handlePunkNoLongerForSale(PunkNoLongerForSaleEvent);
+  assert.fieldEquals("AskCreated", "1-100-ASKCREATED", "nft", "1");
+  logStore();
+});
 /**
  * Example: https://etherscan.io/tx/0x83f2c4b428b2ee5cf0c317fe72bb39716ca2e4d93597b3d80a8a2e60aa698d22
  * 1. registerProxy
@@ -309,7 +337,12 @@ test("testWrappedTransfer", () => {
       5
     )
   );
-  assert.fieldEquals("Wrap", WRAPPED_PUNK_ADDRESS + "-0-WRAP", "type", "WRAP");
+  assert.fieldEquals(
+    "Wrap",
+    WRAPPED_PUNK_ADDRESS + "-100-WRAP",
+    "id",
+    "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6-100-WRAP"
+  );
   assert.fieldEquals("Punk", "1", "id", "1");
 
   logStore();
