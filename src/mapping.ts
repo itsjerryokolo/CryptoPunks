@@ -61,6 +61,8 @@ import {
   getOrCreateMetadata,
   getOrCreateAssign,
   getOrCreatePunk,
+  getOrCreateWrap,
+  getOrCreateUnWrap,
 } from "./helper";
 
 export function handleAssign(event: Assigned): void {
@@ -195,36 +197,17 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     punk.save();
   } else if (event.params.to.toHexString() == WRAPPED_PUNK_ADDRESS) {
     // Mint/Wrap
-    let wrap = Wrap.load(
-      WRAPPED_PUNK_ADDRESS.toString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("WRAP")
+    let wrap = getOrCreateWrap(
+      Address.fromString(WRAPPED_PUNK_ADDRESS),
+      event.params.from,
+      event.params.punkIndex,
+      event
     );
-
-    if (!wrap) {
-      wrap = new Wrap(
-        WRAPPED_PUNK_ADDRESS.toString()
-          .concat("-")
-          .concat(event.logIndex.toString())
-          .concat("-")
-          .concat("WRAP")
-      );
-    }
 
     let fromAccount = getOrCreateAccount(event.params.from);
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BigInt.fromI32(1)
     );
-
-    wrap.from = fromAccount.id;
-    wrap.type = "WRAP";
-    wrap.timestamp = event.block.timestamp;
-    wrap.nft = event.params.punkIndex.toString();
-    wrap.blockNumber = event.block.number;
-    wrap.blockHash = event.block.hash;
-    wrap.txHash = event.transaction.hash;
 
     wrap.save();
     fromAccount.save();
@@ -658,35 +641,14 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
     // A wrapped punk is minted (wrapped)
-
-    let wrap = Wrap.load(
-      WRAPPED_PUNK_ADDRESS.toString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("WRAP")
+    let wrap = getOrCreateWrap(
+      Address.fromString(WRAPPED_PUNK_ADDRESS),
+      event.params.from,
+      event.params.tokenId,
+      event
     );
 
-    if (!wrap) {
-      wrap = new Wrap(
-        WRAPPED_PUNK_ADDRESS.toString()
-          .concat("-")
-          .concat(event.logIndex.toString())
-          .concat("-")
-          .concat("WRAP")
-      );
-    }
-
     let toAccount = getOrCreateAccount(event.params.to);
-
-    wrap.from = event.params.from.toHexString();
-    wrap.to = toAccount.id;
-    wrap.type = "WRAP";
-    wrap.timestamp = event.block.timestamp;
-    wrap.nft = event.params.tokenId.toString();
-    wrap.blockNumber = event.block.number;
-    wrap.blockHash = event.block.hash;
-    wrap.txHash = event.transaction.hash;
 
     contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
     punk.owner = toAccount.id;
@@ -696,34 +658,15 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     punk.save();
   } else if (event.params.to.toHexString() == ZERO_ADDRESS) {
     // A wrapped punk is burned (unwrapped)
-    let unWrap = Unwrap.load(
-      WRAPPED_PUNK_ADDRESS.toString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("UNWRAP")
+    let unWrap = getOrCreateUnWrap(
+      Address.fromString(WRAPPED_PUNK_ADDRESS),
+      event.params.from,
+      event.params.to,
+      event.params.tokenId,
+      event
     );
 
-    if (!unWrap) {
-      unWrap = new Unwrap(
-        WRAPPED_PUNK_ADDRESS.toString()
-          .concat("-")
-          .concat(event.logIndex.toString())
-          .concat("-")
-          .concat("UNWRAP")
-      );
-    }
-
     let fromAccount = getOrCreateAccount(event.params.from);
-
-    unWrap.from = event.params.from.toHexString();
-    unWrap.to = fromAccount.id;
-    unWrap.type = "UNWRAP";
-    unWrap.timestamp = event.block.timestamp;
-    unWrap.nft = event.params.tokenId.toString();
-    unWrap.blockNumber = event.block.number;
-    unWrap.blockHash = event.block.hash;
-    unWrap.txHash = event.transaction.hash;
 
     contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
 

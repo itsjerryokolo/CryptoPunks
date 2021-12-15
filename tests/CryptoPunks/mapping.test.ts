@@ -116,7 +116,7 @@ function createPunkTransferEvent(
   from: Address,
   to: Address,
   punkIndex: i32,
-  blockNumber: i32 = 2
+  blockNumber: i32 = 1000
 ): PunkTransfer {
   let mockEvent = newMockEvent();
 
@@ -206,7 +206,7 @@ function createProxyRegisteredEvent(
   return proxyRegisteredEvent;
 }
 
-test("test handleAssign", () => {
+/* test("test handleAssign", () => {
   log.warning("test handleAssign", []);
   let assignEvent = createAssign(Address.fromString(OWNER1), 1);
   createMockedFunction(CRYPTOPUNKS_ADDRESS, "name", "name():(string)").returns([
@@ -228,18 +228,24 @@ test("test handleAssign", () => {
   assert.fieldEquals("MetaData", "1-1-METADATA", "punk", "1");
   assert.fieldEquals("Punk", "1", "metadata", "1-1-METADATA");
   assert.fieldEquals("Punk", "1", "wrapped", "false");
-});
+}); */
 
 test("test Transfer", () => {
   let transferEvent = createPunkTransferEvent(
-    Address.fromString(OWNER1),
-    Address.fromString(OWNER2),
+    Address.fromString("0x0056af3a28893bd11f0c4e45b62b18113a85fcb0"),
+    Address.fromString(WRAPPED_PUNK_ADDRESS),
+    1,
     1
   );
   handlePunkTransfer(transferEvent);
-  assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "0");
-  assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
-  assert.fieldEquals("Punk", "1", "tokenId", "1");
+  //assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "0");
+  //assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+  assert.fieldEquals(
+    "Wrap",
+    "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6-1-WRAP",
+    "type",
+    "WRAP"
+  );
   logStore();
 });
 
@@ -253,7 +259,7 @@ test("test Transfer", () => {
  * User Proxy: 0x674578060c0f07146BcC86D12B8a2efA1e819C38
  *
  */
-test("testWrap", () => {
+/* test("testWrap", () => {
   handleProxyRegistered(
     createProxyRegisteredEvent(
       Address.fromString(OWNER2),
@@ -292,19 +298,22 @@ test("testWrap", () => {
   //   "0"
   // );
   logStore();
-});
+}); */
 
-// test("testWrappedTransfer", () => {
-//   handleWrappedPunkTransfer(
-//     createWrappedPunkTransfer(
-//       Address.fromString(OWNER3),
-//       Address.fromString(WRAPPED_PUNK_ADDRESS),
-//       1,
-//       5
-//     )
-//   );
-//   logStore();
-// });
+test("testWrappedTransfer", () => {
+  handleWrappedPunkTransfer(
+    createWrappedPunkTransfer(
+      Address.fromString(ZERO_ADDRESS),
+      Address.fromString(OWNER3),
+      1,
+      5
+    )
+  );
+  assert.fieldEquals("Wrap", WRAPPED_PUNK_ADDRESS + "-0-WRAP", "type", "WRAP");
+  assert.fieldEquals("Punk", "1", "id", "1");
+
+  logStore();
+});
 
 // test("testUnwrap", () => {
 //   /*   handleProxyRegistered(
