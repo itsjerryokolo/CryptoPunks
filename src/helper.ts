@@ -11,6 +11,7 @@ import {
   Ask,
   AskRemoved,
   AskCreated,
+  Sale,
 } from "../generated/schema";
 import {
   TOKEN_URI,
@@ -418,4 +419,81 @@ export function getOrCreateAskRemoved(
   askRemoved.save();
 
   return askRemoved as AskRemoved;
+}
+
+export function getOrCreateSale(
+  toAddress: Address,
+  fromAddress: Address,
+  punk: BigInt,
+  event: ethereum.Event
+): Sale {
+  let sale = Sale.load(
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "SALE"
+  );
+
+  if (!sale) {
+    sale = new Sale(
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "SALE"
+    );
+  }
+
+  sale.to = toAddress.toHexString();
+  sale.from = fromAddress.toHexString();
+  sale.contract = event.address.toHexString();
+  sale.nft = punk.toString();
+  sale.timestamp = event.block.timestamp;
+  sale.blockNumber = event.block.number;
+  sale.txHash = event.transaction.hash;
+  sale.blockHash = event.block.hash;
+  sale.type = "SALE";
+
+  sale.save();
+  return sale as Sale;
+}
+
+export function getOrCreateTransfer(
+  fromAddress: Address,
+  toAddress: Address,
+  punk: BigInt,
+  event: ethereum.Event,
+  entityType: string
+): Transfer {
+  let transfer = Transfer.load(
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      entityType
+  );
+
+  if (!transfer) {
+    transfer = new Transfer(
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        entityType //REGULAR TRANSFER or WRAPPEDPUNK TRANSFER
+    );
+  }
+
+  transfer.from = fromAddress.toHexString();
+  transfer.to = toAddress.toHexString();
+  transfer.contract = event.address.toHexString();
+  transfer.nft = punk.toString();
+  transfer.timestamp = event.block.timestamp;
+  transfer.blockNumber = event.block.number;
+  transfer.txHash = event.transaction.hash;
+  transfer.blockHash = event.block.hash;
+  transfer.type = "TRANSFER";
+
+  transfer.save();
+  return transfer as Transfer;
 }

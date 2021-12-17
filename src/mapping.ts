@@ -63,9 +63,11 @@ import {
   getOrCreatePunk,
   getOrCreateWrap,
   getOrCreateUnWrap,
+  getOrCreateSale,
   getOrCreateAsk,
   getOrCreateAskCreated,
   getOrCreateAskRemoved,
+  getOrCreateTransfer,
 } from "./helper";
 
 export function handleAssign(event: Assigned): void {
@@ -149,39 +151,17 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   ) {
     // Regular PunkTransfer
 
-    let transfer = Transfer.load(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "TRANSFER"
-    );
-
     let toAccount = getOrCreateAccount(event.params.to);
     let fromAccount = getOrCreateAccount(event.params.from);
     let punk = getOrCreatePunk(event.params.punkIndex, event.params.to);
 
-    if (!transfer) {
-      transfer = new Transfer(
-        event.transaction.hash.toHexString() +
-          "-" +
-          event.logIndex.toString() +
-          "-" +
-          "TRANSFER"
-      );
-    }
-
-    transfer.type = "TRANSFER";
-    transfer.contract = event.address.toHexString();
-    transfer.to = event.params.to.toHexString();
-    transfer.from = event.params.from.toHexString();
-
-    transfer.nft = event.params.punkIndex.toString();
-    transfer.timestamp = event.block.timestamp;
-    transfer.blockNumber = event.block.number;
-    transfer.txHash = event.transaction.hash;
-    transfer.blockHash = event.block.hash;
-    transfer.contract = event.address.toHexString();
+    let transfer = getOrCreateTransfer(
+      event.params.from,
+      event.params.to,
+      event.params.punkIndex,
+      event,
+      "TRANSFER"
+    );
 
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BigInt.fromI32(1)
@@ -437,38 +417,18 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 export function handlePunkBought(event: PunkBought): void {
   log.debug("handlePunkBought", []);
 
-  let sale = Sale.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "SALE"
+  let sale = getOrCreateSale(
+    event.params.toAddress,
+    event.params.fromAddress,
+    event.params.punkIndex,
+    event
   );
   let punk = getOrCreatePunk(event.params.punkIndex, event.params.toAddress);
   let contract = getOrCreateCryptoPunkContract(event.address);
   let toAccount = getOrCreateAccount(event.params.toAddress);
   let fromAccount = getOrCreateAccount(event.params.fromAddress);
 
-  if (!sale) {
-    sale = new Sale(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "SALE"
-    );
-  }
-
   sale.amount = event.params.value;
-  sale.to = event.params.toAddress.toHexString();
-  sale.from = event.params.fromAddress.toHexString();
-  sale.contract = contract.id;
-  sale.nft = event.params.punkIndex.toString();
-  sale.timestamp = event.block.timestamp;
-  sale.blockNumber = event.block.number;
-  sale.txHash = event.transaction.hash;
-  sale.blockHash = event.block.hash;
-  sale.type = "SALE";
 
   contract.totalAmountTraded = contract.totalAmountTraded.plus(
     event.params.value
@@ -565,37 +525,13 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     // Wrapped Punk Transfer
 
     // We do not want to save a transfer for wrapped punk mints/burns
-    let transfer = Transfer.load(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "WRAPPEDPUNKTRANSFER"
+    let transfer = getOrCreateTransfer(
+      event.params.from,
+      event.params.to,
+      event.params.tokenId,
+      event,
+      "WRAPPEDPUNKTRANSFER"
     );
-
-    if (!transfer) {
-      transfer = new Transfer(
-        event.transaction.hash.toHexString() +
-          "-" +
-          event.logIndex.toString() +
-          "-" +
-          "WRAPPEDPUNKTRANSFER"
-      );
-    }
-
-    transfer.type = "TRANSFER";
-
-    transfer.contract = contract.id;
-    transfer.to = event.params.to.toHexString();
-    transfer.from = event.params.from.toHexString();
-
-    transfer.nft = event.params.tokenId.toString();
-    transfer.timestamp = event.block.timestamp;
-    transfer.blockNumber = event.block.number;
-    transfer.txHash = event.transaction.hash;
-    transfer.blockHash = event.block.hash;
-    transfer.contract = contract.id;
-    transfer.save();
 
     // There is always a from account, since they were assigned
     let fromAccount = getOrCreateAccount(event.params.from);

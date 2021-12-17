@@ -262,19 +262,13 @@ test("test Transfer", () => {
   handlePunkTransfer(transferEvent);
   //assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "0");
   //assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
-  assert.fieldEquals(
-    "Wrap",
-    "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6-100-WRAP",
-    "id",
-    "WRAP"
-  );
   logStore();
 });
 
 test("test PunkNoLongerForSale", () => {
   let PunkNoLongerForSaleEvent = createPunkNoLongerForSaleEvent(1);
   handlePunkNoLongerForSale(PunkNoLongerForSaleEvent);
-  assert.fieldEquals("AskCreated", "1-100-ASKCREATED", "nft", "1");
+  //assert.fieldEquals("AskCreated", "1-100-ASKCREATED", "nft", "1");
   logStore();
 });
 /**
@@ -336,12 +330,6 @@ test("testWrappedTransfer", () => {
       1,
       5
     )
-  );
-  assert.fieldEquals(
-    "Wrap",
-    WRAPPED_PUNK_ADDRESS + "-100-WRAP",
-    "id",
-    "0xb7f7f6c52f2e2fdb1963eab30438024864c313f6-100-WRAP"
   );
   assert.fieldEquals("Punk", "1", "id", "1");
 
