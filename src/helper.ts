@@ -12,6 +12,9 @@ import {
   AskRemoved,
   AskCreated,
   Sale,
+  BidCreated,
+  BidRemoved,
+  Bid,
 } from "../generated/schema";
 import {
   TOKEN_URI,
@@ -496,4 +499,39 @@ export function getOrCreateTransfer(
 
   transfer.save();
   return transfer as Transfer;
+}
+
+export function getOrCreateBid(
+  account: Address,
+  bidRemoved: BidRemoved,
+  bidCreated: BidCreated,
+  nft: BigInt,
+  event: ethereum.Event
+): Bid {
+  let bid = Bid.load(
+    event.transaction.hash.toHexString() +
+      "-" +
+      event.logIndex.toString() +
+      "-" +
+      "BID"
+  );
+
+  if (!bid) {
+    bid = new Bid(
+      event.transaction.hash.toHexString() +
+        "-" +
+        event.logIndex.toString() +
+        "-" +
+        "BID"
+    );
+    bid.open = true;
+  }
+  bid.nft = nft.toString();
+  bid.from = account.toHexString();
+  bid.created = bidCreated.id;
+  bid.offerType = "BID";
+  bid.removed = bidRemoved.id;
+  bid.save();
+
+  return bid as Bid;
 }

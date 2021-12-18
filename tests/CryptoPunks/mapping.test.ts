@@ -12,6 +12,7 @@ import {
   PunkTransfer,
   cryptopunks,
   PunkNoLongerForSale,
+  PunkBidEntered,
 } from "../../generated/cryptopunks/cryptopunks";
 import {
   ProxyRegistered,
@@ -23,6 +24,7 @@ import {
   handlePunkNoLongerForSale,
   handlePunkTransfer,
   handleWrappedPunkTransfer,
+  handlePunkBidEntered,
 } from "../../src/mapping";
 
 import { WRAPPED_PUNK_ADDRESS, ZERO_ADDRESS } from "../../src/constant";
@@ -200,6 +202,36 @@ function createPunkNoLongerForSaleEvent(punkIndex: i32): PunkNoLongerForSale {
   return PunkNoLongerForSaleEvent;
 }
 
+function createPunkBidEntered(
+  punkIndex: i32,
+  bid: i32,
+  bidder: Address
+): PunkBidEntered {
+  let mockEvent = newMockEvent();
+  let parameters = new Array<ethereum.EventParam>();
+
+  parameters.push(
+    new ethereum.EventParam("punkIndex", ethereum.Value.fromI32(punkIndex))
+  );
+
+  parameters.push(new ethereum.EventParam("bid", ethereum.Value.fromI32(bid)));
+
+  parameters.push(
+    new ethereum.EventParam("bidder", ethereum.Value.fromAddress(bidder))
+  );
+
+  let PunkBidEnteredEvent = new PunkBidEntered(
+    CRYPTOPUNKS_ADDRESS,
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    createBlock(4),
+    mockEvent.transaction,
+    parameters
+  );
+  return PunkBidEnteredEvent;
+}
+
 function createProxyRegisteredEvent(
   user: Address,
   proxy: Address
@@ -269,6 +301,17 @@ test("test PunkNoLongerForSale", () => {
   let PunkNoLongerForSaleEvent = createPunkNoLongerForSaleEvent(1);
   handlePunkNoLongerForSale(PunkNoLongerForSaleEvent);
   //assert.fieldEquals("AskCreated", "1-100-ASKCREATED", "nft", "1");
+  logStore();
+});
+
+test("test PunkBidEntered", () => {
+  let PunkBidEnteredEvent = createPunkBidEntered(
+    1,
+    100000,
+    Address.fromString(OWNER1)
+  );
+  handlePunkBidEntered(PunkBidEnteredEvent);
+  assert.fieldEquals("Bid", "1-100-BID", "type", "BID");
   logStore();
 });
 /**

@@ -68,6 +68,7 @@ import {
   getOrCreateAskCreated,
   getOrCreateAskRemoved,
   getOrCreateTransfer,
+  getOrCreateBid,
 } from "./helper";
 
 export function handleAssign(event: Assigned): void {
@@ -259,13 +260,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
       "-" +
       "BIDCREATED"
   );
-  let bid = Bid.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "BID"
-  );
+
   let account = getOrCreateAccount(event.params.fromAddress);
   let bidRemoved = BidRemoved.load(
     event.transaction.hash.toHexString() +
@@ -274,6 +269,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
       "-" +
       "BIDREMOVED"
   );
+
   let punk = getOrCreatePunk(event.params.punkIndex, event.params.fromAddress);
 
   if (!bidCreated) {
@@ -296,27 +292,14 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
         .concat("BIDREMOVED")
     );
   }
+  let bid = getOrCreateBid(
+    event.params.fromAddress,
+    bidRemoved as BidRemoved,
+    bidCreated as BidCreated,
+    event.params.punkIndex,
+    event
+  );
 
-  if (!bid) {
-    bid = new Bid(
-      event.transaction.hash
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("BID")
-    );
-  }
-
-  if (!bid) {
-    bid.open = true;
-  }
-  bid.nft = event.params.punkIndex.toString();
-  bid.created = bidCreated.id;
-  bid.removed = bidRemoved.id;
-  bid.from = account.id;
-  bid.nft = event.params.punkIndex.toString();
-  bid.offerType = "BID";
   bid.amount = event.params.value;
 
   bidRemoved.bid = bidCreated.id;
