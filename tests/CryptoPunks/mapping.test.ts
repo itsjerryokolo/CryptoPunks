@@ -311,7 +311,12 @@ test("test PunkBidEntered", () => {
     Address.fromString(OWNER1)
   );
   handlePunkBidEntered(PunkBidEnteredEvent);
-  assert.fieldEquals("Bid", "1-100-BID", "type", "BID");
+  assert.fieldEquals(
+    "BidRemoved",
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1-BIDREMOVED",
+    "type",
+    "BID_REMOVED"
+  );
   logStore();
 });
 /**

@@ -69,6 +69,8 @@ import {
   getOrCreateAskRemoved,
   getOrCreateTransfer,
   getOrCreateBid,
+  getOrCreateBidCreated,
+  getOrCreateBidRemoved,
 } from "./helper";
 
 export function handleAssign(event: Assigned): void {
@@ -253,45 +255,22 @@ export function handlePunkOffered(event: PunkOffered): void {
 export function handlePunkBidEntered(event: PunkBidEntered): void {
   log.debug("handlePunkBidCreatedEntered", []);
 
-  let bidCreated = BidCreated.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "BIDCREATED"
+  let bidCreated = getOrCreateBidCreated(
+    event.params.fromAddress,
+    event.params.punkIndex,
+    event
+  );
+
+  let bidRemoved = getOrCreateBidRemoved(
+    event.params.fromAddress,
+    bidCreated as BidCreated,
+    event.params.punkIndex,
+    event
   );
 
   let account = getOrCreateAccount(event.params.fromAddress);
-  let bidRemoved = BidRemoved.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "BIDREMOVED"
-  );
-
   let punk = getOrCreatePunk(event.params.punkIndex, event.params.fromAddress);
 
-  if (!bidCreated) {
-    bidCreated = new BidCreated(
-      event.transaction.hash
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("BIDCREATED")
-    );
-  }
-  if (!bidRemoved) {
-    bidRemoved = new BidRemoved(
-      event.transaction.hash
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("BIDREMOVED")
-    );
-  }
   let bid = getOrCreateBid(
     event.params.fromAddress,
     bidRemoved as BidRemoved,
@@ -301,27 +280,8 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   );
 
   bid.amount = event.params.value;
-
-  bidRemoved.bid = bidCreated.id;
   bidRemoved.amount = event.params.value;
-  bidRemoved.from = account.id;
-  bidRemoved.contract = event.address.toHexString();
-  bidRemoved.nft = event.params.punkIndex.toString();
-  bidRemoved.timestamp = event.block.timestamp;
-  bidRemoved.blockNumber = event.block.number;
-  bidRemoved.txHash = event.transaction.hash;
-  bidRemoved.blockHash = event.block.hash;
-  bidRemoved.type = "BID_REMOVED";
-
   bidCreated.amount = event.params.value;
-  bidCreated.from = account.id;
-  bidCreated.contract = event.address.toHexString();
-  bidCreated.nft = event.params.punkIndex.toString();
-  bidCreated.timestamp = event.block.timestamp;
-  bidCreated.blockNumber = event.block.number;
-  bidCreated.txHash = event.transaction.hash;
-  bidCreated.blockHash = event.block.hash;
-  bidCreated.type = "BID_CREATED";
 
   bid.save();
   punk.save();
