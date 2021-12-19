@@ -293,63 +293,22 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   log.debug("handlePunkBidCreatedWithdrawn", []);
 
-  let bidRemoved = BidRemoved.load(
-    event.transaction.hash
-      .toHexString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("BIDREMOVED")
+  let bidCreated = getOrCreateBidCreated(
+    event.params.fromAddress,
+    event.params.punkIndex,
+    event
   );
-  let bidCreated = BidCreated.load(
-    event.transaction.hash
-      .toHexString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("BIDCREATED")
+
+  let bidRemoved = getOrCreateBidRemoved(
+    event.params.fromAddress,
+    bidCreated as BidCreated,
+    event.params.punkIndex,
+    event
   );
   let account = getOrCreateAccount(event.params.fromAddress);
   let punk = getOrCreatePunk(event.params.punkIndex, event.params.fromAddress);
 
-  if (!bidRemoved) {
-    bidRemoved = new BidRemoved(
-      event.transaction.hash
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("BIDREMOVED")
-    );
-  }
-  if (!bidCreated) {
-    bidCreated = new BidCreated(
-      event.transaction.hash
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("BIDCREATED")
-    );
-  }
-
-  bidRemoved.bid = bidCreated.id;
-  bidRemoved.from = account.id;
-  bidRemoved.contract = event.address.toHexString();
   bidRemoved.amount = event.params.value;
-  bidRemoved.nft = event.params.punkIndex.toString();
-  bidRemoved.timestamp = event.block.timestamp;
-  bidRemoved.blockNumber = event.block.number;
-  bidRemoved.txHash = event.transaction.hash;
-  bidRemoved.blockHash = event.block.hash;
-  bidRemoved.type = "BID_REMOVED";
-
-  bidCreated.nft = event.params.punkIndex.toString();
-  bidCreated.timestamp = event.block.timestamp;
-  bidCreated.blockNumber = event.block.number;
-  bidCreated.txHash = event.transaction.hash;
-  bidCreated.blockHash = event.block.hash;
-  bidCreated.type = "BID_CREATED";
 
   punk.save();
   account.save();
