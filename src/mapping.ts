@@ -1,13 +1,5 @@
+import { BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
 import {
-  BigInt,
-  Address,
-  Bytes,
-  log,
-  BigDecimal,
-  ByteArray,
-} from "@graphprotocol/graph-ts";
-import {
-  cryptopunks,
   Assign as Assigned,
   PunkTransfer,
   PunkOffered,
@@ -15,12 +7,9 @@ import {
   PunkBidWithdrawn,
   PunkBought,
   PunkNoLongerForSale,
-  cryptopunks__punkBidsResult,
 } from "../generated/cryptopunks/cryptopunks";
 
 import {
-  WrappedPunks,
-  Approval,
   Transfer as WrappedPunkTransfer,
   ProxyRegistered,
 } from "../generated/WrappedPunks/WrappedPunks";
@@ -28,50 +17,48 @@ import {
 import { getTrait } from "./traits";
 
 import {
-  Ask,
   Account,
-  Assign,
-  Transfer,
   BidCreated,
   Punk,
-  Sale,
   Trait,
   BidRemoved,
   AskCreated,
   AskRemoved,
-  Contract,
   MetaData,
-  Bid,
-  Wrap,
-  Unwrap,
   UserProxy,
 } from "../generated/schema";
 
+import { ZERO_ADDRESS, WRAPPED_PUNK_ADDRESS } from "./constant";
 import {
-  TOKEN_URI,
-  ZERO_ADDRESS,
-  IMAGE_URI,
-  WRAPPED_PUNK_ADDRESS,
-  CONTRACT_URI,
-} from "./constant";
-import {
-  getOrCreateCryptoPunkContract,
   getOrCreateAccount,
-  getOrCreateWrappedPunkContract,
   getOrCreateMetadata,
   getOrCreateAssign,
   getOrCreatePunk,
+  getOrCreateSale,
+  getOrCreateTransfer,
+} from "./helpers/entityHelper";
+
+import {
+  getOrCreateCryptoPunkContract,
+  getOrCreateWrappedPunkContract,
+} from "../src/helpers/contractHelper";
+
+import {
   getOrCreateWrap,
   getOrCreateUnWrap,
-  getOrCreateSale,
+} from "../src/helpers/wrapAndUnwrap";
+
+import {
   getOrCreateAsk,
   getOrCreateAskCreated,
   getOrCreateAskRemoved,
-  getOrCreateTransfer,
+} from "./helpers/askHelpers";
+
+import {
   getOrCreateBid,
   getOrCreateBidCreated,
   getOrCreateBidRemoved,
-} from "./helper";
+} from "../src/helpers/bidHelpers";
 
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);

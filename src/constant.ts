@@ -1,6 +1,3 @@
-import { Address, Bytes } from "@graphprotocol/graph-ts";
-import { Account } from "../generated/schema";
-
 export const TOKEN_URI = "https://www.larvalabs.com/cryptopunks/details/";
 export const CONTRACT_URI = "https://www.larvalabs.com/cryptopunks";
 export const IMAGE_URI =
