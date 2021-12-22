@@ -9,7 +9,8 @@
     "create-local": "graph create --node http://localhost:8020/ itsjerryokolo/cryptopunks",
     "remove-local": "graph remove --node http://localhost:8020/ itsjerryokolo/cryptopunks",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 itsjerryokolo/cryptopunks",
-    "test": "graph build && graph test CryptoPunks"
+    "test": "graph build && graph test CryptoPunks",
+    "test:force": "rm -rf ./tests/.bin ./build && yarn test"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.22.3",
