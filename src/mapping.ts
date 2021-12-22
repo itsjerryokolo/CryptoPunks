@@ -123,23 +123,23 @@ export function handleAssign(event: Assigned): void {
 }
 
 export function handlePunkTransfer(event: PunkTransfer): void {
-  log.debug("handlePunkTransfer", []);
-  let fromIsProxy = UserProxy.load(event.params.from.toHexString());
-  let toIsProxy = UserProxy.load(event.params.to.toHexString());
+  log.debug("handlePunkTransfer from: {} to: {}", [
+    event.params.from.toHexString(),
+    event.params.to.toHexString(),
+  ]);
+  let fromProxy = UserProxy.load(event.params.from.toHexString());
+  let toProxy = UserProxy.load(event.params.to.toHexString());
 
-  if (fromIsProxy !== null || toIsProxy !== null) {
-    log.debug("PunkTransfer with proxy detected fromProxy: {} toProxy: {} ", [
-      fromIsProxy !== null ? event.params.from.toHexString() : "false",
-      toIsProxy !== null ? event.params.to.toHexString() : "false",
-    ]);
+  if (toProxy !== null) {
+    log.debug("PunkTransfer to proxy detected toProxy: {} ", [toProxy.id]);
     return;
-  }
-
-  if (
-    event.params.to.toHexString() !== WRAPPED_PUNK_ADDRESS ||
-    event.params.from.toHexString() !== WRAPPED_PUNK_ADDRESS
+  } else if (
+    event.params.to.toHexString() != WRAPPED_PUNK_ADDRESS &&
+    event.params.from.toHexString() != WRAPPED_PUNK_ADDRESS
   ) {
-    // Regular PunkTransfer
+    log.debug("Regular punk transfer check: {} ", [
+      event.params.punkIndex.toString(),
+    ]);
 
     let toAccount = getOrCreateAccount(event.params.to);
     let fromAccount = getOrCreateAccount(event.params.from);
@@ -168,22 +168,29 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     toAccount.save();
     fromAccount.save();
     punk.save();
-  } else if (event.params.to.toHexString() == WRAPPED_PUNK_ADDRESS) {
-    // Mint/Wrap
+  } else if (
+    fromProxy !== null &&
+    event.params.from.toHexString() == fromProxy.id &&
+    event.params.to.toHexString() == WRAPPED_PUNK_ADDRESS
+  ) {
+    log.debug("Wrap detected of punk: {} ", [
+      event.params.punkIndex.toString(),
+    ]);
     let wrap = getOrCreateWrap(
       Address.fromString(WRAPPED_PUNK_ADDRESS),
-      event.params.from,
+      Address.fromString(fromProxy.user),
       event.params.punkIndex,
       event
     );
 
-    let fromAccount = getOrCreateAccount(event.params.from);
-    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BigInt.fromI32(1)
+    let punk = getOrCreatePunk(
+      event.params.punkIndex,
+      Address.fromString(fromProxy.user)
     );
+    punk.wrapped = true;
 
+    punk.save();
     wrap.save();
-    fromAccount.save();
   } else if (event.params.from.toHexString() == WRAPPED_PUNK_ADDRESS) {
     // Burn/Unwrap
 

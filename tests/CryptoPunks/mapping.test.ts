@@ -30,10 +30,10 @@ import {
 import { WRAPPED_PUNK_ADDRESS, ZERO_ADDRESS } from "../../src/constant";
 import { MetaData } from "../../generated/schema";
 
-const OWNER1 = "0x6f4a2d3a4f47f9c647d86c929755593911ee91ec";
-const OWNER2 = "0xc36817163b7eaef25234e1d18adbfa52105ae510";
-const OWNER3 = "0xb4cf0f5f2ffed445ca804898654366316d0a779a";
-const PROXY2 = "0x674578060c0f07146BcC86D12B8a2efA1e819C38";
+const OWNER1 = "0x6f4a2d3a4f47f9c647d86c929755593911ee0001";
+const OWNER2 = "0xc36817163b7eaef25234e1d18adbfa52105a0002";
+const OWNER3 = "0xb4cf0f5f2ffed445ca804898654366316d0a0003";
+const PROXY2 = "0x674578060c0f07146bcc86d12b8a2efa1e810002";
 
 const CRYPTOPUNKS_ADDRESS = Address.fromString(
   "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb"
@@ -260,18 +260,18 @@ function createProxyRegisteredEvent(
   return proxyRegisteredEvent;
 }
 
-/* test("test handleAssign", () => {
+/////////////////////////////////////////////////////////////////////////////////////
+
+test("test handleAssign", () => {
   log.warning("test handleAssign", []);
   let assignEvent = createAssign(Address.fromString(OWNER1), 1);
   createMockedFunction(CRYPTOPUNKS_ADDRESS, "name", "name():(string)").returns([
     ethereum.Value.fromString("CryptoPunks"),
   ]);
-  // logStore();
+
   handleAssign(assignEvent);
 
-  logStore();
-
-  //assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "1");
+  assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "1");
   assert.fieldEquals(
     "Contract",
     CRYPTOPUNKS_ADDRESS.toHexString(),
@@ -282,43 +282,21 @@ function createProxyRegisteredEvent(
   assert.fieldEquals("MetaData", "1-1-METADATA", "punk", "1");
   assert.fieldEquals("Punk", "1", "metadata", "1-1-METADATA");
   assert.fieldEquals("Punk", "1", "wrapped", "false");
-}); */
+});
 
 test("test Transfer", () => {
   let transferEvent = createPunkTransferEvent(
-    Address.fromString("0x0056af3a28893bd11f0c4e45b62b18113a85fcb0"),
-    Address.fromString(WRAPPED_PUNK_ADDRESS),
+    Address.fromString(OWNER1),
+    Address.fromString(OWNER2),
     1,
     1
   );
   handlePunkTransfer(transferEvent);
-  //assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "0");
-  //assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
-  logStore();
+  assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "0");
+  assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+  // logStore();
 });
 
-test("test PunkNoLongerForSale", () => {
-  let PunkNoLongerForSaleEvent = createPunkNoLongerForSaleEvent(1);
-  handlePunkNoLongerForSale(PunkNoLongerForSaleEvent);
-  //assert.fieldEquals("AskCreated", "1-100-ASKCREATED", "nft", "1");
-  logStore();
-});
-
-test("test PunkBidEntered", () => {
-  let PunkBidEnteredEvent = createPunkBidEntered(
-    1,
-    100000,
-    Address.fromString(OWNER1)
-  );
-  handlePunkBidEntered(PunkBidEnteredEvent);
-  assert.fieldEquals(
-    "BidRemoved",
-    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1-BIDREMOVED",
-    "type",
-    "BID_REMOVED"
-  );
-  logStore();
-});
 /**
  * Example: https://etherscan.io/tx/0x83f2c4b428b2ee5cf0c317fe72bb39716ca2e4d93597b3d80a8a2e60aa698d22
  * 1. registerProxy
@@ -329,13 +307,18 @@ test("test PunkBidEntered", () => {
  * User Proxy: 0x674578060c0f07146BcC86D12B8a2efA1e819C38
  *
  */
-/* test("testWrap", () => {
+test("testWrap", () => {
+  assert.fieldEquals("Punk", "1", "owner", OWNER2);
+
   handleProxyRegistered(
     createProxyRegisteredEvent(
       Address.fromString(OWNER2),
       Address.fromString(PROXY2)
     )
   );
+
+  assert.fieldEquals("UserProxy", PROXY2, "user", OWNER2);
+
   handlePunkTransfer(
     createPunkTransferEvent(
       Address.fromString(OWNER2),
@@ -344,6 +327,9 @@ test("test PunkBidEntered", () => {
       4
     )
   );
+
+  assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+
   handlePunkTransfer(
     createPunkTransferEvent(
       Address.fromString(PROXY2),
@@ -352,37 +338,45 @@ test("test PunkBidEntered", () => {
       5
     )
   );
-  handleWrappedPunkTransfer(
-    createWrappedPunkTransfer(
-      Address.fromString(ZERO_ADDRESS),
-      Address.fromString(OWNER2),
-      1,
-      5
-    )
-  );
+
+  // logStore();
+
   assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+  assert.fieldEquals("Punk", "1", "wrapped", "true");
+  // TODO: Check wrap
+
+  // handleWrappedPunkTransfer(
+  //   createWrappedPunkTransfer(
+  //     Address.fromString(ZERO_ADDRESS),
+  //     Address.fromString(OWNER2),
+  //     1,
+  //     5
+  //   )
+  // );
+  // assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
   // assert.fieldEquals(
   //   "Account",
   //   WRAPPED_PUNK_ADDRESS,
   //   "numberOfPunksOwned",
   //   "0"
   // );
-  logStore();
-}); */
-
-test("testWrappedTransfer", () => {
-  handleWrappedPunkTransfer(
-    createWrappedPunkTransfer(
-      Address.fromString(ZERO_ADDRESS),
-      Address.fromString(OWNER3),
-      1,
-      5
-    )
-  );
-  assert.fieldEquals("Punk", "1", "id", "1");
-
-  logStore();
+  // logStore();
 });
+
+// test("testWrappedTransfer", () => {
+//   logStore();
+//   handleWrappedPunkTransfer(
+//     createWrappedPunkTransfer(
+//       Address.fromString(ZERO_ADDRESS),
+//       Address.fromString(OWNER3),
+//       1,
+//       5
+//     )
+//   );
+//   assert.fieldEquals("Punk", "1", "id", "1");
+
+//   // logStore();
+// });
 
 // test("testUnwrap", () => {
 //   /*   handleProxyRegistered(
@@ -429,5 +423,28 @@ test("testWrappedTransfer", () => {
 //   );
 //   assert.fieldEquals("Account", OWNER3, "numberOfPunksOwned", "1");
 
-//   logStore();
+//   // logStore();
+// });
+
+// test("test PunkNoLongerForSale", () => {
+//   let PunkNoLongerForSaleEvent = createPunkNoLongerForSaleEvent(1);
+//   handlePunkNoLongerForSale(PunkNoLongerForSaleEvent);
+//   //assert.fieldEquals("AskCreated", "1-100-ASKCREATED", "nft", "1");
+//   // logStore();
+// });
+
+// test("test PunkBidEntered", () => {
+//   let PunkBidEnteredEvent = createPunkBidEntered(
+//     1,
+//     100000,
+//     Address.fromString(OWNER1)
+//   );
+//   handlePunkBidEntered(PunkBidEnteredEvent);
+//   assert.fieldEquals(
+//     "BidRemoved",
+//     "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1-BIDREMOVED",
+//     "type",
+//     "BID_REMOVED"
+//   );
+//   // logStore();
 // });
