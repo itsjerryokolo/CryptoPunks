@@ -173,9 +173,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     event.params.from.toHexString() == fromProxy.id &&
     event.params.to.toHexString() == WRAPPED_PUNK_ADDRESS
   ) {
-    log.debug("Wrap detected of punk: {} ", [
-      event.params.punkIndex.toString(),
-    ]);
+    log.info("Wrap detected of punk: {} ", [event.params.punkIndex.toString()]);
     let wrap = getOrCreateWrap(
       Address.fromString(WRAPPED_PUNK_ADDRESS),
       Address.fromString(fromProxy.user),
@@ -196,6 +194,10 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
     let punk = getOrCreatePunk(event.params.punkIndex, event.params.to);
     let toAccount = getOrCreateAccount(event.params.to);
+
+    log.debug("Wrappedpunk address detected: {} ", [
+      event.params.from.toHexString(),
+    ]);
 
     let unWrap = getOrCreateUnWrap(
       Address.fromString(WRAPPED_PUNK_ADDRESS),

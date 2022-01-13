@@ -6,7 +6,7 @@ import {
   createMockedFunction,
 } from "matchstick-as/assembly/index";
 import { log } from "matchstick-as/assembly/log";
-import { logStore } from "matchstick-as/assembly/store";
+import { clearStore, logStore } from "matchstick-as/assembly/store";
 import {
   Assign,
   PunkTransfer,
@@ -261,7 +261,8 @@ function createProxyRegisteredEvent(
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
-
+//TEST ASSIGN
+///////////////////////////////////////////
 test("test handleAssign", () => {
   log.warning("test handleAssign", []);
   let assignEvent = createAssign(Address.fromString(OWNER1), 1);
@@ -283,6 +284,9 @@ test("test handleAssign", () => {
   assert.fieldEquals("Punk", "1", "metadata", "1-1-METADATA");
   assert.fieldEquals("Punk", "1", "wrapped", "false");
 });
+///////////////////////////////////////////
+//TEST PUNK TRANSFER
+///////////////////////////////////////////
 
 test("test Transfer", () => {
   let transferEvent = createPunkTransferEvent(
@@ -297,6 +301,10 @@ test("test Transfer", () => {
   // logStore();
 });
 
+///////////////////////////////////////////
+//TEST WRAP
+///////////////////////////////////////////
+
 /**
  * Example: https://etherscan.io/tx/0x83f2c4b428b2ee5cf0c317fe72bb39716ca2e4d93597b3d80a8a2e60aa698d22
  * 1. registerProxy
@@ -307,6 +315,7 @@ test("test Transfer", () => {
  * User Proxy: 0x674578060c0f07146BcC86D12B8a2efA1e819C38
  *
  */
+
 test("testWrap", () => {
   assert.fieldEquals("Punk", "1", "owner", OWNER2);
 
@@ -343,40 +352,26 @@ test("testWrap", () => {
 
   assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
   assert.fieldEquals("Punk", "1", "wrapped", "true");
-  // TODO: Check wrap
-
-  // handleWrappedPunkTransfer(
-  //   createWrappedPunkTransfer(
-  //     Address.fromString(ZERO_ADDRESS),
-  //     Address.fromString(OWNER2),
-  //     1,
-  //     5
-  //   )
-  // );
-  // assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
-  // assert.fieldEquals(
-  //   "Account",
-  //   WRAPPED_PUNK_ADDRESS,
-  //   "numberOfPunksOwned",
-  //   "0"
-  // );
-  // logStore();
 });
 
-// test("testWrappedTransfer", () => {
-//   logStore();
-//   handleWrappedPunkTransfer(
-//     createWrappedPunkTransfer(
-//       Address.fromString(ZERO_ADDRESS),
-//       Address.fromString(OWNER3),
-//       1,
-//       5
-//     )
-//   );
-//   assert.fieldEquals("Punk", "1", "id", "1");
+///////////////////////////////////////////
+//TEST UNWRAP
+///////////////////////////////////////////
 
-//   // logStore();
-// });
+test("testUnwrap", () => {
+  clearStore();
+  handlePunkTransfer(
+    createPunkTransferEvent(
+      Address.fromString(WRAPPED_PUNK_ADDRESS),
+      Address.fromString(OWNER2),
+      1,
+      5
+    )
+  );
+  assert.fieldEquals("Punk", "1", "wrapped", "false");
+
+  logStore();
+});
 
 // test("testUnwrap", () => {
 //   /*   handleProxyRegistered(
