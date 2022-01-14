@@ -370,26 +370,11 @@ test("testUnwrap", () => {
     )
   );
   assert.fieldEquals("Punk", "1", "wrapped", "false");
+  assert.fieldEquals("Punk", "1", "owner", OWNER2);
+  assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
 
-  logStore();
+  // logStore();
 });
-
-// test("testUnwrap", () => {
-//   /*   handleProxyRegistered(
-//     createProxyRegisteredEvent(
-//       Address.fromString(PROXY2),
-//       Address.fromString(OWNER2)
-//     )
-//   ); */
-//   /*   handleWrappedPunkTransfer(
-//     //Owner3 initiates a burn event and sends punk to WP contract
-//     createWrappedPunkTransfer(
-//       Address.fromString(OWNER3),
-//       Address.fromString(WRAPPED_PUNK_ADDRESS),
-//       1,
-//       5
-//      )
-//   ); */
 
 //   handleWrappedPunkTransfer(
 //     //Owner3 sends wrapped punk to ZERO_ADDRESS

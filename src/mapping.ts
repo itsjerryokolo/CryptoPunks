@@ -208,10 +208,6 @@ export function handlePunkTransfer(event: PunkTransfer): void {
       event
     );
 
-    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BigInt.fromI32(1)
-    );
-
     punk.wrapped = false;
 
     punk.save();
