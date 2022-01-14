@@ -63,19 +63,6 @@ export function getOrCreateAssign(
   return assign as Assign;
 }
 
-export function getOrCreatePunk(id: BigInt, account: Address): Punk {
-  let punk = Punk.load(id.toString());
-  if (!punk) {
-    punk = new Punk(id.toString());
-    punk.wrapped = false;
-  }
-  punk.tokenId = id;
-  punk.owner = account.toHexString();
-  punk.save();
-
-  return punk as Punk;
-}
-
 export function getOrCreateMetadata(
   punkId: BigInt,
   event: ethereum.Event
