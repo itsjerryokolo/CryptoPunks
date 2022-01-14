@@ -359,7 +359,8 @@ test("testWrap", () => {
 ///////////////////////////////////////////
 
 test("testUnwrap", () => {
-  clearStore();
+  assert.fieldEquals("Punk", "1", "wrapped", "true");
+
   handlePunkTransfer(
     createPunkTransferEvent(
       Address.fromString(WRAPPED_PUNK_ADDRESS),
