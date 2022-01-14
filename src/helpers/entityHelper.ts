@@ -16,6 +16,7 @@ export function getOrCreateAccount(address: Address): Account {
   if (!account) {
     account = new Account(id);
     account.numberOfPunksOwned = BigInt.fromI32(0);
+    account.save();
   }
 
   return account as Account;
