@@ -165,8 +165,8 @@ export function handlePunkTransfer(event: PunkTransfer): void {
       BigInt.fromI32(1)
     );
 
-    //Capture punk transfers and owners if not transfered to WRAPPED PUNK ADDRESS
-    //punk.owner = toAccount.id;
+    // Capture punk transfers and owners if not transfered to WRAPPED PUNK ADDRESS
+    punk.owner = toAccount.id;
 
     transfer.save();
     toAccount.save();
@@ -192,13 +192,13 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     wrap.save();
   } else if (event.params.from.toHexString() == WRAPPED_PUNK_ADDRESS) {
     // Burn/Unwrap
+    log.debug("Unwrapt detected. From: {}, punk: {}", [
+      event.params.from.toHexString(),
+      event.params.punkIndex.toString(),
+    ]);
 
     let punk = Punk.load(event.params.punkIndex.toString())!;
     let toAccount = getOrCreateAccount(event.params.to);
-
-    log.debug("Wrappedpunk address detected: {} ", [
-      event.params.from.toHexString(),
-    ]);
 
     let unWrap = getOrCreateUnWrap(
       Address.fromString(WRAPPED_PUNK_ADDRESS),
@@ -208,9 +208,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
       event
     );
 
-    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BigInt.fromI32(1)
-    );
+    punk.wrapped = false;
 
     punk.save();
     toAccount.save();
