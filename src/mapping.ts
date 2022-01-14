@@ -147,7 +147,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
     let toAccount = getOrCreateAccount(event.params.to);
     let fromAccount = getOrCreateAccount(event.params.from);
-    let punk = Punk.load(event.params.punkIndex.toString());
+    let punk = Punk.load(event.params.punkIndex.toString())!;
 
     let transfer = getOrCreateTransfer(
       event.params.from,
@@ -185,7 +185,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
       event
     );
 
-    let punk = Punk.load(event.params.punkIndex.toString());
+    let punk = Punk.load(event.params.punkIndex.toString())!;
     punk.wrapped = true;
 
     punk.save();
@@ -193,7 +193,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
   } else if (event.params.from.toHexString() == WRAPPED_PUNK_ADDRESS) {
     // Burn/Unwrap
 
-    let punk = Punk.load(event.params.punkIndex.toString());
+    let punk = Punk.load(event.params.punkIndex.toString())!;
     let toAccount = getOrCreateAccount(event.params.to);
 
     log.debug("Wrappedpunk address detected: {} ", [
@@ -224,7 +224,7 @@ export function handlePunkOffered(event: PunkOffered): void {
   let askCreated = getOrCreateAskCreated(event.params.punkIndex, event);
   let askRemoved = getOrCreateAskRemoved(event.params.punkIndex, event);
 
-  let punk = Punk.load(event.params.punkIndex.toString());
+  let punk = Punk.load(event.params.punkIndex.toString())!;
   let account = getOrCreateAccount(event.params.toAddress);
   let ask = getOrCreateAsk(
     account as Account,
@@ -265,7 +265,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
     event
   );
 
-  let punk = Punk.load(event.params.punkIndex.toString());
+  let punk = Punk.load(event.params.punkIndex.toString())!;
   let account = getOrCreateAccount(event.params.fromAddress);
 
   let bid = getOrCreateBid(
@@ -303,7 +303,7 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
     event
   );
   let account = getOrCreateAccount(event.params.fromAddress);
-  let punk = Punk.load(event.params.punkIndex.toString());
+  let punk = Punk.load(event.params.punkIndex.toString())!;
 
   bidRemoved.amount = event.params.value;
 
@@ -322,7 +322,7 @@ export function handlePunkBought(event: PunkBought): void {
     event.params.punkIndex,
     event
   );
-  let punk = Punk.load(event.params.punkIndex.toString());
+  let punk = Punk.load(event.params.punkIndex.toString())!;
   let contract = getOrCreateCryptoPunkContract(event.address);
   let toAccount = getOrCreateAccount(event.params.toAddress);
   let fromAccount = getOrCreateAccount(event.params.fromAddress);
@@ -356,7 +356,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
 
   let askRemoved = getOrCreateAskRemoved(event.params.punkIndex, event);
   let askCreated = getOrCreateAskCreated(event.params.punkIndex, event);
-  let punk = Punk.load(event.params.punkIndex.toString());
+  let punk = Punk.load(event.params.punkIndex.toString())!;
 
   if (!punk) {
     punk = new Punk(event.params.punkIndex.toString());
@@ -378,7 +378,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     event.params.to.toHexString(),
   ]);
 
-  let punk = Punk.load(event.params.tokenId.toString());
+  let punk = Punk.load(event.params.tokenId.toString())!;
   if (!punk) {
     punk = new Punk(event.params.tokenId.toString());
   }
