@@ -217,32 +217,57 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 }
 
 export function handlePunkOffered(event: PunkOffered): void {
-  log.debug("handlePunkOffered", []);
+  log.debug("handlePunkOffered: PunkIndex {}, toAddress: {}, hash: {}", [
+    event.params.punkIndex.toString(),
+    event.params.toAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
 
   let askCreated = getOrCreateAskCreated(event.params.punkIndex, event);
   let askRemoved = getOrCreateAskRemoved(event.params.punkIndex, event);
 
   let punk = Punk.load(event.params.punkIndex.toString())!;
-  let account = getOrCreateAccount(event.params.toAddress);
   let ask = getOrCreateAsk(
-    account as Account,
     askRemoved as AskRemoved,
     askCreated as AskCreated,
     event.params.punkIndex,
     event
   );
 
-  if (!ask) {
-    ask.open = true;
-  }
-
+  //event.params.to currently emits to 0x0(ZERO_ADDRESS) and doesn't emit msg.sender
+  //The previous owner remains the owner
+  ask.from = punk.owner;
+  askCreated.from = punk.owner;
   ask.amount = event.params.minValue;
-  askCreated.from = account.id;
-  askCreated.to = event.params.toAddress.toHexString();
+
+  //Ask created to another account. offerPunkForSaleToAddress()
+  if (event.params.toAddress.toHexString() != ZERO_ADDRESS) {
+    let askCreated = getOrCreateAskCreated(event.params.punkIndex, event);
+    let askRemoved = getOrCreateAskRemoved(event.params.punkIndex, event);
+    let account = getOrCreateAccount(event.params.toAddress);
+    let punk = Punk.load(event.params.punkIndex.toString())!;
+    let ask = getOrCreateAsk(
+      askRemoved as AskRemoved,
+      askCreated as AskCreated,
+      event.params.punkIndex,
+      event
+    );
+
+    //The previous owner remains the owner
+    ask.from = punk.owner;
+    askCreated.from = punk.owner;
+    askCreated.to = account.id;
+    ask.amount = event.params.minValue;
+
+    ask.save();
+    punk.save();
+    account.save();
+    askRemoved.save();
+    askCreated.save();
+  }
 
   ask.save();
   punk.save();
-  account.save();
   askRemoved.save();
   askCreated.save();
 }
