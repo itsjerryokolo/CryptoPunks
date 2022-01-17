@@ -13,6 +13,7 @@ import {
   cryptopunks,
   PunkNoLongerForSale,
   PunkBidEntered,
+  PunkOffered,
 } from "../../generated/cryptopunks/cryptopunks";
 import {
   ProxyRegistered,
@@ -25,6 +26,7 @@ import {
   handlePunkTransfer,
   handleWrappedPunkTransfer,
   handlePunkBidEntered,
+  handlePunkOffered,
 } from "../../src/mapping";
 
 import { WRAPPED_PUNK_ADDRESS, ZERO_ADDRESS } from "../../src/constant";
@@ -232,6 +234,38 @@ function createPunkBidEntered(
   return PunkBidEnteredEvent;
 }
 
+function createPunkOffered(
+  punkIndex: i32,
+  offer: i32,
+  offeredBy: Address
+): PunkOffered {
+  let mockEvent = newMockEvent();
+  let parameters = new Array<ethereum.EventParam>();
+
+  parameters.push(
+    new ethereum.EventParam("punkIndex", ethereum.Value.fromI32(punkIndex))
+  );
+
+  parameters.push(
+    new ethereum.EventParam("offer", ethereum.Value.fromI32(offer))
+  );
+
+  parameters.push(
+    new ethereum.EventParam("offeredBy", ethereum.Value.fromAddress(offeredBy))
+  );
+
+  let PunkOfferedEvent = new PunkOffered(
+    CRYPTOPUNKS_ADDRESS,
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    createBlock(4),
+    mockEvent.transaction,
+    parameters
+  );
+  return PunkOfferedEvent;
+}
+
 function createProxyRegisteredEvent(
   user: Address,
   proxy: Address
@@ -263,43 +297,43 @@ function createProxyRegisteredEvent(
 /////////////////////////////////////////////////////////////////////////////////////
 //TEST ASSIGN
 ///////////////////////////////////////////
-test("test handleAssign", () => {
-  log.warning("test handleAssign", []);
-  let assignEvent = createAssign(Address.fromString(OWNER1), 1);
-  createMockedFunction(CRYPTOPUNKS_ADDRESS, "name", "name():(string)").returns([
-    ethereum.Value.fromString("CryptoPunks"),
-  ]);
+// test("test handleAssign", () => {
+//   log.warning("test handleAssign", []);
+//   let assignEvent = createAssign(Address.fromString(OWNER1), 1);
+//   createMockedFunction(CRYPTOPUNKS_ADDRESS, "name", "name():(string)").returns([
+//     ethereum.Value.fromString("CryptoPunks"),
+//   ]);
 
-  handleAssign(assignEvent);
+//   handleAssign(assignEvent);
 
-  assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "1");
-  assert.fieldEquals(
-    "Contract",
-    CRYPTOPUNKS_ADDRESS.toHexString(),
-    "name",
-    "CryptoPunks"
-  );
+//   assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "1");
+//   assert.fieldEquals(
+//     "Contract",
+//     CRYPTOPUNKS_ADDRESS.toHexString(),
+//     "name",
+//     "CryptoPunks"
+//   );
 
-  assert.fieldEquals("MetaData", "1-1-METADATA", "punk", "1");
-  assert.fieldEquals("Punk", "1", "metadata", "1-1-METADATA");
-  assert.fieldEquals("Punk", "1", "wrapped", "false");
-});
+//   assert.fieldEquals("MetaData", "1-1-METADATA", "punk", "1");
+//   assert.fieldEquals("Punk", "1", "metadata", "1-1-METADATA");
+//   assert.fieldEquals("Punk", "1", "wrapped", "false");
+// });
 ///////////////////////////////////////////
 //TEST PUNK TRANSFER
 ///////////////////////////////////////////
 
-test("test Transfer", () => {
-  let transferEvent = createPunkTransferEvent(
-    Address.fromString(OWNER1),
-    Address.fromString(OWNER2),
-    1,
-    1
-  );
-  handlePunkTransfer(transferEvent);
-  assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "0");
-  assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
-  // logStore();
-});
+// test("test Transfer", () => {
+//   let transferEvent = createPunkTransferEvent(
+//     Address.fromString(OWNER1),
+//     Address.fromString(OWNER2),
+//     1,
+//     1
+//   );
+//   handlePunkTransfer(transferEvent);
+//   assert.fieldEquals("Account", OWNER1, "numberOfPunksOwned", "0");
+//   assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+//   // logStore();
+// });
 
 ///////////////////////////////////////////
 //TEST WRAP
@@ -316,64 +350,81 @@ test("test Transfer", () => {
  *
  */
 
-test("testWrap", () => {
-  assert.fieldEquals("Punk", "1", "owner", OWNER2);
+// test("testWrap", () => {
+//   assert.fieldEquals("Punk", "1", "owner", OWNER2);
 
-  handleProxyRegistered(
-    createProxyRegisteredEvent(
-      Address.fromString(OWNER2),
-      Address.fromString(PROXY2)
-    )
-  );
+//   handleProxyRegistered(
+//     createProxyRegisteredEvent(
+//       Address.fromString(OWNER2),
+//       Address.fromString(PROXY2)
+//     )
+//   );
 
-  assert.fieldEquals("UserProxy", PROXY2, "user", OWNER2);
+//   assert.fieldEquals("UserProxy", PROXY2, "user", OWNER2);
 
-  handlePunkTransfer(
-    createPunkTransferEvent(
-      Address.fromString(OWNER2),
-      Address.fromString(PROXY2),
-      1,
-      4
-    )
-  );
+//   handlePunkTransfer(
+//     createPunkTransferEvent(
+//       Address.fromString(OWNER2),
+//       Address.fromString(PROXY2),
+//       1,
+//       4
+//     )
+//   );
 
-  assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+//   assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
 
-  handlePunkTransfer(
-    createPunkTransferEvent(
-      Address.fromString(PROXY2),
-      Address.fromString(WRAPPED_PUNK_ADDRESS),
-      1,
-      5
-    )
-  );
+//   handlePunkTransfer(
+//     createPunkTransferEvent(
+//       Address.fromString(PROXY2),
+//       Address.fromString(WRAPPED_PUNK_ADDRESS),
+//       1,
+//       5
+//     )
+//   );
 
-  // logStore();
+//   // logStore();
 
-  assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
-  assert.fieldEquals("Punk", "1", "wrapped", "true");
-});
+//   assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+//   assert.fieldEquals("Punk", "1", "wrapped", "true");
+// });
 
 ///////////////////////////////////////////
 //TEST UNWRAP
 ///////////////////////////////////////////
 
-test("testUnwrap", () => {
-  assert.fieldEquals("Punk", "1", "wrapped", "true");
+// test("testUnwrap", () => {
+//   assert.fieldEquals("Punk", "1", "wrapped", "true");
 
-  handlePunkTransfer(
-    createPunkTransferEvent(
-      Address.fromString(WRAPPED_PUNK_ADDRESS),
-      Address.fromString(OWNER2),
-      1,
-      5
-    )
-  );
-  assert.fieldEquals("Punk", "1", "wrapped", "false");
-  assert.fieldEquals("Punk", "1", "owner", OWNER2);
-  assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
+//   handlePunkTransfer(
+//     createPunkTransferEvent(
+//       Address.fromString(WRAPPED_PUNK_ADDRESS),
+//       Address.fromString(OWNER2),
+//       1,
+//       5
+//     )
+//   );
+//   assert.fieldEquals("Punk", "1", "wrapped", "false");
+//   assert.fieldEquals("Punk", "1", "owner", OWNER2);
+//   assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "1");
 
-  // logStore();
+//   // logStore();
+// });
+
+///////////////////////////////////////////
+//TEST PUNKOFFERED
+///////////////////////////////////////////
+
+test("test PunkOffer", () => {
+  clearStore();
+  //Handle Assign creates the punks otherwise punkId will be null
+  handleAssign(createAssign(Address.fromString(ZERO_ADDRESS), 1));
+  handleAssign(createAssign(Address.fromString(OWNER1), 2));
+
+  handlePunkOffered(createPunkOffered(1, 1, Address.fromString(ZERO_ADDRESS)));
+  handlePunkOffered(createPunkOffered(2, 1, Address.fromString(OWNER1)));
+
+  assert.fieldEquals("Punk", "2", "owner", OWNER1);
+  logStore();
 });
 
 //   handleWrappedPunkTransfer(
