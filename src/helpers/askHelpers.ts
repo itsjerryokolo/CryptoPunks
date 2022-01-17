@@ -2,7 +2,6 @@ import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Account, Ask, AskRemoved, AskCreated } from "../../generated/schema";
 
 export function getOrCreateAsk(
-  account: Account,
   askRemoved: AskRemoved,
   askCreated: AskCreated,
   nft: BigInt,
@@ -24,9 +23,9 @@ export function getOrCreateAsk(
         "-" +
         "ASK"
     );
+    ask.open = true;
   }
   ask.nft = nft.toString();
-  ask.from = account.id;
   ask.created = askCreated.id;
   ask.offerType = "ASK";
   ask.removed = askRemoved.id;
