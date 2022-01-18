@@ -366,6 +366,7 @@ export function handlePunkBought(event: PunkBought): void {
   );
 
   punk.purchasedBy = toAccount.id;
+  punk.owner = toAccount.id;
 
   punk.save();
   fromAccount.save();
