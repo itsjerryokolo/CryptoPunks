@@ -389,6 +389,30 @@ function createProxyRegisteredEvent(
 // });
 
 ///////////////////////////////////////////
+//WRAPPED TRANSFER
+///////////////////////////////////////////
+
+// test("testWrappedTransfer", () => {
+//   assert.fieldEquals("Punk", "1", "wrapped", "true");
+//   assert.fieldEquals("Punk", "1", "owner", OWNER2);
+
+//   handleWrappedPunkTransfer(
+//     createWrappedPunkTransfer(
+//       Address.fromString(OWNER2),
+//       Address.fromString(OWNER3),
+//       1,
+//       6
+//     )
+//   );
+//   assert.fieldEquals("Punk", "1", "wrapped", "true");
+//   assert.fieldEquals("Punk", "1", "owner", OWNER3);
+//   assert.fieldEquals("Account", OWNER2, "numberOfPunksOwned", "0");
+//   assert.fieldEquals("Account", OWNER3, "numberOfPunksOwned", "1");
+
+//   // logStore();
+// });
+
+///////////////////////////////////////////
 //TEST UNWRAP
 ///////////////////////////////////////////
 
@@ -422,41 +446,22 @@ test("test PunkOffer", () => {
 
   handlePunkOffered(createPunkOffered(1, 1, Address.fromString(ZERO_ADDRESS)));
   handlePunkOffered(createPunkOffered(2, 1, Address.fromString(OWNER1)));
+  handlePunkTransfer(
+    createPunkTransferEvent(
+      Address.fromString(WRAPPED_PUNK_ADDRESS),
+      Address.fromString(OWNER3),
+      1,
+      7
+    )
+  );
+
+  assert.fieldEquals("Punk", "1", "wrapped", "false");
+  assert.fieldEquals("Punk", "1", "owner", OWNER3);
+  assert.fieldEquals("Account", OWNER3, "numberOfPunksOwned", "1");
 
   assert.fieldEquals("Punk", "2", "owner", OWNER1);
   logStore();
 });
-
-//   handleWrappedPunkTransfer(
-//     //Owner3 sends wrapped punk to ZERO_ADDRESS
-//     createWrappedPunkTransfer(
-//       Address.fromString(OWNER3),
-//       Address.fromString(ZERO_ADDRESS),
-//       1,
-//       5
-//     )
-//   );
-
-//   handlePunkTransfer(
-//     createPunkTransferEvent(
-//       //Punk get sent in a PunkTransfer event to Owner 2
-//       Address.fromString(WRAPPED_PUNK_ADDRESS),
-//       Address.fromString(OWNER3),
-//       1,
-//       5
-//     )
-//   );
-
-//   assert.fieldEquals(
-//     "Account",
-//     WRAPPED_PUNK_ADDRESS,
-//     "numberOfPunksOwned",
-//     "0"
-//   );
-//   assert.fieldEquals("Account", OWNER3, "numberOfPunksOwned", "1");
-
-//   // logStore();
-// });
 
 // test("test PunkNoLongerForSale", () => {
 //   let PunkNoLongerForSaleEvent = createPunkNoLongerForSaleEvent(1);

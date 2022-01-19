@@ -399,15 +399,11 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
 
 // This function is called for three events: Mint (Wrap), Burn (Unwrap) and Transfer
 export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
-  log.info("handleWrappedPunksTransfer tokenId: {} to: {}", [
+  log.info("handleWrappedPunksTransfer tokenId: {} from: {} to: {}", [
     event.params.tokenId.toString(),
+    event.params.from.toHexString(),
     event.params.to.toHexString(),
   ]);
-
-  let punk = Punk.load(event.params.tokenId.toString())!;
-  if (!punk) {
-    punk = new Punk(event.params.tokenId.toString());
-  }
 
   let contract = getOrCreateWrappedPunkContract(event.address);
 
@@ -420,16 +416,10 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       event
     );
 
-    let toAccount = getOrCreateAccount(event.params.to);
-
     contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
-    punk.owner = toAccount.id;
 
     wrap.to = event.params.to.toHexString();
-
     wrap.save();
-    toAccount.save();
-    punk.save();
   } else if (event.params.to.toHexString() == ZERO_ADDRESS) {
     // A wrapped punk is burned (unwrapped)
     let unWrap = getOrCreateUnWrap(
@@ -440,12 +430,9 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       event
     );
 
-    let fromAccount = getOrCreateAccount(event.params.from);
-
     contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
 
     unWrap.save();
-    fromAccount.save();
   } else {
     // Wrapped Punk Transfer
 
@@ -458,18 +445,25 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       "WRAPPEDPUNKTRANSFER"
     );
 
-    // There is always a from account, since they were assigned
+    let toAccount = getOrCreateAccount(event.params.to);
     let fromAccount = getOrCreateAccount(event.params.from);
+    let punk = Punk.load(event.params.tokenId.toString())!;
 
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BigInt.fromI32(1)
     );
+    punk.owner = toAccount.id;
+
     fromAccount.save();
+    toAccount.save();
     transfer.save();
+    punk.save();
   }
 
   contract.save();
-  punk.save();
 }
 
 export function handleProxyRegistered(event: ProxyRegistered): void {
