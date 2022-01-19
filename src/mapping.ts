@@ -239,6 +239,7 @@ export function handlePunkOffered(event: PunkOffered): void {
   ask.from = punk.owner;
   askCreated.from = punk.owner;
   ask.amount = event.params.minValue;
+  askCreated.amount = event.params.minValue;
 
   //Ask created to another account. offerPunkForSaleToAddress()
   if (event.params.toAddress.toHexString() != ZERO_ADDRESS) {
@@ -257,6 +258,7 @@ export function handlePunkOffered(event: PunkOffered): void {
     ask.from = punk.owner;
     askCreated.from = punk.owner;
     askCreated.to = account.id;
+    askCreated.amount = event.params.minValue;
     ask.amount = event.params.minValue;
 
     ask.save();
