@@ -198,7 +198,6 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     ]);
 
     let punk = Punk.load(event.params.punkIndex.toString())!;
-    let toAccount = getOrCreateAccount(event.params.to);
 
     let unWrap = getOrCreateUnWrap(
       Address.fromString(WRAPPED_PUNK_ADDRESS),
@@ -211,7 +210,6 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     punk.wrapped = false;
 
     punk.save();
-    toAccount.save();
     unWrap.save();
   }
 }
@@ -359,6 +357,7 @@ export function handlePunkBought(event: PunkBought): void {
   );
   contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
 
+  // Note: buyPunk() does not emit a PunkTransfer event, so we need to keep track
   toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
     BigInt.fromI32(1)
   );
