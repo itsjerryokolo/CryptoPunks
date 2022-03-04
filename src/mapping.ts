@@ -32,6 +32,7 @@ import {
   AskRemoved,
   MetaData,
   UserProxy,
+  Ask,
 } from "../generated/schema";
 
 import { ZERO_ADDRESS, WRAPPED_PUNK_ADDRESS } from "./constant";
@@ -53,11 +54,7 @@ import {
   getOrCreateUnWrap,
 } from "../src/helpers/wrapAndUnwrap";
 
-import {
-  getOrCreateAsk,
-  getOrCreateAskCreated,
-  getOrCreateAskRemoved,
-} from "./helpers/askHelpers";
+import { createAskCreated, getOrCreateAskRemoved } from "./helpers/askHelpers";
 
 import {
   getOrCreateBid,
@@ -227,30 +224,36 @@ export function handlePunkOffered(event: PunkOffered): void {
     event.transaction.hash.toHexString(),
   ]);
 
-  let askCreated = getOrCreateAskCreated(
-    event.transaction.from.toHexString(),
-    event.params.punkIndex,
-    true,
-    event
-  );
+  let askCreated = createAskCreated(event.params.punkIndex, event);
 
   let punk = Punk.load(event.params.punkIndex.toString())!;
-  let ask = getOrCreateAsk(
-    event.transaction.from.toHexString(),
-    event.params.punkIndex,
-    true,
-    event
+
+  if (punk.currentAsk) {
+    let oldAsk = Ask.load(punk.currentAsk);
+    oldAsk.open = false;
+    oldAsk.removed = askCreated.id;
+    oldAsk.save();
+  }
+
+  let ask = new Ask(
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
   );
 
-  ask.from = punk.owner;
   askCreated.from = punk.owner;
-  ask.amount = event.params.minValue;
-  ask.created = askCreated.id;
   askCreated.amount = event.params.minValue;
 
+  ask.from = punk.owner;
+  ask.amount = event.params.minValue;
+  ask.created = askCreated.id;
+  ask.open = true;
+  ask.nft = punk.id;
+  ask.offerType = "ASK";
+
+  punk.currentAsk = ask.id;
+
   ask.save();
-  punk.save();
   askCreated.save();
+  punk.save();
 }
 /**
  * first step: Create BidEvent //Record the event
