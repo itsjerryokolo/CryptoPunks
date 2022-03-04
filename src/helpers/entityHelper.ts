@@ -23,41 +23,41 @@ export function getOrCreateAccount(address: Address): Account {
 }
 
 export function getOrCreateAssign(
-  id: BigInt,
+  punkIndex: BigInt,
+  toAccount: Address,
   punk: Punk,
-  account: Address,
   metadata: MetaData,
   event: ethereum.Event
 ): Assign {
   let assign = Assign.load(
-    id
-      .toString()
+    toAccount
+      .toHexString()
+      .concat("-")
+      .concat(punkIndex.toString())
       .concat("-")
       .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("ASSIGN")
   );
 
   if (!assign) {
     assign = new Assign(
-      id
-        .toString()
+      toAccount
+        .toHexString()
+        .concat("-")
+        .concat(punkIndex.toString())
         .concat("-")
         .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("ASSIGN")
     );
   }
-  assign.to = account.toHexString();
-  assign.nft = punk.id;
+  assign.to = toAccount.toHexString();
+  assign.nft = punkIndex.toString();
   assign.timestamp = event.block.timestamp;
   assign.contract = event.address.toHexString();
   assign.blockNumber = event.block.number;
   assign.txHash = event.transaction.hash;
   assign.blockHash = event.block.hash;
   punk.metadata = metadata.id;
-  punk.assignedTo = account.toHexString();
-  punk.transferedTo = account.toHexString();
+  punk.assignedTo = toAccount.toHexString();
+  punk.transferedTo = toAccount.toHexString();
   assign.type = "ASSIGN";
   assign.save();
 
@@ -105,24 +105,29 @@ export function getOrCreateSale(
   toAddress: Address,
   fromAddress: Address,
   punk: BigInt,
+  needed: boolean,
   event: ethereum.Event
 ): Sale {
   let sale = Sale.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "SALE"
+    event.transaction.hash.toHexString() + "-" + punk.toString()
   );
 
   if (!sale) {
     sale = new Sale(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "SALE"
+      event.transaction.hash.toHexString() + "-" + punk.toString()
     );
+  } else {
+    if (needed) {
+      let archiveSale = new Sale(
+        event.transaction.hash.toHexString() +
+          "-" +
+          punk.toString() +
+          "-" +
+          event.logIndex.toString()
+      );
+      archiveSale.merge([sale]);
+      archiveSale.save();
+    }
   }
 
   sale.to = toAddress.toHexString();
@@ -147,7 +152,7 @@ export function getOrCreateTransfer(
   entityType: string
 ): Transfer {
   let transfer = Transfer.load(
-    event.transaction.hash.toHexString() +
+    event.transaction.from.toHexString() +
       "-" +
       event.logIndex.toString() +
       "-" +
@@ -156,7 +161,7 @@ export function getOrCreateTransfer(
 
   if (!transfer) {
     transfer = new Transfer(
-      event.transaction.hash.toHexString() +
+      event.transaction.from.toHexString() +
         "-" +
         event.logIndex.toString() +
         "-" +

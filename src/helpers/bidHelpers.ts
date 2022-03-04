@@ -2,65 +2,70 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { BidCreated, BidRemoved, Bid } from "../../generated/schema";
 
 export function getOrCreateBid(
-  account: Address,
-  bidRemoved: BidRemoved,
-  bidCreated: BidCreated,
-  nft: BigInt,
+  fromAddress: string,
+  punkIndex: BigInt,
+  needed: boolean,
   event: ethereum.Event
 ): Bid {
-  let bid = Bid.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "BID"
-  );
+  let bidId = fromAddress + "-" + punkIndex.toString();
+
+  let bid = Bid.load(bidId);
 
   if (!bid) {
-    bid = new Bid(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "BID"
-    );
+    bid = new Bid(bidId);
+    bid.open = true;
+  } else {
+    if (needed) {
+      let archiveBid = new Bid(
+        bidId +
+          //Hash of new event
+          event.transaction.hash.toHexString() +
+          "-" +
+          event.logIndex.toString()
+      );
+      archiveBid.merge([bid]);
+      archiveBid.save();
+    }
     bid.open = true;
   }
-  bid.nft = nft.toString();
-  bid.from = account.toHexString();
-  bid.created = bidCreated.id;
+
+  bid.nft = punkIndex.toString();
+  bid.from = fromAddress;
   bid.offerType = "BID";
-  bid.removed = bidRemoved.id;
   bid.save();
 
   return bid as Bid;
 }
 
 export function getOrCreateBidCreated(
-  fromAddress: Address,
-  nft: BigInt,
+  fromAddress: string,
+  punkIndex: BigInt,
+  needed: boolean,
   event: ethereum.Event
 ): BidCreated {
-  let bidCreated = BidCreated.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "BIDCREATED"
-  );
+  let bidCreatedId = fromAddress + "-" + punkIndex.toString();
+
+  let bidCreated = BidCreated.load(bidCreatedId);
 
   if (!bidCreated) {
-    bidCreated = new BidCreated(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "BIDCREATED"
-    );
+    bidCreated = new BidCreated(bidCreatedId);
+  } else {
+    if (needed) {
+      let archiveBidCreated = new BidCreated(
+        bidCreatedId +
+          //Hash of new event
+          event.transaction.hash.toHexString() +
+          "-" +
+          event.logIndex.toString()
+      );
+      archiveBidCreated.merge([bidCreated]);
+      archiveBidCreated.save();
+    }
   }
+
   bidCreated.type = "BID_CREATED";
-  bidCreated.nft = nft.toString();
-  bidCreated.from = fromAddress.toHexString();
+  bidCreated.nft = punkIndex.toString();
+  bidCreated.from = fromAddress;
   bidCreated.timestamp = event.block.timestamp;
   bidCreated.blockNumber = event.block.number;
   bidCreated.txHash = event.transaction.hash;
@@ -72,34 +77,34 @@ export function getOrCreateBidCreated(
 }
 
 export function getOrCreateBidRemoved(
-  fromAddress: Address,
-  bidCreated: BidCreated,
-  nft: BigInt,
+  fromAddress: string,
+  punkIndex: BigInt,
+  needed: boolean,
   event: ethereum.Event
 ): BidRemoved {
-  let bidRemoved = BidRemoved.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "BIDREMOVED"
-  );
+  let bidRemovedId = fromAddress + "-" + punkIndex.toString();
+
+  let bidRemoved = BidRemoved.load(bidRemovedId);
 
   if (!bidRemoved) {
-    bidRemoved = new BidRemoved(
-      event.transaction.hash
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("BIDREMOVED")
-    );
+    bidRemoved = new BidRemoved(bidRemovedId);
+  } else {
+    if (needed) {
+      let archiveBidRemoved = new BidRemoved(
+        bidRemovedId +
+          //Hash of new event
+          event.transaction.hash.toHexString() +
+          "-" +
+          event.logIndex.toString()
+      );
+      archiveBidRemoved.merge([bidRemoved]);
+      archiveBidRemoved.save();
+    }
   }
 
-  bidRemoved.bid = bidCreated.id;
-  bidRemoved.from = fromAddress.toHexString();
+  bidRemoved.from = fromAddress;
   bidRemoved.contract = event.address.toHexString();
-  bidRemoved.nft = nft.toString();
+  bidRemoved.nft = punkIndex.toString();
   bidRemoved.timestamp = event.block.timestamp;
   bidRemoved.blockNumber = event.block.number;
   bidRemoved.txHash = event.transaction.hash;

@@ -1,62 +1,67 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Account, Ask, AskRemoved, AskCreated } from "../../generated/schema";
 
 export function getOrCreateAsk(
-  askRemoved: AskRemoved,
-  askCreated: AskCreated,
-  nft: BigInt,
+  fromAddress: string,
+  punkIndex: BigInt,
+  needed: boolean,
   event: ethereum.Event
 ): Ask {
-  let ask = Ask.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "ASK"
-  );
+  let askId = fromAddress + "-" + punkIndex.toString();
+
+  let ask = Ask.load(askId);
 
   if (!ask) {
-    ask = new Ask(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "ASK"
-    );
+    ask = new Ask(askId);
+    ask.open = true;
+  } else {
+    if (needed) {
+      let archiveAsk = new Ask(
+        askId +
+          //Hash of new event
+          event.transaction.hash.toHexString() +
+          "-" +
+          event.logIndex.toString()
+      );
+      archiveAsk.merge([ask]);
+      archiveAsk.save();
+    }
     ask.open = true;
   }
-  ask.nft = nft.toString();
-  ask.created = askCreated.id;
+  ask.nft = punkIndex.toString();
   ask.offerType = "ASK";
-  ask.removed = askRemoved.id;
   ask.save();
 
   return ask as Ask;
 }
 
 export function getOrCreateAskCreated(
-  nft: BigInt,
+  fromAddress: string,
+  punkIndex: BigInt,
+  needed: boolean,
   event: ethereum.Event
 ): AskCreated {
-  let askCreated = AskCreated.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "ASKCREATED"
-  );
+  let askCreatedId = fromAddress + "-" + punkIndex.toString();
+
+  let askCreated = AskCreated.load(askCreatedId);
 
   if (!askCreated) {
-    askCreated = new AskCreated(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "ASKCREATED"
-    );
+    askCreated = new AskCreated(askCreatedId);
+  } else {
+    if (needed) {
+      let archiveaskCreated = new AskCreated(
+        askCreatedId +
+          //Hash of new event
+          event.transaction.hash.toHexString() +
+          "-" +
+          event.logIndex.toString()
+      );
+      archiveaskCreated.merge([askCreated]);
+      archiveaskCreated.save();
+    }
   }
   askCreated.type = "ASK_CREATED";
-  askCreated.nft = nft.toString();
+  askCreated.nft = punkIndex.toString();
   askCreated.timestamp = event.block.timestamp;
   askCreated.blockNumber = event.block.number;
   askCreated.txHash = event.transaction.hash;
@@ -68,28 +73,32 @@ export function getOrCreateAskCreated(
 }
 
 export function getOrCreateAskRemoved(
-  nft: BigInt,
+  fromAddress: string,
+  punkIndex: BigInt,
+  needed: boolean,
   event: ethereum.Event
 ): AskRemoved {
-  let askRemoved = AskRemoved.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "ASKREMOVED"
-  );
+  let askRemovedId = fromAddress + "-" + punkIndex.toString();
+
+  let askRemoved = AskRemoved.load(askRemovedId);
 
   if (!askRemoved) {
-    askRemoved = new AskRemoved(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "ASKREMOVED"
-    );
+    askRemoved = new AskRemoved(askRemovedId);
+  } else {
+    if (needed) {
+      let archiveAskRemoved = new AskRemoved(
+        askRemovedId +
+          //Hash of new event
+          event.transaction.hash.toHexString() +
+          "-" +
+          event.logIndex.toString()
+      );
+      archiveAskRemoved.merge([askRemoved]);
+      archiveAskRemoved.save();
+    }
   }
   askRemoved.type = "ASK_REMOVED";
-  askRemoved.nft = nft.toString();
+  askRemoved.nft = punkIndex.toString();
   askRemoved.timestamp = event.block.timestamp;
   askRemoved.blockNumber = event.block.number;
   askRemoved.txHash = event.transaction.hash;

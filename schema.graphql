@@ -189,6 +189,7 @@ type AskCreated implements Event @entity {
   id: ID!
   from: Account
   to: Account
+  ask: Ask!
   amount: BigInt
   contract: Contract
   nft: NFT!
@@ -203,6 +204,7 @@ type BidCreated implements Event @entity {
   id: ID!
   from: Account
   to: Account
+  bid: Bid!
   amount: BigInt
   contract: Contract
   nft: NFT!
@@ -218,7 +220,7 @@ type BidRemoved implements Event @entity {
   from: Account
   to: Account
   amount: BigInt
-  bid: BidCreated!
+  bid: Bid!
   contract: Contract
   nft: NFT!
   blockNumber: BigInt!
@@ -230,7 +232,7 @@ type BidRemoved implements Event @entity {
 
 type AskRemoved implements Event @entity {
   id: ID!
-  ask: AskCreated!
+  ask: Ask!
   from: Account
   to: Account
   amount: BigInt
