@@ -26,6 +26,8 @@ interface NFT {
   tokenId: BigInt!
   owner: Account!
   events: [Event!]! @derivedFrom(field: "nft")
+  currentAsk: Ask
+  currentBid: Bid
 }
 
 interface Event {
@@ -84,6 +86,8 @@ type Punk implements NFT @entity {
   owner: Account!
   wrapped: Boolean!
   events: [Event!]! @derivedFrom(field: "nft")
+  currentAsk: Ask
+  currentBid: Bid
 }
 
 type MetaData @entity {

@@ -1,65 +1,21 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Account, Ask, AskRemoved, AskCreated } from "../../generated/schema";
+import {
+  Account,
+  Ask,
+  AskRemoved,
+  AskCreated,
+  Punk,
+} from "../../generated/schema";
 
-export function getOrCreateAsk(
-  fromAddress: string,
+export function createAskCreated(
   punkIndex: BigInt,
-  needed: boolean,
-  event: ethereum.Event
-): Ask {
-  let askId = fromAddress + "-" + punkIndex.toString();
-
-  let ask = Ask.load(askId);
-
-  if (!ask) {
-    ask = new Ask(askId);
-    ask.open = true;
-  } else {
-    if (needed) {
-      let archiveAsk = new Ask(
-        askId +
-          //Hash of new event
-          event.transaction.hash.toHexString() +
-          "-" +
-          event.logIndex.toString()
-      );
-      archiveAsk.merge([ask]);
-      archiveAsk.save();
-    }
-    ask.open = true;
-  }
-  ask.nft = punkIndex.toString();
-  ask.offerType = "ASK";
-  ask.save();
-
-  return ask as Ask;
-}
-
-export function getOrCreateAskCreated(
-  fromAddress: string,
-  punkIndex: BigInt,
-  needed: boolean,
   event: ethereum.Event
 ): AskCreated {
-  let askCreatedId = fromAddress + "-" + punkIndex.toString();
+  let askCreatedId =
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
 
-  let askCreated = AskCreated.load(askCreatedId);
+  let askCreated = new AskCreated(askCreatedId);
 
-  if (!askCreated) {
-    askCreated = new AskCreated(askCreatedId);
-  } else {
-    if (needed) {
-      let archiveaskCreated = new AskCreated(
-        askCreatedId +
-          //Hash of new event
-          event.transaction.hash.toHexString() +
-          "-" +
-          event.logIndex.toString()
-      );
-      archiveaskCreated.merge([askCreated]);
-      archiveaskCreated.save();
-    }
-  }
   askCreated.type = "ASK_CREATED";
   askCreated.nft = punkIndex.toString();
   askCreated.timestamp = event.block.timestamp;
