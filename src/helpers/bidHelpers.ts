@@ -1,35 +1,48 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { BidCreated, BidRemoved, Bid } from "../../generated/schema";
+import { BidCreated, BidRemoved, Bid, Punk } from "../../generated/schema";
 
 export function getOrCreateBid(
   fromAddress: string,
-  punkIndex: BigInt,
-  needed: boolean,
+  punkIndex: Punk,
   event: ethereum.Event
 ): Bid {
-  let bidId = fromAddress + "-" + punkIndex.toString();
+  let bidId = fromAddress + "-" + punkIndex.id;
+  let oldBidId = punkIndex.currentBid;
 
   let bid = Bid.load(bidId);
 
-  if (!bid) {
-    bid = new Bid(bidId);
+  // if (!bid) {
+  //   bid = new Bid(bidId);
+  //   bid.open = true;
+  // } else {
+  //   if (needed) {
+  //     let archiveBid = new Bid(
+  //       bidId +
+  //         //Hash of new event
+  //         event.transaction.hash.toHexString() +
+  //         "-" +
+  //         event.logIndex.toString()
+  //     );
+  //     archiveBid.merge([bid]);
+  //     archiveBid.save();
+  //   }
+  //   bid.open = true;
+  // }
+
+  if (oldBidId !== null) {
+    bid = new Bid(
+      oldBidId
+        .concat(event.transaction.hash.toHexString())
+        .concat("-")
+        .concat(event.logIndex.toString())
+    );
     bid.open = true;
   } else {
-    if (needed) {
-      let archiveBid = new Bid(
-        bidId +
-          //Hash of new event
-          event.transaction.hash.toHexString() +
-          "-" +
-          event.logIndex.toString()
-      );
-      archiveBid.merge([bid]);
-      archiveBid.save();
-    }
+    bid = new Bid(bidId);
     bid.open = true;
   }
 
-  bid.nft = punkIndex.toString();
+  bid.nft = punkIndex.id;
   bid.from = fromAddress;
   bid.offerType = "BID";
   bid.save();
@@ -37,31 +50,14 @@ export function getOrCreateBid(
   return bid as Bid;
 }
 
-export function getOrCreateBidCreated(
-  fromAddress: string,
+export function createBidCreated(
   punkIndex: BigInt,
-  needed: boolean,
+  fromAddress: string,
   event: ethereum.Event
 ): BidCreated {
-  let bidCreatedId = fromAddress + "-" + punkIndex.toString();
-
-  let bidCreated = BidCreated.load(bidCreatedId);
-
-  if (!bidCreated) {
-    bidCreated = new BidCreated(bidCreatedId);
-  } else {
-    if (needed) {
-      let archiveBidCreated = new BidCreated(
-        bidCreatedId +
-          //Hash of new event
-          event.transaction.hash.toHexString() +
-          "-" +
-          event.logIndex.toString()
-      );
-      archiveBidCreated.merge([bidCreated]);
-      archiveBidCreated.save();
-    }
-  }
+  let bidCreated = new BidCreated(
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
+  );
 
   bidCreated.type = "BID_CREATED";
   bidCreated.nft = punkIndex.toString();
@@ -76,31 +72,14 @@ export function getOrCreateBidCreated(
   return bidCreated as BidCreated;
 }
 
-export function getOrCreateBidRemoved(
-  fromAddress: string,
+export function createBidRemoved(
   punkIndex: BigInt,
-  needed: boolean,
+  fromAddress: string,
   event: ethereum.Event
 ): BidRemoved {
-  let bidRemovedId = fromAddress + "-" + punkIndex.toString();
-
-  let bidRemoved = BidRemoved.load(bidRemovedId);
-
-  if (!bidRemoved) {
-    bidRemoved = new BidRemoved(bidRemovedId);
-  } else {
-    if (needed) {
-      let archiveBidRemoved = new BidRemoved(
-        bidRemovedId +
-          //Hash of new event
-          event.transaction.hash.toHexString() +
-          "-" +
-          event.logIndex.toString()
-      );
-      archiveBidRemoved.merge([bidRemoved]);
-      archiveBidRemoved.save();
-    }
-  }
+  let bidRemoved = new BidRemoved(
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
+  );
 
   bidRemoved.from = fromAddress;
   bidRemoved.contract = event.address.toHexString();

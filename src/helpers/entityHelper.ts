@@ -105,29 +105,12 @@ export function getOrCreateSale(
   toAddress: Address,
   fromAddress: Address,
   punk: BigInt,
-  needed: boolean,
   event: ethereum.Event
 ): Sale {
-  let sale = Sale.load(
-    event.transaction.hash.toHexString() + "-" + punk.toString()
-  );
+  let sale = Sale.load(fromAddress.toHexString() + "-" + punk.toString());
 
   if (!sale) {
-    sale = new Sale(
-      event.transaction.hash.toHexString() + "-" + punk.toString()
-    );
-  } else {
-    if (needed) {
-      let archiveSale = new Sale(
-        event.transaction.hash.toHexString() +
-          "-" +
-          punk.toString() +
-          "-" +
-          event.logIndex.toString()
-      );
-      archiveSale.merge([sale]);
-      archiveSale.save();
-    }
+    sale = new Sale(fromAddress.toHexString() + "-" + punk.toString());
   }
 
   sale.to = toAddress.toHexString();
@@ -154,16 +137,20 @@ export function getOrCreateTransfer(
   let transfer = Transfer.load(
     event.transaction.from.toHexString() +
       "-" +
-      event.logIndex.toString() +
+      punk.toString() +
       "-" +
-      entityType
+      event.transaction.to.toString() +
+      "-" +
+      entityType //REGULAR TRANSFER or WRAPPEDPUNK TRANSFER
   );
 
   if (!transfer) {
     transfer = new Transfer(
       event.transaction.from.toHexString() +
         "-" +
-        event.logIndex.toString() +
+        punk.toString() +
+        "-" +
+        event.transaction.to.toString() +
         "-" +
         entityType //REGULAR TRANSFER or WRAPPEDPUNK TRANSFER
     );

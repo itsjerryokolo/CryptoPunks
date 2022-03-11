@@ -1,11 +1,5 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import {
-  Account,
-  Ask,
-  AskRemoved,
-  AskCreated,
-  Punk,
-} from "../../generated/schema";
+import { AskRemoved, AskCreated } from "../../generated/schema";
 
 export function createAskCreated(
   punkIndex: BigInt,
@@ -28,31 +22,15 @@ export function createAskCreated(
   return askCreated as AskCreated;
 }
 
-export function getOrCreateAskRemoved(
-  fromAddress: string,
+export function createAskRemoved(
   punkIndex: BigInt,
-  needed: boolean,
   event: ethereum.Event
 ): AskRemoved {
-  let askRemovedId = fromAddress + "-" + punkIndex.toString();
+  let askRemovedId =
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
 
-  let askRemoved = AskRemoved.load(askRemovedId);
+  let askRemoved = new AskRemoved(askRemovedId);
 
-  if (!askRemoved) {
-    askRemoved = new AskRemoved(askRemovedId);
-  } else {
-    if (needed) {
-      let archiveAskRemoved = new AskRemoved(
-        askRemovedId +
-          //Hash of new event
-          event.transaction.hash.toHexString() +
-          "-" +
-          event.logIndex.toString()
-      );
-      archiveAskRemoved.merge([askRemoved]);
-      archiveAskRemoved.save();
-    }
-  }
   askRemoved.type = "ASK_REMOVED";
   askRemoved.nft = punkIndex.toString();
   askRemoved.timestamp = event.block.timestamp;

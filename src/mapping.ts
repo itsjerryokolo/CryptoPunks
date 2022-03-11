@@ -54,12 +54,12 @@ import {
   getOrCreateUnWrap,
 } from "../src/helpers/wrapAndUnwrap";
 
-import { createAskCreated, getOrCreateAskRemoved } from "./helpers/askHelpers";
+import { createAskCreated, createAskRemoved } from "./helpers/askHelpers";
 
 import {
   getOrCreateBid,
-  getOrCreateBidCreated,
-  getOrCreateBidRemoved,
+  createBidCreated,
+  createBidRemoved,
 } from "../src/helpers/bidHelpers";
 
 export function handleAssign(event: Assigned): void {
@@ -227,17 +227,19 @@ export function handlePunkOffered(event: PunkOffered): void {
   let askCreated = createAskCreated(event.params.punkIndex, event);
 
   let punk = Punk.load(event.params.punkIndex.toString())!;
+  let currentAsk = punk.currentAsk;
 
-  if (punk.currentAsk) {
-    let oldAsk = Ask.load(punk.currentAsk);
+  if (currentAsk !== null) {
+    let oldAsk = Ask.load(currentAsk);
+    if (!oldAsk) {
+      oldAsk = new Ask(currentAsk);
+    }
     oldAsk.open = false;
     oldAsk.removed = askCreated.id;
     oldAsk.save();
   }
 
-  let ask = new Ask(
-    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
-  );
+  let ask = new Ask(punk.owner + "-" + event.params.punkIndex.toString());
 
   askCreated.from = punk.owner;
   askCreated.amount = event.params.minValue;
@@ -263,22 +265,16 @@ export function handlePunkOffered(event: PunkOffered): void {
 export function handlePunkBidEntered(event: PunkBidEntered): void {
   log.debug("handlePunkBidCreatedEntered", []);
 
-  let bidCreated = getOrCreateBidCreated(
-    event.params.fromAddress.toHexString(),
+  let bidCreated = createBidCreated(
     event.params.punkIndex,
-    true,
+    event.params.fromAddress.toHexString(),
     event
   );
 
   let punk = Punk.load(event.params.punkIndex.toString())!;
   let account = getOrCreateAccount(event.params.fromAddress);
 
-  let bid = getOrCreateBid(
-    event.params.fromAddress.toHexString(),
-    event.params.punkIndex,
-    true,
-    event
-  );
+  let bid = getOrCreateBid(event.params.fromAddress.toHexString(), punk, event);
 
   bid.amount = event.params.value;
   bid.created = bidCreated.id;
@@ -297,20 +293,14 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   log.debug("handlePunkBidCreatedWithdrawn", []);
 
-  let bidRemoved = getOrCreateBidRemoved(
-    event.params.fromAddress.toHexString(),
+  let bidRemoved = createBidRemoved(
     event.params.punkIndex,
-    true,
-    event
-  );
-  let bid = getOrCreateBid(
     event.params.fromAddress.toHexString(),
-    event.params.punkIndex,
-    true,
     event
   );
   let account = getOrCreateAccount(event.params.fromAddress);
   let punk = Punk.load(event.params.punkIndex.toString())!;
+  let bid = getOrCreateBid(event.params.fromAddress.toHexString(), punk, event);
 
   bidRemoved.amount = event.params.value;
   bid.open = false;
@@ -328,23 +318,18 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 export function handlePunkBought(event: PunkBought): void {
   log.debug("handlePunkBought", []);
 
-  let sale = getOrCreateSale(
-    event.params.toAddress,
-    event.params.fromAddress,
-    event.params.punkIndex,
-    true,
-    event
-  );
-  let bid = getOrCreateBid(
-    event.params.fromAddress.toHexString(),
-    event.params.punkIndex,
-    false,
-    event
-  );
   let punk = Punk.load(event.params.punkIndex.toString())!;
   let contract = getOrCreateCryptoPunkContract(event.address);
   let toAccount = getOrCreateAccount(event.params.toAddress);
   let fromAccount = getOrCreateAccount(event.params.fromAddress);
+
+  let sale = getOrCreateSale(
+    event.params.toAddress,
+    event.params.fromAddress,
+    event.params.punkIndex,
+    event
+  );
+  let bid = getOrCreateBid(event.params.fromAddress.toHexString(), punk, event);
 
   sale.amount = event.params.value;
 
@@ -377,12 +362,7 @@ export function handlePunkBought(event: PunkBought): void {
 export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   log.debug("handlePunkNoLongerForSale", []);
 
-  let askRemoved = getOrCreateAskRemoved(
-    event.transaction.from.toHexString(),
-    event.params.punkIndex,
-    false,
-    event
-  );
+  let askRemoved = createAskRemoved(event.params.punkIndex, event);
   let punk = Punk.load(event.params.punkIndex.toString())!;
 
   punk.save();
