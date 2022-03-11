@@ -161,7 +161,7 @@ type Contract @entity {
   imageHash: String
 }
 
-type Assign implements Event @entity {
+type Assign implements Event @entity(immutable: true) {
   id: ID!
   contract: Contract
   nft: NFT!
@@ -175,7 +175,7 @@ type Assign implements Event @entity {
   from: Account
 }
 
-type Sale implements Event @entity {
+type Sale implements Event @entity(immutable: true) {
   id: ID!
   to: Account
   amount: BigInt
@@ -189,7 +189,7 @@ type Sale implements Event @entity {
   type: EventType!
 }
 
-type AskCreated implements Event @entity {
+type AskCreated implements Event @entity(immutable: true) {
   id: ID!
   from: Account
   to: Account
@@ -204,7 +204,7 @@ type AskCreated implements Event @entity {
   type: EventType!
 }
 
-type BidCreated implements Event @entity {
+type BidCreated implements Event @entity(immutable: true) {
   id: ID!
   from: Account
   to: Account
@@ -219,7 +219,7 @@ type BidCreated implements Event @entity {
   type: EventType!
 }
 
-type BidRemoved implements Event @entity {
+type BidRemoved implements Event @entity(immutable: true) {
   id: ID!
   from: Account
   to: Account
@@ -234,7 +234,7 @@ type BidRemoved implements Event @entity {
   type: EventType!
 }
 
-type AskRemoved implements Event @entity {
+type AskRemoved implements Event @entity(immutable: true) {
   id: ID!
   ask: Ask!
   from: Account
@@ -249,7 +249,7 @@ type AskRemoved implements Event @entity {
   type: EventType!
 }
 
-type Transfer implements Event @entity {
+type Transfer implements Event @entity(immutable: true) {
   id: ID!
   from: Account
   to: Account
@@ -263,7 +263,7 @@ type Transfer implements Event @entity {
   type: EventType!
 }
 
-type Wrap implements Event @entity {
+type Wrap implements Event @entity(immutable: true) {
   id: ID!
   from: Account
   to: Account
@@ -277,7 +277,7 @@ type Wrap implements Event @entity {
   type: EventType!
 }
 
-type Unwrap implements Event @entity {
+type Unwrap implements Event @entity(immutable: true) {
   id: ID!
   from: Account
   to: Account

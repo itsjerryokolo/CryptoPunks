@@ -135,24 +135,12 @@ export function getOrCreateTransfer(
   entityType: string
 ): Transfer {
   let transfer = Transfer.load(
-    event.transaction.from.toHexString() +
-      "-" +
-      punk.toString() +
-      "-" +
-      event.transaction.to.toString() +
-      "-" +
-      entityType //REGULAR TRANSFER or WRAPPEDPUNK TRANSFER
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
   );
 
   if (!transfer) {
     transfer = new Transfer(
-      event.transaction.from.toHexString() +
-        "-" +
-        punk.toString() +
-        "-" +
-        event.transaction.to.toString() +
-        "-" +
-        entityType //REGULAR TRANSFER or WRAPPEDPUNK TRANSFER
+      event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
     );
   }
 
