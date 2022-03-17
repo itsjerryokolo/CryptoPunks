@@ -38,7 +38,7 @@ import {
 import { ZERO_ADDRESS, WRAPPED_PUNK_ADDRESS } from "./constant";
 import {
   getOrCreateAccount,
-  getOrCreateMetadata,
+  createMetadata,
   getOrCreateAssign,
   getOrCreateSale,
   getOrCreateTransfer,
@@ -68,7 +68,7 @@ export function handleAssign(event: Assigned): void {
   let trait = getTrait(event.params.punkIndex.toI32());
 
   let account = getOrCreateAccount(event.params.to);
-  let metadata = getOrCreateMetadata(event.params.punkIndex, event);
+  let metadata = createMetadata(event.params.punkIndex);
   let contract = getOrCreateCryptoPunkContract(event.address);
 
   // Assign is always the first event that actually creates the punk
@@ -84,7 +84,6 @@ export function handleAssign(event: Assigned): void {
     metadata as MetaData,
     event
   );
-
   if (trait !== null) {
     let traits = new Array<string>();
     let type = Trait.load(trait.type);
@@ -156,8 +155,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
       event.params.from,
       event.params.to,
       event.params.punkIndex,
-      event,
-      "TRANSFER"
+      event
     );
 
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
@@ -195,7 +193,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     wrap.save();
   } else if (event.params.from.toHexString() == WRAPPED_PUNK_ADDRESS) {
     // Burn/Unwrap
-    log.debug("Unwrapt detected. From: {}, punk: {}", [
+    log.debug("Unwrapped detected. From: {}, punk: {}", [
       event.params.from.toHexString(),
       event.params.punkIndex.toString(),
     ]);
@@ -239,7 +237,9 @@ export function handlePunkOffered(event: PunkOffered): void {
     oldAsk.save();
   }
 
-  let ask = new Ask(punk.owner + "-" + event.params.punkIndex.toString());
+  let ask = new Ask(
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
+  );
 
   askCreated.from = punk.owner;
   askCreated.amount = event.params.minValue;
@@ -413,8 +413,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       event.params.from,
       event.params.to,
       event.params.tokenId,
-      event,
-      "WRAPPEDPUNKTRANSFER"
+      event
     );
 
     let toAccount = getOrCreateAccount(event.params.to);

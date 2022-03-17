@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { BidCreated, BidRemoved, Bid, Punk } from "../../generated/schema";
 
 export function getOrCreateBid(
@@ -6,41 +6,16 @@ export function getOrCreateBid(
   punkIndex: Punk,
   event: ethereum.Event
 ): Bid {
-  let bidId = fromAddress + "-" + punkIndex.id;
-  let oldBidId = punkIndex.currentBid;
+  let bidId =
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+  let currentBid = punkIndex.currentBid;
 
-  let bid = Bid.load(bidId);
-
-  // if (!bid) {
-  //   bid = new Bid(bidId);
-  //   bid.open = true;
-  // } else {
-  //   if (needed) {
-  //     let archiveBid = new Bid(
-  //       bidId +
-  //         //Hash of new event
-  //         event.transaction.hash.toHexString() +
-  //         "-" +
-  //         event.logIndex.toString()
-  //     );
-  //     archiveBid.merge([bid]);
-  //     archiveBid.save();
-  //   }
-  //   bid.open = true;
-  // }
-
-  if (oldBidId !== null) {
-    bid = new Bid(
-      oldBidId
-        .concat(event.transaction.hash.toHexString())
-        .concat("-")
-        .concat(event.logIndex.toString())
-    );
-    bid.open = true;
-  } else {
-    bid = new Bid(bidId);
-    bid.open = true;
+  if (currentBid !== null) {
+    let oldBid = Bid.load(currentBid)!;
+    oldBid.open = false;
+    oldBid.save();
   }
+  let bid = new Bid(bidId);
 
   bid.nft = punkIndex.id;
   bid.from = fromAddress;

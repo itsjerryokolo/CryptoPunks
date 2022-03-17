@@ -30,22 +30,12 @@ export function getOrCreateAssign(
   event: ethereum.Event
 ): Assign {
   let assign = Assign.load(
-    toAccount
-      .toHexString()
-      .concat("-")
-      .concat(punkIndex.toString())
-      .concat("-")
-      .concat(event.logIndex.toString())
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
   );
 
   if (!assign) {
     assign = new Assign(
-      toAccount
-        .toHexString()
-        .concat("-")
-        .concat(punkIndex.toString())
-        .concat("-")
-        .concat(event.logIndex.toString())
+      event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
     );
   }
   assign.to = toAccount.toHexString();
@@ -64,39 +54,18 @@ export function getOrCreateAssign(
   return assign as Assign;
 }
 
-export function getOrCreateMetadata(
-  punkId: BigInt,
-  event: ethereum.Event
-): MetaData {
-  let metadata = MetaData.load(
-    punkId
-      .toString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("METADATA")
-  );
+export function createMetadata(punkId: BigInt): MetaData {
+  let metadata = new MetaData(punkId.toString());
+  metadata.tokenURI = TOKEN_URI.concat(punkId.toString());
+  metadata.contractURI = CONTRACT_URI;
+  metadata.tokenId = punkId;
+  metadata.punk = punkId.toString();
+  metadata.contractURI = CONTRACT_URI;
+  metadata.imageURI = IMAGE_URI.concat(punkId.toString()).concat(".png");
 
-  if (!metadata) {
-    metadata = new MetaData(
-      punkId
-        .toString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("METADATA")
-    );
-    metadata.tokenURI = TOKEN_URI.concat(punkId.toString());
-    metadata.contractURI = CONTRACT_URI;
-    metadata.tokenId = punkId;
-    metadata.punk = punkId.toString();
-    metadata.contractURI = CONTRACT_URI;
-    metadata.imageURI = IMAGE_URI.concat(punkId.toString()).concat(".png");
+  metadata.traits = new Array<string>();
 
-    metadata.traits = new Array<string>();
-
-    metadata.save();
-  }
+  metadata.save();
 
   return metadata as MetaData;
 }
@@ -107,10 +76,14 @@ export function getOrCreateSale(
   punk: BigInt,
   event: ethereum.Event
 ): Sale {
-  let sale = Sale.load(fromAddress.toHexString() + "-" + punk.toString());
+  let sale = Sale.load(
+    event.transaction.hash.toHexString() + "-" + punk.toString()
+  );
 
   if (!sale) {
-    sale = new Sale(fromAddress.toHexString() + "-" + punk.toString());
+    sale = new Sale(
+      event.transaction.hash.toHexString() + "-" + punk.toString()
+    );
   }
 
   sale.to = toAddress.toHexString();
@@ -131,8 +104,7 @@ export function getOrCreateTransfer(
   fromAddress: Address,
   toAddress: Address,
   punk: BigInt,
-  event: ethereum.Event,
-  entityType: string
+  event: ethereum.Event
 ): Transfer {
   let transfer = Transfer.load(
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
