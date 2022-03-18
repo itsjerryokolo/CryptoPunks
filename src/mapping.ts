@@ -49,10 +49,7 @@ import {
   getOrCreateWrappedPunkContract,
 } from "../src/helpers/contractHelper";
 
-import {
-  getOrCreateWrap,
-  getOrCreateUnWrap,
-} from "../src/helpers/wrapAndUnwrap";
+import { createWrap, createUnwrap } from "../src/helpers/wrapAndUnwrap";
 
 import { createAskCreated, createAskRemoved } from "./helpers/askHelpers";
 
@@ -179,18 +176,11 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     event.params.to.toHexString() == WRAPPED_PUNK_ADDRESS
   ) {
     log.info("Wrap detected of punk: {} ", [event.params.punkIndex.toString()]);
-    let wrap = getOrCreateWrap(
-      Address.fromString(WRAPPED_PUNK_ADDRESS),
-      Address.fromString(fromProxy.user),
-      event.params.punkIndex,
-      event
-    );
 
     let punk = Punk.load(event.params.punkIndex.toString())!;
     punk.wrapped = true;
 
     punk.save();
-    wrap.save();
   } else if (event.params.from.toHexString() == WRAPPED_PUNK_ADDRESS) {
     // Burn/Unwrap
     log.debug("Unwrapped detected. From: {}, punk: {}", [
@@ -199,19 +189,9 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     ]);
 
     let punk = Punk.load(event.params.punkIndex.toString())!;
-
-    let unWrap = getOrCreateUnWrap(
-      Address.fromString(WRAPPED_PUNK_ADDRESS),
-      event.params.from,
-      event.params.to,
-      event.params.punkIndex,
-      event
-    );
-
     punk.wrapped = false;
 
     punk.save();
-    unWrap.save();
   }
 }
 
@@ -381,7 +361,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
     // A wrapped punk is minted (wrapped)
-    let wrap = getOrCreateWrap(
+    let wrap = createWrap(
       Address.fromString(WRAPPED_PUNK_ADDRESS),
       event.params.from,
       event.params.tokenId,
@@ -394,8 +374,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     wrap.save();
   } else if (event.params.to.toHexString() == ZERO_ADDRESS) {
     // A wrapped punk is burned (unwrapped)
-    let unWrap = getOrCreateUnWrap(
-      Address.fromString(WRAPPED_PUNK_ADDRESS),
+    let unWrap = createUnwrap(
       event.params.from,
       event.params.to,
       event.params.tokenId,

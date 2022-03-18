@@ -90,7 +90,7 @@ type Punk implements NFT @entity {
   currentBid: Bid
 }
 
-type MetaData @entity {
+type MetaData @entity(immutable: true) {
   id: ID!
   tokenId: BigInt!
   tokenURI: String!
