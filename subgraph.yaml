@@ -38,6 +38,8 @@ dataSources:
           handler: handleAssign
         - event: PunkTransfer(indexed address,indexed address,uint256)
           handler: handlePunkTransfer
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
         - event: PunkOffered(indexed uint256,uint256,indexed address)
           handler: handlePunkOffered
         - event: PunkBidEntered(indexed uint256,uint256,indexed address)

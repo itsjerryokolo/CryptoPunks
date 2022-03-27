@@ -7,6 +7,7 @@ import {
   PunkBidWithdrawn,
   PunkBought,
   PunkNoLongerForSale,
+  Transfer as cTokenTransfer,
 } from "../generated/cryptopunks/cryptopunks";
 
 import {
@@ -26,6 +27,8 @@ import {
   AskRemoved,
   MetaData,
   UserProxy,
+  CToken,
+  Transfer,
 } from "../generated/schema";
 
 import { ZERO_ADDRESS, WRAPPED_PUNK_ADDRESS } from "./constant";
@@ -125,6 +128,8 @@ export function handleAssign(event: Assigned): void {
   metadata.save();
   punk.save();
 }
+
+export function handleTransfer(event: cTokenTransfer): void {}
 
 export function handlePunkTransfer(event: PunkTransfer): void {
   log.debug("handlePunkTransfer from: {} to: {}", [

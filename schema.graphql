@@ -257,6 +257,17 @@ type Transfer implements Event @entity {
   type: EventType!
 }
 
+type CToken @entity {
+  id: ID!
+  from: Account
+  to: Account
+  amount: BigInt
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+}
+
 type Wrap implements Event @entity {
   id: ID!
   from: Account
