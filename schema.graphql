@@ -26,6 +26,8 @@ interface NFT {
   tokenId: BigInt!
   owner: Account!
   events: [Event!]! @derivedFrom(field: "nft")
+  currentAsk: Ask
+  currentBid: Bid
 }
 
 interface Event {
@@ -84,9 +86,11 @@ type Punk implements NFT @entity {
   owner: Account!
   wrapped: Boolean!
   events: [Event!]! @derivedFrom(field: "nft")
+  currentAsk: Ask
+  currentBid: Bid
 }
 
-type MetaData @entity {
+type MetaData @entity(immutable: true) {
   id: ID!
   tokenId: BigInt!
   tokenURI: String!
@@ -157,7 +161,7 @@ type Contract @entity {
   imageHash: String
 }
 
-type Assign implements Event @entity {
+type Assign implements Event @entity(immutable: true) {
   id: ID!
   contract: Contract
   nft: NFT!
@@ -171,7 +175,7 @@ type Assign implements Event @entity {
   from: Account
 }
 
-type Sale implements Event @entity {
+type Sale implements Event @entity(immutable: true) {
   id: ID!
   to: Account
   amount: BigInt
@@ -185,8 +189,54 @@ type Sale implements Event @entity {
   type: EventType!
 }
 
-type AskCreated implements Event @entity {
+type AskCreated implements Event @entity(immutable: true) {
   id: ID!
+  from: Account
+  to: Account
+  ask: Ask!
+  amount: BigInt
+  contract: Contract
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType!
+}
+
+type BidCreated implements Event @entity(immutable: true) {
+  id: ID!
+  from: Account
+  to: Account
+  bid: Bid!
+  amount: BigInt
+  contract: Contract
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType!
+}
+
+type BidRemoved implements Event @entity(immutable: true) {
+  id: ID!
+  from: Account
+  to: Account
+  amount: BigInt
+  bid: Bid!
+  contract: Contract
+  nft: NFT!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  txHash: Bytes!
+  timestamp: BigInt!
+  type: EventType!
+}
+
+type AskRemoved implements Event @entity(immutable: true) {
+  id: ID!
+  ask: Ask!
   from: Account
   to: Account
   amount: BigInt
@@ -199,51 +249,7 @@ type AskCreated implements Event @entity {
   type: EventType!
 }
 
-type BidCreated implements Event @entity {
-  id: ID!
-  from: Account
-  to: Account
-  amount: BigInt
-  contract: Contract
-  nft: NFT!
-  blockNumber: BigInt!
-  blockHash: Bytes!
-  txHash: Bytes!
-  timestamp: BigInt!
-  type: EventType!
-}
-
-type BidRemoved implements Event @entity {
-  id: ID!
-  from: Account
-  to: Account
-  amount: BigInt
-  bid: BidCreated!
-  contract: Contract
-  nft: NFT!
-  blockNumber: BigInt!
-  blockHash: Bytes!
-  txHash: Bytes!
-  timestamp: BigInt!
-  type: EventType!
-}
-
-type AskRemoved implements Event @entity {
-  id: ID!
-  ask: AskCreated!
-  from: Account
-  to: Account
-  amount: BigInt
-  contract: Contract
-  nft: NFT!
-  blockNumber: BigInt!
-  blockHash: Bytes!
-  txHash: Bytes!
-  timestamp: BigInt!
-  type: EventType!
-}
-
-type Transfer implements Event @entity {
+type Transfer implements Event @entity(immutable: true) {
   id: ID!
   from: Account
   to: Account
@@ -268,7 +274,7 @@ type CToken @entity {
   timestamp: BigInt!
 }
 
-type Wrap implements Event @entity {
+type Wrap implements Event @entity(immutable: true) {
   id: ID!
   from: Account
   to: Account
@@ -282,7 +288,7 @@ type Wrap implements Event @entity {
   type: EventType!
 }
 
-type Unwrap implements Event @entity {
+type Unwrap implements Event @entity(immutable: true) {
   id: ID!
   from: Account
   to: Account

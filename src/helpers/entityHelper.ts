@@ -23,80 +23,49 @@ export function getOrCreateAccount(address: Address): Account {
 }
 
 export function getOrCreateAssign(
-  id: BigInt,
+  punkIndex: BigInt,
+  toAccount: Address,
   punk: Punk,
-  account: Address,
   metadata: MetaData,
   event: ethereum.Event
 ): Assign {
   let assign = Assign.load(
-    id
-      .toString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("ASSIGN")
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
   );
 
   if (!assign) {
     assign = new Assign(
-      id
-        .toString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("ASSIGN")
+      event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
     );
   }
-  assign.to = account.toHexString();
-  assign.nft = punk.id;
+  assign.to = toAccount.toHexString();
+  assign.nft = punkIndex.toString();
   assign.timestamp = event.block.timestamp;
   assign.contract = event.address.toHexString();
   assign.blockNumber = event.block.number;
   assign.txHash = event.transaction.hash;
   assign.blockHash = event.block.hash;
   punk.metadata = metadata.id;
-  punk.assignedTo = account.toHexString();
-  punk.transferedTo = account.toHexString();
+  punk.assignedTo = toAccount.toHexString();
+  punk.transferedTo = toAccount.toHexString();
   assign.type = "ASSIGN";
   assign.save();
 
   return assign as Assign;
 }
 
-export function getOrCreateMetadata(
-  punkId: BigInt,
-  event: ethereum.Event
-): MetaData {
-  let metadata = MetaData.load(
-    punkId
-      .toString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("METADATA")
-  );
+export function createMetadata(punkId: BigInt): MetaData {
+  let metadata = new MetaData(punkId.toString());
+  metadata.tokenURI = TOKEN_URI.concat(punkId.toString());
+  metadata.contractURI = CONTRACT_URI;
+  metadata.tokenId = punkId;
+  metadata.punk = punkId.toString();
+  metadata.contractURI = CONTRACT_URI;
+  metadata.imageURI = IMAGE_URI.concat(punkId.toString()).concat(".png");
 
-  if (!metadata) {
-    metadata = new MetaData(
-      punkId
-        .toString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("METADATA")
-    );
-    metadata.tokenURI = TOKEN_URI.concat(punkId.toString());
-    metadata.contractURI = CONTRACT_URI;
-    metadata.tokenId = punkId;
-    metadata.punk = punkId.toString();
-    metadata.contractURI = CONTRACT_URI;
-    metadata.imageURI = IMAGE_URI.concat(punkId.toString()).concat(".png");
+  metadata.traits = new Array<string>();
 
-    metadata.traits = new Array<string>();
-
-    metadata.save();
-  }
+  metadata.save();
 
   return metadata as MetaData;
 }
@@ -108,20 +77,12 @@ export function getOrCreateSale(
   event: ethereum.Event
 ): Sale {
   let sale = Sale.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "SALE"
+    event.transaction.hash.toHexString() + "-" + punk.toString()
   );
 
   if (!sale) {
     sale = new Sale(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "SALE"
+      event.transaction.hash.toHexString() + "-" + punk.toString()
     );
   }
 
@@ -143,24 +104,15 @@ export function getOrCreateTransfer(
   fromAddress: Address,
   toAddress: Address,
   punk: BigInt,
-  event: ethereum.Event,
-  entityType: string
+  event: ethereum.Event
 ): Transfer {
   let transfer = Transfer.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      entityType
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
   );
 
   if (!transfer) {
     transfer = new Transfer(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        entityType //REGULAR TRANSFER or WRAPPEDPUNK TRANSFER
+      event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
     );
   }
 

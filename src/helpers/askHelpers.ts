@@ -1,62 +1,17 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Account, Ask, AskRemoved, AskCreated } from "../../generated/schema";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { AskRemoved, AskCreated } from "../../generated/schema";
 
-export function getOrCreateAsk(
-  askRemoved: AskRemoved,
-  askCreated: AskCreated,
-  nft: BigInt,
-  event: ethereum.Event
-): Ask {
-  let ask = Ask.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "ASK"
-  );
-
-  if (!ask) {
-    ask = new Ask(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "ASK"
-    );
-    ask.open = true;
-  }
-  ask.nft = nft.toString();
-  ask.created = askCreated.id;
-  ask.offerType = "ASK";
-  ask.removed = askRemoved.id;
-  ask.save();
-
-  return ask as Ask;
-}
-
-export function getOrCreateAskCreated(
-  nft: BigInt,
+export function createAskCreated(
+  punkIndex: BigInt,
   event: ethereum.Event
 ): AskCreated {
-  let askCreated = AskCreated.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "ASKCREATED"
-  );
+  let askCreatedId =
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
 
-  if (!askCreated) {
-    askCreated = new AskCreated(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "ASKCREATED"
-    );
-  }
+  let askCreated = new AskCreated(askCreatedId);
+
   askCreated.type = "ASK_CREATED";
-  askCreated.nft = nft.toString();
+  askCreated.nft = punkIndex.toString();
   askCreated.timestamp = event.block.timestamp;
   askCreated.blockNumber = event.block.number;
   askCreated.txHash = event.transaction.hash;
@@ -67,29 +22,17 @@ export function getOrCreateAskCreated(
   return askCreated as AskCreated;
 }
 
-export function getOrCreateAskRemoved(
-  nft: BigInt,
+export function createAskRemoved(
+  punkIndex: BigInt,
   event: ethereum.Event
 ): AskRemoved {
-  let askRemoved = AskRemoved.load(
-    event.transaction.hash.toHexString() +
-      "-" +
-      event.logIndex.toString() +
-      "-" +
-      "ASKREMOVED"
-  );
+  let askRemovedId =
+    event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
 
-  if (!askRemoved) {
-    askRemoved = new AskRemoved(
-      event.transaction.hash.toHexString() +
-        "-" +
-        event.logIndex.toString() +
-        "-" +
-        "ASKREMOVED"
-    );
-  }
+  let askRemoved = new AskRemoved(askRemovedId);
+
   askRemoved.type = "ASK_REMOVED";
-  askRemoved.nft = nft.toString();
+  askRemoved.nft = punkIndex.toString();
   askRemoved.timestamp = event.block.timestamp;
   askRemoved.blockNumber = event.block.number;
   askRemoved.txHash = event.transaction.hash;

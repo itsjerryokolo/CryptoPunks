@@ -14,6 +14,7 @@ import {
   PunkNoLongerForSale,
   PunkBidEntered,
   PunkOffered,
+  PunkBought,
 } from "../../generated/cryptopunks/cryptopunks";
 import {
   ProxyRegistered,
@@ -27,10 +28,11 @@ import {
   handleWrappedPunkTransfer,
   handlePunkBidEntered,
   handlePunkOffered,
+  handlePunkBought,
 } from "../../src/mapping";
 
 import { WRAPPED_PUNK_ADDRESS, ZERO_ADDRESS } from "../../src/constant";
-import { MetaData } from "../../generated/schema";
+import { MetaData, Sale } from "../../generated/schema";
 
 const OWNER1 = "0x6f4a2d3a4f47f9c647d86c929755593911ee0001";
 const OWNER2 = "0xc36817163b7eaef25234e1d18adbfa52105a0002";
@@ -294,6 +296,43 @@ function createProxyRegisteredEvent(
   return proxyRegisteredEvent;
 }
 
+function createPunkBoughtEvent(
+  punk: i32,
+  value: i32,
+  seller: Address,
+  buyer: Address
+): PunkBought {
+  let mockEvent = newMockEvent();
+
+  let parameters = new Array<ethereum.EventParam>();
+
+  parameters.push(
+    new ethereum.EventParam("punk", ethereum.Value.fromI32(punk))
+  );
+  parameters.push(
+    new ethereum.EventParam("value", ethereum.Value.fromI32(value))
+  );
+
+  parameters.push(
+    new ethereum.EventParam("seller", ethereum.Value.fromAddress(seller))
+  );
+  parameters.push(
+    new ethereum.EventParam("buyer", ethereum.Value.fromAddress(buyer))
+  );
+
+  let punkBoughtEvent = new PunkBought(
+    CRYPTOPUNKS_ADDRESS,
+    mockEvent.logIndex,
+    mockEvent.transactionLogIndex,
+    mockEvent.logType,
+    createBlock(3),
+    mockEvent.transaction,
+    parameters
+  );
+
+  return punkBoughtEvent;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 //TEST ASSIGN
 ///////////////////////////////////////////
@@ -434,6 +473,19 @@ test("testUnwrap", () => {
   // logStore();
 });
 
+test("Test Sale ID", () => {
+  log.warning("Test Sale ID", []);
+  handlePunkBought(
+    createPunkBoughtEvent(
+      1,
+      100,
+      Address.fromString(OWNER1),
+      Address.fromString(OWNER2)
+    )
+  );
+
+  logStore();
+});
 ///////////////////////////////////////////
 //TEST PUNKOFFERED
 ///////////////////////////////////////////

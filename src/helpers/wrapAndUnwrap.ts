@@ -1,31 +1,18 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Wrap, Unwrap } from "../../generated/schema";
 
-export function getOrCreateWrap(
+export function createWrap(
   id: Address,
   fromAccount: Address,
   nft: BigInt,
   event: ethereum.Event
 ): Wrap {
-  let wrap = Wrap.load(
-    id
+  let wrap = new Wrap(
+    event.transaction.hash
       .toHexString()
       .concat("-")
       .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("WRAP")
   );
-
-  if (!wrap) {
-    wrap = new Wrap(
-      id
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("WRAP")
-    );
-  }
   wrap.from = fromAccount.toHexString();
   wrap.type = "WRAP";
   wrap.timestamp = event.block.timestamp;
@@ -38,32 +25,18 @@ export function getOrCreateWrap(
   return wrap as Wrap;
 }
 
-export function getOrCreateUnWrap(
-  id: Address,
+export function createUnwrap(
   fromAccount: Address,
   toAccount: Address,
   nft: BigInt,
   event: ethereum.Event
 ): Unwrap {
-  let unWrap = Unwrap.load(
-    id
+  let unWrap = new Unwrap(
+    event.transaction.hash
       .toHexString()
       .concat("-")
       .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("UNWRAP")
   );
-
-  if (!unWrap) {
-    unWrap = new Unwrap(
-      id
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-        .concat("-")
-        .concat("UNWRAP")
-    );
-  }
   unWrap.from = fromAccount.toHexString();
   unWrap.to = toAccount.toHexString();
   unWrap.type = "UNWRAP";
