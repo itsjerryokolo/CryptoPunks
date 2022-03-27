@@ -128,7 +128,63 @@ export function handleAssign(event: Assigned): void {
   punk.save();
 }
 
-export function handleTransfer(event: cTokenTransfer): void {}
+export function handleTransfer(event: cTokenTransfer): void {
+  if (event.params.to.toHexString() != ZERO_ADDRESS) {
+    let cToken = CToken.load(
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString())
+    );
+    if (!cToken) {
+      cToken = new CToken(
+        event.transaction.hash
+          .toHexString()
+          .concat("-")
+          .concat(event.logIndex.toString())
+      );
+    }
+    let transfer = Transfer.load(
+      event.transaction.hash
+        .toHexString()
+        .concat("-")
+        .concat(event.logIndex.toString())
+    );
+    if (!transfer) {
+      transfer = new Transfer(
+        event.transaction.hash
+          .toHexString()
+          .concat("-")
+          .concat(event.logIndex.toString())
+      );
+
+      let transfers = new Array<string>();
+      transfer.save();
+      transfers.push(transfer.id);
+      cToken.transfers = transfers;
+    }
+    let oldTransfers = cToken.transfers;
+    oldTransfers.push(transfer.id);
+
+    cToken.from = event.params.from.toHexString();
+    cToken.to = event.params.to.toHexString();
+    cToken.transfers = oldTransfers;
+    cToken.amount = event.params.value;
+    cToken.blockNumber = event.block.number;
+    cToken.blockHash = event.block.hash;
+    cToken.txHash = event.transaction.hash;
+    cToken.timestamp = event.block.timestamp;
+
+    transfer.blockNumber = event.block.number;
+    transfer.type = "TRANSFER";
+    transfer.blockHash = event.block.hash;
+    transfer.txHash = event.transaction.hash;
+    transfer.timestamp = event.block.timestamp;
+
+    cToken.save();
+    transfer.save();
+  }
+}
 
 export function handlePunkTransfer(event: PunkTransfer): void {
   log.debug("handlePunkTransfer from: {} to: {}", [
