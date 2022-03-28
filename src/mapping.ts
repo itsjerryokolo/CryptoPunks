@@ -158,12 +158,10 @@ export function handleTransfer(event: cTokenTransfer): void {
     // Add new one to Array
     // Store in field to update state/count
     let oldTransfers = cToken.transfers;
-    if (!oldTransfers) {
-      oldTransfers = new Array<string>();
+    if (oldTransfers !== null) {
+      oldTransfers.push(transfer.id);
+      oldTransfers = cToken.transfers;
     }
-    oldTransfers = cToken.transfers;
-    oldTransfers.push(transfer.id);
-    cToken.transfers = oldTransfers;
 
     //Update fields
     cToken.from = event.params.from.toHexString();
