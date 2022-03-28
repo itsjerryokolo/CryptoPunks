@@ -5,8 +5,12 @@ export function createAskCreated(
   punkIndex: BigInt,
   event: ethereum.Event
 ): AskCreated {
-  let askCreatedId =
-    event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+  let askCreatedId = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.logIndex.toString())
+    .concat("-")
+    .concat("ASK_CREATED");
 
   let askCreated = new AskCreated(askCreatedId);
 
@@ -26,8 +30,12 @@ export function createAskRemoved(
   punkIndex: BigInt,
   event: ethereum.Event
 ): AskRemoved {
-  let askRemovedId =
-    event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+  let askRemovedId = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.logIndex.toString())
+    .concat("-")
+    .concat("ASK_REMOVED");
 
   let askRemoved = new AskRemoved(askRemovedId);
 

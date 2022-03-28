@@ -6,8 +6,12 @@ export function getOrCreateBid(
   punkIndex: Punk,
   event: ethereum.Event
 ): Bid {
-  let bidId =
-    event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+  let bidId = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.logIndex.toString())
+    .concat("-")
+    .concat("BID");
   let currentBid = punkIndex.currentBid;
 
   if (currentBid !== null) {
@@ -31,7 +35,12 @@ export function createBidCreated(
   event: ethereum.Event
 ): BidCreated {
   let bidCreated = new BidCreated(
-    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString())
+      .concat("-")
+      .concat("BID_CREATED")
   );
 
   bidCreated.type = "BID_CREATED";
@@ -53,7 +62,12 @@ export function createBidRemoved(
   event: ethereum.Event
 ): BidRemoved {
   let bidRemoved = new BidRemoved(
-    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString())
+      .concat("-")
+      .concat("BID_REMOVED")
   );
 
   bidRemoved.from = fromAddress;

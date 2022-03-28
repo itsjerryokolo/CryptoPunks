@@ -141,26 +141,12 @@ export function handleTransfer(event: cTokenTransfer): void {
     let cToken = CToken.load(id);
     if (!cToken) {
       cToken = new CToken(id);
-      let transfers = new Array<string>();
-      transfers.push(id);
-      cToken.transfers = transfers;
-      cToken.amount = event.params.value;
-      cToken.blockNumber = event.block.number;
-      cToken.blockHash = event.block.hash;
-      cToken.txHash = event.transaction.hash;
-      cToken.timestamp = event.block.timestamp;
-      cToken.save();
     }
 
     //Create/load a transfer entity so we can keep track of entity count
     let transfer = Transfer.load(id);
     if (!transfer) {
       transfer = new Transfer(id);
-      let transfers = new Array<string>();
-      transfer.save();
-      transfers.push(transfer.id);
-      cToken.transfers = transfers; //There will always be at least 1 transferID
-      cToken.save();
     }
 
     // We do not need to increment toAccount again in PunkBought event
@@ -172,6 +158,10 @@ export function handleTransfer(event: cTokenTransfer): void {
     // Add new one to Array
     // Store in field to update state/count
     let oldTransfers = cToken.transfers;
+    if (!oldTransfers) {
+      oldTransfers = new Array<string>();
+    }
+    oldTransfers = cToken.transfers;
     oldTransfers.push(transfer.id);
     cToken.transfers = oldTransfers;
 
@@ -275,6 +265,12 @@ export function handlePunkOffered(event: PunkOffered): void {
     event.transaction.hash.toHexString(),
   ]);
 
+  let id = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.logIndex.toString())
+    .concat("ASK");
+
   let askCreated = createAskCreated(event.params.punkIndex, event);
 
   let punk = Punk.load(event.params.punkIndex.toString())!;
@@ -290,9 +286,7 @@ export function handlePunkOffered(event: PunkOffered): void {
     oldAsk.save();
   }
 
-  let ask = new Ask(
-    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
-  );
+  let ask = new Ask(id.concat("-").concat("ASK"));
 
   askCreated.from = punk.owner;
   askCreated.amount = event.params.minValue;
@@ -368,15 +362,19 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 */
 export function handlePunkBought(event: PunkBought): void {
   if (event.params.toAddress.toHexString() == ZERO_ADDRESS) {
-    //bidAccepted {
+    //bidAccepted
     //Catch acceptBidForPunk()
     //e.g https://etherscan.io/tx/0x23d6e24628dabf4fa92fa93630e5fa6f679fac75071aab38d7e307a3c0f4a3ca#eventlog
 
-    let cToken: CToken;
     let id = event.transaction.hash
       .toHexString()
       .concat("-")
       .concat(event.logIndex.toString());
+
+    let cToken = CToken.load(id);
+    if (!cToken) {
+      cToken = new CToken(id);
+    }
 
     let bidRemoved = createBidRemoved(
       event.params.punkIndex,
@@ -386,14 +384,21 @@ export function handlePunkBought(event: PunkBought): void {
     let punk = Punk.load(event.params.punkIndex.toString())!;
     let askRemoved = createAskRemoved(event.params.punkIndex, event); //Create new AskRemoved
     let fromAccount = getOrCreateAccount(event.params.fromAddress);
-    let ask = Ask.load(id);
+    let ask = Ask.load(id.concat("-").concat("ASK"));
 
     //Load last Ask iD
     let currentAsk = punk.currentAsk;
 
     //Load array of iDs from cToken
     let transferIds = cToken.transfers;
+    if (!transferIds) {
+      transferIds = [];
+    }
+
     let ownerIds = cToken.owners;
+    if (!ownerIds) {
+      ownerIds = [];
+    }
 
     //Arraylength
     let transferIdLength = transferIds.length;
@@ -407,12 +412,12 @@ export function handlePunkBought(event: PunkBought): void {
       //Update Punk entities with new buyer
 
       for (let i = 0; i < transferIdLength; i++) {
-        let transfer = Transfer.load(transferIds[i])!; //cannot be null
+        let transfer = Transfer.load(transferIds[transferIdLength - 1])!; //cannot be null
         let contract = getOrCreateCryptoPunkContract(event.address);
 
         //Update Sale status of Punk
         let sale = getOrCreateSale(
-          Address.fromString(ownerIds[i]),
+          Address.fromString(ownerIds[ownerIdLength - 1]),
           event.params.fromAddress,
           event.params.punkIndex,
           event
@@ -421,7 +426,11 @@ export function handlePunkBought(event: PunkBought): void {
 
         //Update Bid status of Punk to closed/false
         //Update fields
-        let bid = getOrCreateBid(ownerIds[i].toString(), punk, event);
+        let bid = getOrCreateBid(
+          ownerIds[ownerIdLength - 1].toString(),
+          punk,
+          event
+        );
         bid.open = false;
         bid.removed = bidRemoved.id;
 
@@ -440,7 +449,7 @@ export function handlePunkBought(event: PunkBought): void {
         }
         //Create new Ask if not found
         if (!ask) {
-          ask = new Ask(id);
+          ask = new Ask(id.concat("-").concat("ASK"));
         }
         ask.from = fromAccount.id;
         ask.removed = askRemoved.id;
@@ -481,10 +490,14 @@ export function handlePunkBought(event: PunkBought): void {
     }
   } else {
     log.debug("handlePunkBought", []);
+
     let id = event.transaction.hash
       .toHexString()
       .concat("-")
-      .concat(event.logIndex.toString());
+      .concat(event.logIndex.toString())
+      .concat("-")
+      .concat("ASK");
+
     let punk = Punk.load(event.params.punkIndex.toString())!;
     let contract = getOrCreateCryptoPunkContract(event.address);
     let toAccount = getOrCreateAccount(event.params.toAddress);
