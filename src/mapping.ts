@@ -130,45 +130,54 @@ export function handleAssign(event: Assigned): void {
 
 export function handleTransfer(event: cTokenTransfer): void {
   if (event.params.to.toHexString() != ZERO_ADDRESS) {
-    let cToken = CToken.load(
-      event.transaction.hash
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-    );
-    if (!cToken) {
-      cToken = new CToken(
-        event.transaction.hash
-          .toHexString()
-          .concat("-")
-          .concat(event.logIndex.toString())
-      );
-    }
-    let transfer = Transfer.load(
-      event.transaction.hash
-        .toHexString()
-        .concat("-")
-        .concat(event.logIndex.toString())
-    );
-    if (!transfer) {
-      transfer = new Transfer(
-        event.transaction.hash
-          .toHexString()
-          .concat("-")
-          .concat(event.logIndex.toString())
-      );
+    let fromAccount = getOrCreateAccount(event.params.from);
+    let toAccount = getOrCreateAccount(event.params.to);
+    let id = event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString());
 
+    //Create/load a cToken to store all cToken transfers
+    let cToken = CToken.load(id);
+    if (!cToken) {
+      cToken = new CToken(id);
+      let transfers = new Array<string>();
+      transfers.push(id);
+      cToken.transfers = transfers;
+      cToken.amount = event.params.value;
+      cToken.blockNumber = event.block.number;
+      cToken.blockHash = event.block.hash;
+      cToken.txHash = event.transaction.hash;
+      cToken.timestamp = event.block.timestamp;
+      cToken.save();
+    }
+
+    //Create/load a transfer entity so we can keep track of entity count
+    let transfer = Transfer.load(id);
+    if (!transfer) {
+      transfer = new Transfer(id);
       let transfers = new Array<string>();
       transfer.save();
       transfers.push(transfer.id);
-      cToken.transfers = transfers;
+      cToken.transfers = transfers; //There will always be at least 1 transferID
+      cToken.save();
     }
+
+    // We do not need to increment toAccount again in PunkBought event
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+
+    // Load old transfers from cToken
+    // Add new one to Array
+    // Store in field to update state/count
     let oldTransfers = cToken.transfers;
     oldTransfers.push(transfer.id);
+    cToken.transfers = oldTransfers;
 
+    //Update fields
     cToken.from = event.params.from.toHexString();
     cToken.to = event.params.to.toHexString();
-    cToken.transfers = oldTransfers;
     cToken.amount = event.params.value;
     cToken.blockNumber = event.block.number;
     cToken.blockHash = event.block.hash;
@@ -181,8 +190,11 @@ export function handleTransfer(event: cTokenTransfer): void {
     transfer.txHash = event.transaction.hash;
     transfer.timestamp = event.block.timestamp;
 
+    //Write
     cToken.save();
     transfer.save();
+    toAccount.save();
+    fromAccount.save();
   }
 }
 
@@ -355,57 +367,239 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   step two: We need to close bid when bid accepted, PunkBought
 */
 export function handlePunkBought(event: PunkBought): void {
-  log.debug("handlePunkBought", []);
+  if (event.params.toAddress.toHexString() == ZERO_ADDRESS) {
+    //bidAccepted {
+    //Catch acceptBidForPunk()
+    //e.g https://etherscan.io/tx/0x23d6e24628dabf4fa92fa93630e5fa6f679fac75071aab38d7e307a3c0f4a3ca#eventlog
 
-  let punk = Punk.load(event.params.punkIndex.toString())!;
-  let contract = getOrCreateCryptoPunkContract(event.address);
-  let toAccount = getOrCreateAccount(event.params.toAddress);
-  let fromAccount = getOrCreateAccount(event.params.fromAddress);
+    let cToken: CToken;
+    let id = event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString());
 
-  let sale = getOrCreateSale(
-    event.params.toAddress,
-    event.params.fromAddress,
-    event.params.punkIndex,
-    event
-  );
-  let bid = getOrCreateBid(event.params.fromAddress.toHexString(), punk, event);
+    let bidRemoved = createBidRemoved(
+      event.params.punkIndex,
+      event.params.fromAddress.toHexString(),
+      event
+    ); //Create new BidRemoved
+    let punk = Punk.load(event.params.punkIndex.toString())!;
+    let askRemoved = createAskRemoved(event.params.punkIndex, event); //Create new AskRemoved
+    let fromAccount = getOrCreateAccount(event.params.fromAddress);
+    let ask = Ask.load(id);
 
-  sale.amount = event.params.value;
+    //Load last Ask iD
+    let currentAsk = punk.currentAsk;
 
-  contract.totalAmountTraded = contract.totalAmountTraded.plus(
-    event.params.value
-  );
-  contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
+    //Load array of iDs from cToken
+    let transferIds = cToken.transfers;
+    let ownerIds = cToken.owners;
 
-  // Note: buyPunk() does not emit a PunkTransfer event, so we need to keep track
-  toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-    BigInt.fromI32(1)
-  );
+    //Arraylength
+    let transferIdLength = transferIds.length;
+    let ownerIdLength = ownerIds.length;
 
-  fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-    BigInt.fromI32(1)
-  );
+    //Check: transferIds and ownerIds should not be empty
+    if (transferIds !== null && ownerIds !== null) {
+      //Update all Transfer entities with correct buyers & punks
+      //Record the SaleEvent
+      //Close the current Bid & the current Ask from buyer & seller
+      //Update Punk entities with new buyer
 
-  punk.purchasedBy = toAccount.id;
-  punk.owner = toAccount.id;
-  bid.open = false;
+      for (let i = 0; i < transferIdLength; i++) {
+        let transfer = Transfer.load(transferIds[i])!; //cannot be null
+        let contract = getOrCreateCryptoPunkContract(event.address);
 
-  punk.save();
-  fromAccount.save();
-  bid.save();
-  toAccount.save();
-  contract.save();
-  sale.save();
+        //Update Sale status of Punk
+        let sale = getOrCreateSale(
+          Address.fromString(ownerIds[i]),
+          event.params.fromAddress,
+          event.params.punkIndex,
+          event
+        );
+        sale.amount = event.params.value;
+
+        //Update Bid status of Punk to closed/false
+        //Update fields
+        let bid = getOrCreateBid(ownerIds[i].toString(), punk, event);
+        bid.open = false;
+        bid.removed = bidRemoved.id;
+
+        //Update Ask status of Punk to false
+        //Update fields
+        if (currentAsk !== null) {
+          let ask = Ask.load(currentAsk)!;
+
+          ask.from = fromAccount.id;
+          ask.removed = askRemoved.id;
+
+          ask.open = false;
+          ask.nft = punk.id;
+          ask.offerType = "ASK";
+          ask.save();
+        }
+        //Create new Ask if not found
+        if (!ask) {
+          ask = new Ask(id);
+        }
+        ask.from = fromAccount.id;
+        ask.removed = askRemoved.id;
+        ask.open = false;
+        ask.nft = punk.id;
+        ask.offerType = "ASK";
+
+        //Update owner of Punk from cToken
+        let newOwner = ownerIds[ownerIdLength - 1];
+        punk.purchasedBy = newOwner;
+        punk.owner = newOwner;
+
+        //Update transfer entities with correct punk and owner
+        transfer.nft = event.params.punkIndex.toString();
+        transfer.to = newOwner;
+
+        //Update tradeValues
+        contract.totalAmountTraded = contract.totalAmountTraded.plus(
+          event.params.value
+        );
+        contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
+
+        //Update account
+        //We do not need to increment the fromAccount again in the cTokenTransfer event
+        fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+          BigInt.fromI32(1)
+        );
+
+        contract.save();
+        bid.save();
+        sale.save();
+        transfer.save();
+        punk.save();
+        sale.save();
+        fromAccount.save();
+        ask.save();
+      }
+    }
+  } else {
+    log.debug("handlePunkBought", []);
+    let id = event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString());
+    let punk = Punk.load(event.params.punkIndex.toString())!;
+    let contract = getOrCreateCryptoPunkContract(event.address);
+    let toAccount = getOrCreateAccount(event.params.toAddress);
+    let fromAccount = getOrCreateAccount(event.params.fromAddress);
+    let askRemoved = createAskRemoved(event.params.punkIndex, event); //Create new AskRemoved
+    let bidRemoved = createBidRemoved(
+      event.params.punkIndex,
+      event.params.fromAddress.toHexString(),
+      event
+    ); //Create new BidRemoved
+    let ask = Ask.load(id);
+    let currentAsk = punk.currentAsk;
+    let sale = getOrCreateSale(
+      event.params.toAddress,
+      event.params.fromAddress,
+      event.params.punkIndex,
+      event
+    );
+    let bid = getOrCreateBid(
+      event.params.fromAddress.toHexString(),
+      punk,
+      event
+    );
+
+    if (currentAsk !== null) {
+      let ask = Ask.load(currentAsk)!;
+
+      ask.from = fromAccount.id;
+      ask.removed = askRemoved.id;
+
+      ask.open = false;
+      ask.nft = punk.id;
+      ask.offerType = "ASK";
+      ask.save();
+    }
+
+    //Create new Ask if not found
+    //Update fields
+    if (!ask) {
+      ask = new Ask(id);
+      ask.from = fromAccount.id;
+    }
+
+    ask.removed = askRemoved.id;
+    ask.open = false;
+    ask.nft = punk.id;
+    ask.offerType = "ASK";
+
+    sale.amount = event.params.value;
+
+    contract.totalAmountTraded = contract.totalAmountTraded.plus(
+      event.params.value
+    );
+    contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
+
+    // Note: buyPunk() does not emit a PunkTransfer event, so we need to keep track
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
+
+    punk.purchasedBy = toAccount.id;
+    punk.owner = toAccount.id;
+    bid.open = false;
+
+    ask.save();
+    askRemoved.save();
+    punk.save();
+    fromAccount.save();
+    bid.save();
+    bidRemoved.save();
+    toAccount.save();
+    contract.save();
+    sale.save();
+  }
 }
 
 export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   log.debug("handlePunkNoLongerForSale", []);
+  let id = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.logIndex.toString());
 
   let askRemoved = createAskRemoved(event.params.punkIndex, event);
   let punk = Punk.load(event.params.punkIndex.toString())!;
+  let ask = Ask.load(id);
+  let currentAsk = punk.currentAsk;
+
+  if (currentAsk !== null) {
+    let ask = Ask.load(currentAsk)!;
+
+    ask.removed = askRemoved.id;
+    ask.open = false;
+    ask.nft = punk.id;
+    ask.offerType = "ASK";
+    ask.save();
+  }
+
+  //Create new Ask if not found
+  //Update fields
+  if (!ask) {
+    ask = new Ask(id);
+  }
+
+  ask.removed = askRemoved.id;
+  ask.open = false;
+  ask.nft = punk.id;
+  ask.offerType = "ASK";
 
   punk.save();
   askRemoved.save();
+  ask.save();
 }
 
 // This function is called for three events: Mint (Wrap), Burn (Unwrap) and Transfer

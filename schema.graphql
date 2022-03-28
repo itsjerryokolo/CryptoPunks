@@ -267,6 +267,7 @@ type CToken @entity {
   id: ID!
   from: Account
   to: Account
+  owners: [Account!]!
   amount: BigInt
   transfers: [Transfer!]!
   blockNumber: BigInt!
