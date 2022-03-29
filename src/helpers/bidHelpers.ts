@@ -1,28 +1,32 @@
 import { BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { BidCreated, BidRemoved, Bid, Punk } from "../../generated/schema";
+import {
+  BidCreated,
+  BidRemoved,
+  CToken,
+  Bid,
+  Punk,
+} from "../../generated/schema";
+import { getGlobalId } from "../utills";
+import { getOrCreateCToken } from "./entityHelper";
 
 export function getOrCreateBid(
   fromAddress: string,
-  punkIndex: Punk,
   event: ethereum.Event
 ): Bid {
-  let bidId = event.transaction.hash
-    .toHexString()
-    .concat("-")
-    .concat(event.logIndex.toString())
-    .concat("-")
-    .concat("BID");
-  let currentBid = punkIndex.currentBid;
-
-  if (currentBid !== null) {
-    let oldBid = Bid.load(currentBid)!;
-    oldBid.open = false;
-    oldBid.save();
+  let bidId = getGlobalId(event).concat("-BID"); // To prevent conflict with interfaces with same ID
+  let bid = Bid.load(bidId);
+  if (!bid) {
+    bid = new Bid(bidId);
+    bid.from = fromAddress;
+    bid.open = true;
+    bid.created = ""; //needs to be the id of createBidCreated in same handler
+    bid.save(); //We have a new Bid entity in the store incase we need the ID elsewhere
   }
-  let bid = new Bid(bidId);
 
-  bid.nft = punkIndex.id;
-  bid.from = fromAddress;
+  //nft - needs to be updated from somewhere else
+  //amount: BigInt! - needs to be updated from somewhere else
+  //bid.removed = "" //needs to be the id of createBidRemoved in same handler
+
   bid.offerType = "BID";
   bid.save();
 
@@ -34,14 +38,7 @@ export function createBidCreated(
   fromAddress: string,
   event: ethereum.Event
 ): BidCreated {
-  let bidCreated = new BidCreated(
-    event.transaction.hash
-      .toHexString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("BID_CREATED")
-  );
+  let bidCreated = new BidCreated(getGlobalId(event).concat("-BID_CREATED"));
 
   bidCreated.type = "BID_CREATED";
   bidCreated.nft = punkIndex.toString();
@@ -61,14 +58,7 @@ export function createBidRemoved(
   fromAddress: string,
   event: ethereum.Event
 ): BidRemoved {
-  let bidRemoved = new BidRemoved(
-    event.transaction.hash
-      .toHexString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-      .concat("-")
-      .concat("BID_REMOVED")
-  );
+  let bidRemoved = new BidRemoved(getGlobalId(event).concat("-BID_REMOVED"));
 
   bidRemoved.from = fromAddress;
   bidRemoved.contract = event.address.toHexString();
@@ -81,4 +71,34 @@ export function createBidRemoved(
   bidRemoved.save();
 
   return bidRemoved as BidRemoved;
+}
+
+export function getLatestBidId(
+  punk: Punk | null,
+  event: ethereum.Event
+): string {
+  //get Global ID to compare with other entities in the same Event type
+  //Load cToken which contains recent bidId
+  let cToken = getOrCreateCToken(getGlobalId(event));
+
+  //Get latest BidID from Punk entity
+  let latestId = punk.currentBid;
+
+  //If Punk not found as argument(null), get ID of acceptedBids from cToken entity
+  if (latestId === null) {
+    let acceptedBids = cToken.transfers;
+
+    //ensure that there is at least one acceptedBid
+    if (acceptedBids === null) {
+      acceptedBids = [];
+    }
+    if (acceptedBids !== null) {
+      let lastestBidId = acceptedBids[acceptedBids.length - 1];
+      return lastestBidId as string;
+    }
+  }
+  //Punk exist as argument so we can get the current bid from $lastestId
+  if (latestId !== null) {
+    return latestId as string;
+  }
 }

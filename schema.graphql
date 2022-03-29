@@ -33,7 +33,7 @@ interface NFT {
 interface Event {
   id: ID!
   contract: Contract
-  nft: NFT!
+  nft: NFT #nullable because punk doesn't appear in all events
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -112,7 +112,7 @@ interface Offer {
   from: Account!
   open: Boolean!
   amount: BigInt!
-  nft: NFT!
+  nft: NFT
   created: Event!
   removed: Event
   offerType: OfferType!
@@ -123,7 +123,7 @@ type Ask implements Offer @entity {
   from: Account!
   open: Boolean!
   amount: BigInt!
-  nft: NFT!
+  nft: NFT
   created: Event!
   removed: Event
   offerType: OfferType!
@@ -134,7 +134,7 @@ type Bid implements Offer @entity {
   from: Account!
   open: Boolean!
   amount: BigInt!
-  nft: NFT!
+  nft: NFT
   created: Event!
   removed: Event
   offerType: OfferType!
@@ -164,7 +164,7 @@ type Contract @entity {
 type Assign implements Event @entity(immutable: true) {
   id: ID!
   contract: Contract
-  nft: NFT!
+  nft: NFT
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -181,7 +181,7 @@ type Sale implements Event @entity(immutable: true) {
   amount: BigInt
   from: Account
   contract: Contract
-  nft: NFT!
+  nft: NFT
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -196,7 +196,7 @@ type AskCreated implements Event @entity(immutable: true) {
   ask: Ask!
   amount: BigInt
   contract: Contract
-  nft: NFT!
+  nft: NFT
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -211,7 +211,7 @@ type BidCreated implements Event @entity(immutable: true) {
   bid: Bid!
   amount: BigInt
   contract: Contract
-  nft: NFT!
+  nft: NFT
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -226,7 +226,7 @@ type BidRemoved implements Event @entity(immutable: true) {
   amount: BigInt
   bid: Bid!
   contract: Contract
-  nft: NFT!
+  nft: NFT
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -241,7 +241,7 @@ type AskRemoved implements Event @entity(immutable: true) {
   to: Account
   amount: BigInt
   contract: Contract
-  nft: NFT!
+  nft: NFT
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -255,7 +255,7 @@ type Transfer implements Event @entity(immutable: true) {
   to: Account
   amount: BigInt
   contract: Contract
-  nft: NFT!
+  nft: NFT
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -282,7 +282,7 @@ type Wrap implements Event @entity(immutable: true) {
   to: Account
   amount: BigInt
   contract: Contract
-  nft: NFT!
+  nft: NFT
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -296,7 +296,7 @@ type Unwrap implements Event @entity(immutable: true) {
   to: Account
   amount: BigInt
   contract: Contract
-  nft: NFT!
+  nft: NFT
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
