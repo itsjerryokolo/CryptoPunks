@@ -5,9 +5,11 @@ import {
   Punk,
   MetaData,
   Transfer,
+  CToken,
   Sale,
 } from "../../generated/schema";
 import { TOKEN_URI, CONTRACT_URI, IMAGE_URI } from "../constant";
+import { getGlobalId } from "../utills";
 
 export function getOrCreateAccount(address: Address): Account {
   let id = address.toHexString();
@@ -29,14 +31,10 @@ export function getOrCreateAssign(
   metadata: MetaData,
   event: ethereum.Event
 ): Assign {
-  let assign = Assign.load(
-    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
-  );
+  let assign = Assign.load(getGlobalId(event));
 
   if (!assign) {
-    assign = new Assign(
-      event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
-    );
+    assign = new Assign(getGlobalId(event));
   }
   assign.to = toAccount.toHexString();
   assign.nft = punkIndex.toString();
@@ -76,56 +74,31 @@ export function getOrCreateSale(
   punk: BigInt,
   event: ethereum.Event
 ): Sale {
-  let sale = Sale.load(
-    event.transaction.hash.toHexString() + "-" + punk.toString()
-  );
+  let sale = Sale.load(getGlobalId(event).concat("-SALE"));
 
   if (!sale) {
-    sale = new Sale(
-      event.transaction.hash.toHexString() + "-" + punk.toString()
-    );
+    sale = new Sale(getGlobalId(event).concat("-SALE"));
+    sale.contract = event.address.toHexString();
+    sale.timestamp = event.block.timestamp;
+    sale.blockNumber = event.block.number;
+    sale.txHash = event.transaction.hash;
+    sale.blockHash = event.block.hash;
+    sale.type = "SALE";
   }
 
   sale.to = toAddress.toHexString();
   sale.from = fromAddress.toHexString();
-  sale.contract = event.address.toHexString();
   sale.nft = punk.toString();
-  sale.timestamp = event.block.timestamp;
-  sale.blockNumber = event.block.number;
-  sale.txHash = event.transaction.hash;
-  sale.blockHash = event.block.hash;
-  sale.type = "SALE";
 
   sale.save();
   return sale as Sale;
 }
 
-export function getOrCreateTransfer(
-  fromAddress: Address,
-  toAddress: Address,
-  punk: BigInt,
-  event: ethereum.Event
-): Transfer {
-  let transfer = Transfer.load(
-    event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
-  );
-
-  if (!transfer) {
-    transfer = new Transfer(
-      event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
-    );
+export function getOrCreateCToken(globalId: string): CToken {
+  let cToken = CToken.load(globalId);
+  if (!cToken) {
+    cToken = new CToken(globalId);
+    cToken.save();
   }
-
-  transfer.from = fromAddress.toHexString();
-  transfer.to = toAddress.toHexString();
-  transfer.contract = event.address.toHexString();
-  transfer.nft = punk.toString();
-  transfer.timestamp = event.block.timestamp;
-  transfer.blockNumber = event.block.number;
-  transfer.txHash = event.transaction.hash;
-  transfer.blockHash = event.block.hash;
-  transfer.type = "TRANSFER";
-
-  transfer.save();
-  return transfer as Transfer;
+  return cToken as CToken;
 }

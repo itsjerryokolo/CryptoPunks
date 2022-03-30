@@ -1,5 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { AskRemoved, AskCreated } from "../../generated/schema";
+import { getGlobalId } from "../utills";
 
 export function createAskCreated(
   punkIndex: BigInt,
@@ -9,8 +10,7 @@ export function createAskCreated(
     .toHexString()
     .concat("-")
     .concat(event.logIndex.toString())
-    .concat("-")
-    .concat("ASK_CREATED");
+    .concat("-ASK_CREATED");
 
   let askCreated = new AskCreated(askCreatedId);
 
@@ -30,14 +30,7 @@ export function createAskRemoved(
   punkIndex: BigInt,
   event: ethereum.Event
 ): AskRemoved {
-  let askRemovedId = event.transaction.hash
-    .toHexString()
-    .concat("-")
-    .concat(event.logIndex.toString())
-    .concat("-")
-    .concat("ASK_REMOVED");
-
-  let askRemoved = new AskRemoved(askRemovedId);
+  let askRemoved = new AskRemoved(getGlobalId(event).concat("-ASK_REMOVED"));
 
   askRemoved.type = "ASK_REMOVED";
   askRemoved.nft = punkIndex.toString();
