@@ -6,23 +6,23 @@ import {
   Bid,
   Punk,
 } from "../../generated/schema";
-import { getGlobalId } from "../utills";
+import { getGlobalId } from "../utils";
 import { getOrCreateCToken } from "./entityHelper";
 
 export function getOrCreateBid(
   fromAddress: string,
   event: ethereum.Event
 ): Bid {
-  let bidId = getGlobalId(event).concat("-BID"); // To prevent conflict with interfaces with same ID
+  let bidId = getGlobalId(event).concat("-BID"); // -BID, To prevent conflict with interfaces with same ID
   let bid = Bid.load(bidId);
   if (!bid) {
     bid = new Bid(bidId);
     bid.from = fromAddress;
     bid.open = true;
-    bid.created = ""; //needs to be the id of createBidCreated in same handler
     bid.save(); //We have a new Bid entity in the store incase we need the ID elsewhere
   }
 
+  //bid.created = "" // non-nullable, needs to be the id of createBidCreated in same handler
   //nft - needs to be updated from somewhere else
   //amount: BigInt! - needs to be updated from somewhere else
   //bid.removed = "" //needs to be the id of createBidRemoved in same handler
@@ -79,7 +79,7 @@ export function getLatestBidId(
 ): string {
   //get Global ID to compare with other entities in the same Event type
   //Load cToken which contains recent bidId
-  let cToken = getOrCreateCToken(getGlobalId(event));
+  let cToken = getOrCreateCToken(event);
 
   //Get latest BidID from Punk entity
   let latestId = punk.currentBid;

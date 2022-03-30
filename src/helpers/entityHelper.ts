@@ -9,7 +9,7 @@ import {
   Sale,
 } from "../../generated/schema";
 import { TOKEN_URI, CONTRACT_URI, IMAGE_URI } from "../constant";
-import { getGlobalId } from "../utills";
+import { getGlobalId } from "../utils";
 
 export function getOrCreateAccount(address: Address): Account {
   let id = address.toHexString();
@@ -94,10 +94,15 @@ export function getOrCreateSale(
   return sale as Sale;
 }
 
-export function getOrCreateCToken(globalId: string): CToken {
-  let cToken = CToken.load(globalId);
+export function getOrCreateCToken(event: ethereum.Event): CToken {
+  let cToken = CToken.load(getGlobalId(event));
   if (!cToken) {
-    cToken = new CToken(globalId);
+    cToken = new CToken(getGlobalId(event));
+    cToken.owners = new Array<string>();
+    cToken.blockNumber = event.block.number;
+    cToken.blockHash = event.block.hash;
+    cToken.txHash = event.transaction.hash;
+    cToken.timestamp = event.block.timestamp;
     cToken.save();
   }
   return cToken as CToken;

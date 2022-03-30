@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { AskRemoved, AskCreated } from "../../generated/schema";
-import { getGlobalId } from "../utills";
+import { getGlobalId } from "../utils";
 
 export function createAskCreated(
   punkIndex: BigInt,
