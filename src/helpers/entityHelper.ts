@@ -4,7 +4,6 @@ import {
   Assign,
   Punk,
   MetaData,
-  Transfer,
   CToken,
   Sale,
 } from "../../generated/schema";
@@ -69,9 +68,8 @@ export function createMetadata(punkId: BigInt): MetaData {
 }
 
 export function getOrCreateSale(
-  toAddress: Address,
   fromAddress: Address,
-  punk: BigInt,
+  punk: string,
   event: ethereum.Event
 ): Sale {
   let sale = Sale.load(getGlobalId(event).concat("-SALE"));
@@ -85,8 +83,8 @@ export function getOrCreateSale(
     sale.blockHash = event.block.hash;
     sale.type = "SALE";
   }
-
-  sale.to = toAddress.toHexString();
+  //Find out where to properly update this fields
+  //sale.to = toAddress.toHexString();
   sale.from = fromAddress.toHexString();
   sale.nft = punk.toString();
 
@@ -99,6 +97,7 @@ export function getOrCreateCToken(event: ethereum.Event): CToken {
   if (!cToken) {
     cToken = new CToken(getGlobalId(event));
     cToken.owners = new Array<string>();
+    cToken.transfers = new Array<string>();
     cToken.blockNumber = event.block.number;
     cToken.blockHash = event.block.hash;
     cToken.txHash = event.transaction.hash;

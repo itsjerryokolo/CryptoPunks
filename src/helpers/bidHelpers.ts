@@ -1,11 +1,5 @@
 import { BigInt, ethereum } from "@graphprotocol/graph-ts";
-import {
-  BidCreated,
-  BidRemoved,
-  CToken,
-  Bid,
-  Punk,
-} from "../../generated/schema";
+import { BidCreated, BidRemoved, Bid, Punk } from "../../generated/schema";
 import { getGlobalId } from "../utils";
 import { getOrCreateCToken } from "./entityHelper";
 
@@ -14,10 +8,11 @@ export function getOrCreateBid(
   event: ethereum.Event
 ): Bid {
   let bidId = getGlobalId(event).concat("-BID"); // -BID, To prevent conflict with interfaces with same ID
-  let bid = Bid.load(bidId);
+  let bid = Bid.load(bidId); //Should not be null
   if (!bid) {
     bid = new Bid(bidId);
     bid.from = fromAddress;
+    bid.offerType = "BID";
     bid.open = true;
     bid.save(); //We have a new Bid entity in the store incase we need the ID elsewhere
   }
@@ -27,10 +22,21 @@ export function getOrCreateBid(
   //amount: BigInt! - needs to be updated from somewhere else
   //bid.removed = "" //needs to be the id of createBidRemoved in same handler
 
-  bid.offerType = "BID";
   bid.save();
 
   return bid as Bid;
+}
+
+export function updateOldBid(
+  lastestBidId: string //call getLatestBidFromPunk() / getLatestBidFromCToken() depending on handler
+): Bid {
+  //Update Old Bid or State of Bid
+  let toUpdateLatestBidId = lastestBidId;
+  let oldBid = Bid.load(toUpdateLatestBidId)!;
+  oldBid.open = false;
+  oldBid.save();
+
+  return oldBid as Bid;
 }
 
 export function createBidCreated(
@@ -73,32 +79,25 @@ export function createBidRemoved(
   return bidRemoved as BidRemoved;
 }
 
-export function getLatestBidId(
-  punk: Punk | null,
-  event: ethereum.Event
-): string {
-  //get Global ID to compare with other entities in the same Event type
+export function getLatestBidfromPunk(punk: Punk): string {
+  //Get latest BidID from Punk
+  let latestId = punk.currentBid;
+  if (latestId === null) {
+    let id = punk.id;
+    return id;
+  } else {
+    return latestId;
+  }
+}
+
+export function getLatestBidFromCToken(event: ethereum.Event): string {
   //Load cToken which contains recent bidId
   let cToken = getOrCreateCToken(event);
+  let acceptedBids = cToken.transfers;
 
-  //Get latest BidID from Punk entity
-  let latestId = punk.currentBid;
-
-  //If Punk not found as argument(null), get ID of acceptedBids from cToken entity
-  if (latestId === null) {
-    let acceptedBids = cToken.transfers;
-
-    //ensure that there is at least one acceptedBid
-    if (acceptedBids === null) {
-      acceptedBids = [];
-    }
-    if (acceptedBids !== null) {
-      let lastestBidId = acceptedBids[acceptedBids.length - 1];
-      return lastestBidId as string;
-    }
+  if (acceptedBids === null) {
+    acceptedBids = [];
   }
-  //Punk exist as argument so we can get the current bid from $lastestId
-  if (latestId !== null) {
-    return latestId as string;
-  }
+  let latestBidId = acceptedBids[acceptedBids.length - 1];
+  return latestBidId as string;
 }

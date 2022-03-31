@@ -1,18 +1,12 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { AskRemoved, AskCreated } from "../../generated/schema";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { AskRemoved, AskCreated, Ask, Punk } from "../../generated/schema";
 import { getGlobalId } from "../utils";
 
 export function createAskCreated(
   punkIndex: BigInt,
   event: ethereum.Event
 ): AskCreated {
-  let askCreatedId = event.transaction.hash
-    .toHexString()
-    .concat("-")
-    .concat(event.logIndex.toString())
-    .concat("-ASK_CREATED");
-
-  let askCreated = new AskCreated(askCreatedId);
+  let askCreated = new AskCreated(getGlobalId(event).concat("-ASK_CREATED"));
 
   askCreated.type = "ASK_CREATED";
   askCreated.nft = punkIndex.toString();
@@ -42,4 +36,36 @@ export function createAskRemoved(
   askRemoved.save();
 
   return askRemoved as AskRemoved;
+}
+
+export function getLatestAskId(punk: Punk): string {
+  //Get latest AskID from Punk entity
+  let latestId = punk.currentAsk; // There is always a punk after AssignEvent
+  if (latestId !== null) {
+    return latestId as string;
+  }
+}
+
+export function getOrCreateAsk(
+  fromAddress: string,
+  event: ethereum.Event
+): Ask {
+  let askId = getGlobalId(event).concat("-ASK"); // -ASK, To prevent conflict with interfaces with same ID
+  let ask = Ask.load(askId);
+  if (!ask) {
+    ask = new Ask(askId);
+    ask.from = fromAddress;
+    ask.open = true;
+    ask.save(); //We have a new Ask entity in the store incase we need the ID elsewhere
+  }
+
+  //ask.created = "" // non-nullable, needs to be the id of createBidCreated in same handler
+  //nft - needs to be updated from somewhere else
+  //amount: BigInt! - needs to be updated from somewhere else
+  //ask.removed = "" //needs to be the id of createBidRemoved in same handler
+
+  ask.offerType = "ASK";
+  ask.save();
+
+  return ask as Ask;
 }
