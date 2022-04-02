@@ -96,8 +96,6 @@ export function getOrCreateCToken(event: ethereum.Event): CToken {
   let cToken = CToken.load(getGlobalId(event));
   if (!cToken) {
     cToken = new CToken(getGlobalId(event));
-    cToken.owners = new Array<string>();
-    cToken.transfers = new Array<string>();
     cToken.blockNumber = event.block.number;
     cToken.blockHash = event.block.hash;
     cToken.txHash = event.transaction.hash;

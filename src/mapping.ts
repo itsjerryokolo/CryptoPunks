@@ -1,10 +1,4 @@
-import {
-  BigInt,
-  Address,
-  Bytes,
-  log,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Address, log } from "@graphprotocol/graph-ts";
 import {
   Assign as Assigned,
   PunkTransfer,
@@ -155,22 +149,16 @@ export function handleTransfer(event: cTokenTransfer): void {
     //Update fields
     cToken.from = event.params.from.toHexString();
     cToken.to = event.params.to.toHexString();
+    cToken.owner = event.params.to.toHexString();
     cToken.amount = event.params.value;
+    cToken.bidId = transfer.id;
 
-    //Load list of owners and use length to update new owner of Punk
-    let array = cToken.owners;
-    if (array !== null) {
-      //Although array can't be null because we initialized it in getOrCreateCToken
-      for (let i = 0; i < array.length; i++) {
-        array.push(event.params.to.toHexString());
-        cToken.owners = array;
+    transfer.to = event.params.to.toHexString();
 
-        cToken.save();
-        transfer.save();
-        toAccount.save();
-        fromAccount.save();
-      }
-    }
+    cToken.save();
+    transfer.save();
+    toAccount.save();
+    fromAccount.save();
   }
 }
 export function handlePunkTransfer(event: PunkTransfer): void {
@@ -248,43 +236,22 @@ export function handlePunkOffered(event: PunkOffered): void {
     event.transaction.hash.toHexString(),
   ]);
 
-  let id = event.transaction.hash
-    .toHexString()
-    .concat("-")
-    .concat(event.logIndex.toString())
-    .concat("-")
-    .concat("ASK");
-
-  let askCreated = createAskCreated(event.params.punkIndex, event);
-
   let punk = Punk.load(event.params.punkIndex.toString())!;
-  let currentAsk = punk.currentAsk;
 
-  if (currentAsk !== null) {
-    let oldAsk = Ask.load(currentAsk);
-    if (!oldAsk) {
-      oldAsk = new Ask(currentAsk);
-    }
-    oldAsk.open = false;
-    oldAsk.removed = askCreated.id;
-    oldAsk.save();
-  }
-
-  let ask = new Ask(id);
-
+  let ask = getOrCreateAsk(punk.owner, event);
+  let askCreated = createAskCreated(event.params.punkIndex, event);
   askCreated.from = punk.owner;
   askCreated.amount = event.params.minValue;
+
+  punk.currentAsk = ask.id;
+  punk.save();
 
   ask.from = punk.owner;
   ask.amount = event.params.minValue;
   ask.created = askCreated.id;
-  ask.open = true;
-  ask.nft = punk.id;
-  ask.offerType = "ASK";
 
   ask.save();
   askCreated.save();
-  punk.save();
 }
 /**
  * first step: Create BidEvent //Record the event
@@ -303,7 +270,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   let account = getOrCreateAccount(event.params.fromAddress);
 
   let bid = getOrCreateBid(event.params.fromAddress.toHexString(), event);
-
+  //Update bid fields
   bid.amount = event.params.value;
   bid.nft = punk.id;
   bid.created = bidCreated.id;
@@ -332,8 +299,6 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   let bid = getOrCreateBid(event.params.fromAddress.toHexString(), event);
 
   bid.removed = bidRemoved.id;
-  bid.open = false;
-
   bidRemoved.amount = event.params.value;
 
   punk.save();
@@ -384,7 +349,7 @@ export function handlePunkBought(event: PunkBought): void {
     let bid = getOrCreateBid(event.params.fromAddress.toHexString(), event);
 
     //Update Old bid to close it
-    let oldBid = updateOldBid(getLatestBidFromCToken(event));
+    let oldBid = updateOldBid(getLatestBidFromCToken(event), fromAccount.id);
 
     //Update Old bid fields with new state
     oldBid.removed = bidRemoved.id;
@@ -453,7 +418,10 @@ export function handlePunkBought(event: PunkBought): void {
     bid.nft = punk.id;
 
     //Update Old bid to close it
-    let oldBid = updateOldBid(getLatestBidfromPunk(punk));
+    let oldBid = updateOldBid(
+      getLatestBidfromPunk(event.params.punkIndex),
+      fromAccount.id
+    );
     //Update Old bid fields with new state
     oldBid.removed = bidRemoved.id;
     oldBid.nft = punk.id;

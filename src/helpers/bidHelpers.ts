@@ -1,5 +1,11 @@
 import { BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { BidCreated, BidRemoved, Bid, Punk } from "../../generated/schema";
+import {
+  BidCreated,
+  BidRemoved,
+  Bid,
+  Punk,
+  CToken,
+} from "../../generated/schema";
 import { getGlobalId } from "../utils";
 import { getOrCreateCToken } from "./entityHelper";
 
@@ -28,11 +34,18 @@ export function getOrCreateBid(
 }
 
 export function updateOldBid(
+  fromAddress: string,
   lastestBidId: string //call getLatestBidFromPunk() / getLatestBidFromCToken() depending on handler
 ): Bid {
   //Update Old Bid or State of Bid
   let toUpdateLatestBidId = lastestBidId;
-  let oldBid = Bid.load(toUpdateLatestBidId)!;
+  let oldBid = Bid.load(toUpdateLatestBidId);
+  if (!oldBid) {
+    oldBid = new Bid(toUpdateLatestBidId);
+    oldBid.from = fromAddress;
+    oldBid.offerType = "BID";
+    oldBid.open = true;
+  }
   oldBid.open = false;
   oldBid.save();
 
@@ -79,25 +92,25 @@ export function createBidRemoved(
   return bidRemoved as BidRemoved;
 }
 
-export function getLatestBidfromPunk(punk: Punk): string {
+export function getLatestBidfromPunk(punkIndex: BigInt): string {
   //Get latest BidID from Punk
-  let latestId = punk.currentBid;
-  if (latestId === null) {
-    let id = punk.id;
-    return id;
-  } else {
-    return latestId;
-  }
+  let id = Punk.load(punkIndex.toString())!;
+  return id.currentBid as string;
 }
 
 export function getLatestBidFromCToken(event: ethereum.Event): string {
   //Load cToken which contains recent bidId
-  let cToken = getOrCreateCToken(event);
-  let acceptedBids = cToken.transfers;
 
-  if (acceptedBids === null) {
-    acceptedBids = [];
-  }
-  let latestBidId = acceptedBids[acceptedBids.length - 1];
-  return latestBidId as string;
+  let cTokenLogIndex = event.logIndex.minus(BigInt.fromI32(1));
+
+  let cToken = CToken.load(
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(cTokenLogIndex.toString())
+  )!;
+
+  let acceptedBidId = cToken.bidId;
+
+  return acceptedBidId as string;
 }

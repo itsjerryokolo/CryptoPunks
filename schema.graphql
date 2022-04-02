@@ -263,13 +263,14 @@ type Transfer implements Event @entity(immutable: true) {
   type: EventType!
 }
 
-type CToken @entity {
+type CToken
+  @entity { #TransferEvent
   id: ID!
-  from: Account
-  to: Account
-  owners: [String!]
+  from: Account!
+  to: Account!
+  owner: String!
   amount: BigInt
-  transfers: [String!]
+  bidId: String!
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!

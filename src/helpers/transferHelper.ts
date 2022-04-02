@@ -37,6 +37,8 @@ export function getOrCreateCTokenTransfer(event: ethereum.Event): Transfer {
     transfer.blockNumber = event.block.number;
     transfer.txHash = event.transaction.hash;
     transfer.blockHash = event.block.hash;
+    transfer.type = "TRANSFER";
+
     transfer.save();
   }
   return transfer as Transfer;

@@ -1,6 +1,5 @@
-import { ethereum } from "@graphprotocol/graph-ts";
-import { getOrCreateCToken } from "./helpers/entityHelper";
-import { getOrCreateCTokenTransfer } from "./helpers/transferHelper";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { CToken } from "../generated/schema";
 
 export function getGlobalId(event: ethereum.Event): string {
   let globalId = event.transaction.hash
@@ -12,17 +11,15 @@ export function getGlobalId(event: ethereum.Event): string {
 
 export function getLatestOwnerFromCToken(event: ethereum.Event): string {
   //Load entities, if they have the same globalID, it will return the the correct event
-  let transfer = getOrCreateCTokenTransfer(event);
-  let cToken = getOrCreateCToken(event);
+  let cTokenLogIndex = event.logIndex.minus(BigInt.fromI32(1));
 
-  let owners = cToken.owners;
-  if (!owners) {
-    owners = new Array<string>();
-    owners.push(owners[owners.length - 1]);
-    cToken.owners = owners; //Push new owner from Transfer entity since CTokenTransfer has the correct owner
-  }
-  let id = owners[owners.length - 1];
-  cToken.save();
+  let cToken = CToken.load(
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(cTokenLogIndex.toString())
+  )!;
+  let owner = cToken.owner;
 
-  return id;
+  return owner;
 }
