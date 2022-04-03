@@ -56,6 +56,7 @@ export function getOrCreateAsk(
     ask = new Ask(askId);
     ask.from = fromAddress;
     ask.open = true;
+    ask.offerType = "ASK";
     ask.save(); //We have a new Ask entity in the store incase we need the ID elsewhere
   }
 
@@ -64,7 +65,6 @@ export function getOrCreateAsk(
   //amount: BigInt! - needs to be updated from somewhere else
   //ask.removed = "" //needs to be the id of createBidRemoved in same handler
 
-  ask.offerType = "ASK";
   ask.save();
 
   return ask as Ask;

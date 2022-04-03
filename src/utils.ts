@@ -10,7 +10,6 @@ export function getGlobalId(event: ethereum.Event): string {
 }
 
 export function getLatestOwnerFromCToken(event: ethereum.Event): string {
-  //Load entities, if they have the same globalID, it will return the the correct event
   let cTokenLogIndex = event.logIndex.minus(BigInt.fromI32(1));
 
   let cToken = CToken.load(
