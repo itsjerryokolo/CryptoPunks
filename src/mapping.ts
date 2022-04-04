@@ -229,6 +229,7 @@ export function handlePunkOffered(event: PunkOffered): void {
   let ask = getOrCreateAsk(punk.owner, event);
   //Update Ask fields
   ask.from = punk.owner;
+  ask.nft = punk.id;
   ask.amount = event.params.minValue;
   ask.created = askCreated.id;
 
@@ -261,7 +262,10 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bid.nft = punk.id;
   bid.created = bidCreated.id;
 
+  //Create relationship with Bid
+  bidCreated.bid = bid.id;
   bidCreated.amount = event.params.value;
+
   punk.currentBid = bid.id; //Update the currentBid for the punk in Punk entity for future reference
 
   bid.save();
@@ -295,6 +299,9 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   bid.open = false;
   bid.nft = punk.id;
   bid.removed = bidRemoved.id;
+
+  //Create relationship with Bid
+  bidRemoved.bid = bid.id;
 
   punk.save();
   bid.save();
@@ -347,6 +354,11 @@ export function handlePunkBought(event: PunkBought): void {
     oldBid.removed = bidRemoved.id;
     oldBid.open = false;
     oldBid.nft = punk.id;
+
+    //Create relationship with OldBid
+    //Create relationship with Ask
+    bidRemoved.bid = oldBid.id;
+    askRemoved.ask = ask.id;
 
     //Update Sale status of Punk
     let sale = getOrCreateSale(
@@ -430,6 +442,11 @@ export function handlePunkBought(event: PunkBought): void {
     //Update Punk entity
     punk.purchasedBy = toAccount.id;
     punk.owner = toAccount.id;
+
+    //Create relationship with Bid
+    //Create relationship with Ask
+    bidRemoved.bid = bid.id;
+    askRemoved.ask = ask.id;
 
     //Update trade values
     contract.totalAmountTraded = contract.totalAmountTraded.plus(

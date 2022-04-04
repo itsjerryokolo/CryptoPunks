@@ -61,9 +61,9 @@ export function getOrCreateAsk(
   }
 
   //ask.created = "" // non-nullable, needs to be the id of createBidCreated in same handler
-  //nft - needs to be updated from somewhere else
-  //amount: BigInt! - needs to be updated from somewhere else
   //ask.removed = "" //needs to be the id of createBidRemoved in same handler
+  //nft - update from same handler
+  //amount: BigInt! - amount can be 0 if owner offers to Address & not zero Address
 
   ask.save();
 
