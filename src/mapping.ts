@@ -133,11 +133,6 @@ export function handleTransfer(event: cTokenTransfer): void {
     // so we can track owners in CToken
     let cToken = getOrCreateCToken(event);
 
-    // We do not need to increment toAccount again in PunkBought event
-    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BigInt.fromI32(1)
-    );
-
     //Update fields
     cToken.from = event.params.from.toHexString();
     cToken.to = event.params.to.toHexString();
@@ -374,8 +369,14 @@ export function handlePunkBought(event: PunkBought): void {
     contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
 
     //Update account
-    //We do not need to increment the fromAccount again in the cTokenTransfer event
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
+    //We get the true owner from CTokenTRANSFER event and decrement their holdings
+    let toAccount = getOrCreateAccount(
+      Address.fromString(getLatestOwnerFromCToken(event))
+    );
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BigInt.fromI32(1)
     );
 
@@ -386,6 +387,7 @@ export function handlePunkBought(event: PunkBought): void {
     ask.save();
     oldBid.save();
     sale.save();
+    toAccount.save();
     fromAccount.save();
   } else {
     log.debug("handlePunkBought", []);
