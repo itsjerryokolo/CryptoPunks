@@ -88,6 +88,8 @@ type Punk implements NFT @entity {
   events: [Event!]! @derivedFrom(field: "nft")
   currentAsk: Ask
   currentBid: Bid
+  currentAskCreated: AskCreated
+  currentBidCreated: AskRemoved
 }
 
 type MetaData @entity(immutable: true) {
