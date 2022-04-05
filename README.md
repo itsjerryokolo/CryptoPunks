@@ -3,66 +3,55 @@
 The CryptoPunks are 10,000 uniquely generated characters.
 No two are exactly alike, and each one of them can be officially owned by a single person on the Ethereum blockchain.
 
-Test
-
-## Query account
+## Query Owner Data
 
 ```graphql
 {
-  accounts(where: { id: "0x94de7e2c73529ebf3206aa3459e699fbcdfcd49b" }) {
+  accounts(where: {id: "0x6aeda057364cc4aad943cac04a1c149d90e10a3b"}) {
     id
     nftsOwned {
       id
     }
-    wrappedPunksOwned {
+    bids{
       id
     }
-    bought {
+    asks{
       id
-      timestamp
-      txHash
-    }
-    assigned {
-      id
-      timestamp
-      txHash
-    }
-    received {
-      id
-      timestamp
-      txHash
-    }
-    bids {
-      id
-      offerType
-      created {
+      created{
         id
-        amount
-        type
-        timestamp
         txHash
-      }
-      removed {
-        id
-        type
         timestamp
-        txHash
       }
     }
-    asks {
+    bought{
       id
+      timestamp
+      nft{
+        id
+      }
     }
-  }
-}
-```
-
-## Query Punk data
-
-```graphql
-{
-  punks(where: { tokenid: "1000" }) {
-    id
-    accessories
+    sent{
+      id
+      nft{
+        id
+      }
+      txHash
+      timestamp
+    }
+    received{
+      id
+      nft{
+        id
+      }
+      txHash
+      timestamp
+    }
+    assigned{
+      id
+      nft{id}
+      timestamp
+      txHash
+    }
   }
 }
 ```
@@ -104,7 +93,7 @@ ETHEREUM_RPC=mainnet:https://eth-mainnet.alchemyapi.io/v2/${YOUR_API_KEY} docker
 - Mint/Wrap
   - In handlePunkTransfer (to = WrappedPunkAddress):
     - decrement from
-  - In handleWrappedPunkTransfer (from = ZeroAddress):
+    - In handleWrappedPunkTransfer (from = ZeroAddress):
     - increment to
     - set owner
     - create Wrap event
