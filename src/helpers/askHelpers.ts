@@ -40,10 +40,10 @@ export function createAskRemoved(
 
 export function updateOldAsk(
   fromAddress: string,
-  latestBidIdFromReferenceId: string //getIdforReferenceFromCToken()
+  latestAskIdFromReferenceId: string //getIdforReferenceFromCToken()
 ): Ask {
-  //Update Old Bid or State of Bid
-  let oldAskId = latestBidIdFromReferenceId;
+  //Update Old Ask or State of Ask
+  let oldAskId = latestAskIdFromReferenceId;
   let oldAsk = Ask.load(oldAskId.concat("-ASK"));
   if (!oldAsk) {
     oldAsk = new Ask(oldAskId.concat("-ASK"));
