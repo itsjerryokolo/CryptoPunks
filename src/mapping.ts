@@ -30,7 +30,7 @@ import {
 
 import { getOrCreateTransfer } from "./helpers/transferHelper";
 
-import { getOwnerFromCToken, getOwnerFromCToken } from "./utils";
+import { getOwnerFromCToken } from "./utils";
 
 import {
   getOrCreateCryptoPunkContract,
@@ -113,6 +113,7 @@ export function handleAssign(event: Assigned): void {
 
   contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
 
+  //Write
   account.save();
   assign.save();
   contract.save();
@@ -130,7 +131,7 @@ export function handleTransfer(event: cTokenTransfer): void {
     //The event {Transfer, PunkBought} will receive its correct logIndex if they are in same transaction (txHash)
 
     //Create a CToken entity to store the cTokenTransferIds
-    // so we can compare/reference them against other events with their globalID(logIndex -1) //acceptBidForPunk()
+    // so we can compare/reference them against other events with their globalID(logIndex -1) //acceptBidForPunk() //acceptAskForPunk()
     // so we can track owners in CToken
     let cToken = getOrCreateCToken(event);
 
@@ -139,7 +140,6 @@ export function handleTransfer(event: cTokenTransfer): void {
     cToken.to = event.params.to.toHexString();
     cToken.owner = event.params.to.toHexString();
     cToken.amount = event.params.value;
-    cToken.bidId = cToken.id;
 
     cToken.save();
     toAccount.save();
@@ -236,17 +236,19 @@ export function handlePunkOffered(event: PunkOffered): void {
 
   punk.currentAsk = ask.id; //Update the currentAsk for the punk in Punk entity for future reference
 
+  //Write
   ask.save();
   punk.save();
   askCreated.save();
 }
 
 export function handlePunkBidEntered(event: PunkBidEntered): void {
-  /**
-   * first step: Create BidEvent //Record the event
-   * second step: Create the bid //The product of the event
-   *
-   */
+  // This event first only fires when a bid is created
+
+  //Actions:
+  //createBidCreatedEVENT
+  //create Bid - The higher level product of the event
+  //create relationship between Bid and BidCreated
   log.debug("handlePunkBidCreatedEntered", []);
 
   let bidCreated = createBidCreated(
@@ -269,16 +271,20 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 
   punk.currentBid = bid.id; //Update the currentBid for the punk in Punk entity for future reference
 
+  //Write
   bid.save();
   punk.save();
   account.save();
   bidCreated.save();
 }
-/**
- * first step: Create WithdrawnEvent
- * second step: Record Bid as closed
- */
+
 export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
+  // This event first only fires when a bid is removed
+
+  //Actions:
+  //createBidRemovedEVENT
+  //create Bid or Load it, and close the BID - The higher level product of the event
+  //create relationship between Bid and BidRemoved
   log.debug("handlePunkBidCreatedWithdrawn", []);
 
   let fromAccount = getOrCreateAccount(event.params.fromAddress);
@@ -299,11 +305,14 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   bid.amount = event.params.value;
   bid.open = false;
   bid.nft = punk.id;
+
+  //Create relationship with BidRemoved
   bid.removed = bidRemoved.id;
 
   //Create relationship with Bid
   bidRemoved.bid = bid.id;
 
+  //Write
   punk.save();
   bid.save();
   fromAccount.save();
@@ -311,28 +320,51 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 }
 //CHECK IF AN ASK NEED TO BE CREATED BEFORE A BID CAN BE CREATED OR ACCEPTED - acceptBidForPunk()
 
-//In PunkNoLonger for sale, if it fires alone, it means the owner withdrew their ask without selling it
-//TransferEVENT, PunkNoLongerForSaleEVENT, PunkBoughtEVENT - means the ask was accepted and the sale went through
-//Ask - Close
-//createSaleEvent
-//createAskRemoved
+export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
+  log.debug("handlePunkNoLongerForSale", []);
+  //This event fires when the owner removes their ask
+  //Also fires when the owner's Ask is accepted which removes their ask and creates a SaleEvent
+  //SaleEvent is a regular punkBought which we already captured in handlePunkBought
 
-/*
-  step one: Create a SaleEvent
-  step two: We need to close bid when bid accepted, PunkBought
-*/
+  //Actions - createAskRemovedEVENT
+  //            - close Old Ask
+
+  let punk = Punk.load(event.params.punkIndex.toString())!;
+  let askRemoved = createAskRemoved(event.params.punkIndex, event);
+
+  //Create or load old Ask of Punk and Close it
+  //get previous owner from CToken since this event doesn't emit the owner or any Address
+  let oldAsk = updateOldAsk(
+    getOwnerFromCToken(event), //Summon the address of the owner from cToken entity. The previous owner is the new owner of the cToken
+    getIdforReferenceFromCToken(event) //This makes sure both the PunkNoLongerForSale event and cTokenTransfer are in the same transaction
+  );
+
+  //Update OldAsk fields
+  oldAsk.open = false;
+  oldAsk.nft = punk.id;
+  //Create relationship with AskRemoved
+  oldAsk.removed = askRemoved.id;
+
+  //Create relationship with OldAsk
+  askRemoved.ask = oldAsk.id;
+
+  //Write
+  punk.save();
+  oldAsk.save();
+  askRemoved.save();
+}
+
 export function handlePunkBought(event: PunkBought): void {
   //Catch acceptBidForPunk()
   if (event.params.toAddress.toHexString() == ZERO_ADDRESS) {
     //BidAccepted - We only close the oldBid when it is ACCEPTED
-    //Actions - createBidRemovedEvent
-    //            - close Old Bid
-    //PunkBought - createSaleEvent
+    //Actions:
+    //  - createBidRemovedEvent
+    //  - close Old Bid
+    //  - createSaleEvent
+
     //cToken Transfer_EVENT fires then PunkBought_EVENT (2 Events)
     //e.g https://etherscan.io/tx/0x23d6e24628dabf4fa92fa93630e5fa6f679fac75071aab38d7e307a3c0f4a3ca#eventlog
-
-    //Regular PunkBought
-    //https://etherscan.io/tx/0x0004ba250b29b0e2cda2e882c8bf5a14e7d2133e63bf0334fb1f44c716ccb187#eventlog
 
     let punk = Punk.load(event.params.punkIndex.toString())!;
     let contract = getOrCreateCryptoPunkContract(event.address);
@@ -345,7 +377,7 @@ export function handlePunkBought(event: PunkBought): void {
       event
     );
 
-    //Update Old bid from cTokenTRANSFER to close it
+    //Update OldBid from cToken to close it
     let oldBid = updateOldBid(
       fromAccount.id,
       getIdforReferenceFromCToken(event)
@@ -359,7 +391,7 @@ export function handlePunkBought(event: PunkBought): void {
     //Create relationship with OldBid
     bidRemoved.bid = oldBid.id;
 
-    //Update Sale status of Punk
+    //Create new SaleEvent
     let sale = getOrCreateSale(
       event.params.fromAddress,
       event.params.punkIndex.toString(),
@@ -383,7 +415,7 @@ export function handlePunkBought(event: PunkBought): void {
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BigInt.fromI32(1)
     );
-    //We get the true owner from CTokenTRANSFER event and decrement their holdings
+    //We get the true owner from CToken and increment their holdings
     let toAccount = getOrCreateAccount(
       Address.fromString(getOwnerFromCToken(event))
     );
@@ -400,7 +432,11 @@ export function handlePunkBought(event: PunkBought): void {
     fromAccount.save();
   } else {
     log.debug("handlePunkBought", []);
-    //Regular PunkBought
+
+    //Regular PunkBought - This also implicitly captures accepted Ask for Punk() which is updated in PunkNoLongerForSale (Close Ask)
+    //https://etherscan.io/tx/0x0004ba250b29b0e2cda2e882c8bf5a14e7d2133e63bf0334fb1f44c716ccb187#eventlog
+    //Actions:
+    //  - createSaleEvent
 
     let punk = Punk.load(event.params.punkIndex.toString())!;
     let contract = getOrCreateCryptoPunkContract(event.address);
@@ -424,6 +460,7 @@ export function handlePunkBought(event: PunkBought): void {
     contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
 
     // Note: buyPunk() does not emit a PunkTransfer event, so we need to keep track
+    //Update account punk holdings
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BigInt.fromI32(1)
     );
@@ -431,45 +468,13 @@ export function handlePunkBought(event: PunkBought): void {
       BigInt.fromI32(1)
     );
 
+    //Write
     punk.save();
     fromAccount.save();
     toAccount.save();
     contract.save();
     sale.save();
   }
-}
-
-export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
-  log.debug("handlePunkNoLongerForSale", []);
-
-  //This event fires when the owner removes their ask
-  //Also fires when the owner's Ask is accepted which removes their ask and creates a SaleEvent
-  //SaleEvent is a regular punkBought which we already captured in handlePunkBought
-
-  //Actions - createAskRemovedEvent
-  //            - close Old Ask
-
-  let punk = Punk.load(event.params.punkIndex.toString())!;
-  let askRemoved = createAskRemoved(event.params.punkIndex, event);
-
-  //Create or load Ask of Punk and Close it
-  //get previous owner from CToken and update Ask since this event doesn't emit the owner or any Address
-  let oldAsk = updateOldAsk(
-    getOwnerFromCToken(event), //Summon the address of the owner from cToken entity. The previous owner is the new owner of the cToken
-    getIdforReferenceFromCToken(event) //This makes sure both the PunkNoLongerForSale event and cTokenTransfer are in the same transaction
-  );
-
-  //Update OldAsk fields
-  oldAsk.removed = askRemoved.id;
-  oldAsk.open = false;
-  oldAsk.nft = punk.id;
-
-  //Create relationship with OldAsk
-  askRemoved.ask = oldAsk.id;
-
-  punk.save();
-  oldAsk.save();
-  askRemoved.save();
 }
 
 // This function is called for three events: Mint (Wrap), Burn (Unwrap) and Transfer

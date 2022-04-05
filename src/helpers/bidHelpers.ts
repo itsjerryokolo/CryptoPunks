@@ -103,7 +103,7 @@ export function getIdforReferenceFromCToken(event: ethereum.Event): string {
   )!;
 
   //Summon the cToken bidID
-  let referenceId = cToken.bidId;
+  let referenceId = cToken.referenceId;
 
   //returns the ID of the bid so we can update the bid with values not in that cTokenTransfer event, but in the (PunkBought) event
   return referenceId as string;
