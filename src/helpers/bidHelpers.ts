@@ -23,8 +23,6 @@ export function getOrCreateBid(
   //bid.removed = "" //needs to be the id of createBidRemoved in same handler ***DONE
   //bid.open = false;
 
-  bid.save();
-
   return bid as Bid;
 }
 
@@ -41,8 +39,8 @@ export function updateOldBid(
     oldBid.from = fromAddress;
     oldBid.offerType = "BID";
     oldBid.open = true;
+    oldBid.save();
   }
-  oldBid.save();
 
   return oldBid as Bid;
 }

@@ -60,12 +60,10 @@ export function getOrCreateAsk(
     ask.save(); //We have a new Ask entity in the store incase we need the ID elsewhere
   }
 
-  //ask.created = "" // non-nullable, needs to be the id of createBidCreated in same handler
-  //ask.removed = "" //needs to be the id of createBidRemoved in same handler
+  //ask.created = "" // non-nullable, needs to be the id of createAskCreated in same handler
+  //ask.removed = "" //needs to be the id of createAskRemoved in same handler
   //nft - update from same handler
   //amount: BigInt! - amount can be 0 if owner offers to Address & not zero Address
-
-  ask.save();
 
   return ask as Ask;
 }

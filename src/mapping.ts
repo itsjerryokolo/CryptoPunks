@@ -479,12 +479,13 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
 
   let askRemoved = createAskRemoved(event.params.punkIndex, event);
   let punk = Punk.load(event.params.punkIndex.toString())!;
-  let ask = getOrCreateAsk(event.transaction.from.toHexString(), event);
+  let ask = getOrCreateAsk(punk.owner, event);
   //Update Ask fields
   ask.removed = askRemoved.id;
   ask.open = false;
   ask.nft = punk.id;
-  ask.offerType = "ASK";
+
+  askRemoved.ask = ask.id;
 
   punk.save();
   askRemoved.save();
