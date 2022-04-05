@@ -30,7 +30,7 @@ import {
 
 import { getOrCreateTransfer } from "./helpers/transferHelper";
 
-import { getCurrentOwnerFromCToken, getPreviousOwnerFromCToken } from "./utils";
+import { getOwnerFromCToken, getOwnerFromCToken } from "./utils";
 
 import {
   getOrCreateCryptoPunkContract,
@@ -366,12 +366,12 @@ export function handlePunkBought(event: PunkBought): void {
       event
     );
     //Update Sale fields
-    sale.to = getCurrentOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
+    sale.to = getOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
     sale.amount = event.params.value;
 
     //Update Punk entity
-    punk.purchasedBy = getCurrentOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
-    punk.owner = getCurrentOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
+    punk.purchasedBy = getOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
+    punk.owner = getOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
 
     //Update tradeValues
     contract.totalAmountTraded = contract.totalAmountTraded.plus(
@@ -385,7 +385,7 @@ export function handlePunkBought(event: PunkBought): void {
     );
     //We get the true owner from CTokenTRANSFER event and decrement their holdings
     let toAccount = getOrCreateAccount(
-      Address.fromString(getCurrentOwnerFromCToken(event))
+      Address.fromString(getOwnerFromCToken(event))
     );
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BigInt.fromI32(1)
@@ -455,7 +455,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   //Create or load Ask of Punk and Close it
   //get previous owner from CToken and update Ask since this event doesn't emit the owner or any Address
   let oldAsk = updateOldAsk(
-    getPreviousOwnerFromCToken(event), //Summon the address of the previous owner from cToken entity
+    getOwnerFromCToken(event), //Summon the address of the owner from cToken entity. The previous owner is the new owner of the cToken
     getIdforReferenceFromCToken(event) //This makes sure both the PunkNoLongerForSale event and cTokenTransfer are in the same transaction
   );
 

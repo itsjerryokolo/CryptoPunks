@@ -9,30 +9,25 @@ export function getGlobalId(event: ethereum.Event): string {
   return globalId;
 }
 
-export function getCurrentOwnerFromCToken(event: ethereum.Event): string {
+export function getOwnerFromCToken(event: ethereum.Event): string {
   let cTokenLogIndex = event.logIndex.minus(BigInt.fromI32(1));
+  let id = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(cTokenLogIndex.toString());
 
-  let cToken = CToken.load(
-    event.transaction.hash
-      .toHexString()
-      .concat("-")
-      .concat(cTokenLogIndex.toString())
-  )!;
+  let cToken = CToken.load(id);
+  if (!cToken) {
+    cToken = new CToken(id);
+    cToken.blockNumber = event.block.number;
+    cToken.referenceId = cToken.id;
+    cToken.blockHash = event.block.hash;
+    cToken.txHash = event.transaction.hash;
+    cToken.timestamp = event.block.timestamp;
+    cToken.save();
+  }
+
   let owner = cToken.owner;
 
   return owner;
-}
-
-export function getPreviousOwnerFromCToken(event: ethereum.Event): string {
-  let cTokenLogIndex = event.logIndex.minus(BigInt.fromI32(1));
-
-  let cToken = CToken.load(
-    event.transaction.hash
-      .toHexString()
-      .concat("-")
-      .concat(cTokenLogIndex.toString())
-  )!;
-  let previousOwner = cToken.from;
-
-  return previousOwner;
 }

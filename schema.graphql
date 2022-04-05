@@ -270,7 +270,7 @@ type CToken
   to: Account!
   owner: String!
   amount: BigInt
-  bidId: String!
+  referenceId: String!
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
