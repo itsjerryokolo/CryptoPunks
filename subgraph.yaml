@@ -11,7 +11,7 @@ dataSources:
     source:
       address: "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB"
       abi: cryptopunks
-      startBlock: 3914493
+      startBlock: 3914490
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
