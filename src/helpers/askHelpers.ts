@@ -38,12 +38,22 @@ export function createAskRemoved(
   return askRemoved as AskRemoved;
 }
 
-export function getLatestAskId(punk: Punk): string {
-  //Get latest AskID from Punk entity
-  let latestId = punk.currentAsk; // There is always a punk after AssignEvent
-  if (latestId !== null) {
-    return latestId as string;
+export function updateOldAsk(
+  fromAddress: string,
+  latestBidIdFromReferenceId: string //getIdforReferenceFromCToken()
+): Ask {
+  //Update Old Bid or State of Bid
+  let oldAskId = latestBidIdFromReferenceId;
+  let oldAsk = Ask.load(oldAskId.concat("-ASK"));
+  if (!oldAsk) {
+    oldAsk = new Ask(oldAskId.concat("-ASK"));
+    oldAsk.from = fromAddress;
+    oldAsk.offerType = "ASK";
+    oldAsk.open = true;
+    oldAsk.save();
   }
+
+  return oldAsk as Ask;
 }
 
 export function getOrCreateAsk(
@@ -60,7 +70,7 @@ export function getOrCreateAsk(
     ask.save(); //We have a new Ask entity in the store incase we need the ID elsewhere
   }
 
-  //ask.created = "" // non-nullable, needs to be the id of createAskCreated in same handler
+  //ask.created = "" // nullable, needs to be the id of createAskCreated in same handler if it exists.
   //ask.removed = "" //needs to be the id of createAskRemoved in same handler
   //nft - update from same handler
   //amount: BigInt! - amount can be 0 if owner offers to Address & not zero Address

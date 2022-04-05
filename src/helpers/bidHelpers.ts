@@ -29,10 +29,10 @@ export function getOrCreateBid(
 //Update the state of the last Bid using helper function
 export function updateOldBid(
   fromAddress: string,
-  latestBidId: string //getLatestBidFromCToken()
+  latestBidIdFromReferenceId: string //getIdforReferenceFromCToken()
 ): Bid {
   //Update Old Bid or State of Bid
-  let oldBidId = latestBidId;
+  let oldBidId = latestBidIdFromReferenceId;
   let oldBid = Bid.load(oldBidId.concat("-BID"));
   if (!oldBid) {
     oldBid = new Bid(oldBidId.concat("-BID"));
@@ -87,10 +87,11 @@ export function createBidRemoved(
   return bidRemoved as BidRemoved;
 }
 
-export function getLatestBidFromCToken(event: ethereum.Event): string {
+export function getIdforReferenceFromCToken(event: ethereum.Event): string {
   //Load cToken which contains recent bidId
-  //The TransferEvent fires first, then the PunkBoughtEvent
-  //To load the cToken entity, which contains the bidID in cToken.bidID, into the PunkBought eventHandler, it will be the logIndex - 1
+  //The TransferEvent fires first, then the PunkBoughtEvent for BIDACCEPTED
+  //The TransferEvent fires first, PunkNoLongerForSale, then the PunkBoughtEvent for ASKACCEPTED
+  //To load the cToken entity, which contains the referenceID in referenceId, into the PunkBought/PunkNoLongerForSale eventHandler, it will be the logIndex - 1
   let cTokenLogIndex = event.logIndex.minus(BigInt.fromI32(1));
 
   //This ID will always be the eventID following the new event (PunkBought) in the same Transaction
@@ -102,8 +103,8 @@ export function getLatestBidFromCToken(event: ethereum.Event): string {
   )!;
 
   //Summon the cToken bidID
-  let acceptedBidId = cToken.bidId;
+  let referenceId = cToken.bidId;
 
   //returns the ID of the bid so we can update the bid with values not in that cTokenTransfer event, but in the (PunkBought) event
-  return acceptedBidId as string;
+  return referenceId as string;
 }

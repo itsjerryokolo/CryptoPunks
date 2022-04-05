@@ -30,7 +30,7 @@ import {
 
 import { getOrCreateTransfer } from "./helpers/transferHelper";
 
-import { getLatestOwnerFromCToken } from "./utils";
+import { getCurrentOwnerFromCToken, getPreviousOwnerFromCToken } from "./utils";
 
 import {
   getOrCreateCryptoPunkContract,
@@ -43,14 +43,15 @@ import {
   createAskCreated,
   createAskRemoved,
   getOrCreateAsk,
+  updateOldAsk,
 } from "./helpers/askHelpers";
 
 import {
   getOrCreateBid,
   createBidCreated,
   createBidRemoved,
-  getLatestBidFromCToken,
   updateOldBid,
+  getIdforReferenceFromCToken,
 } from "../src/helpers/bidHelpers";
 
 export function handleAssign(event: Assigned): void {
@@ -308,6 +309,13 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   fromAccount.save();
   bidRemoved.save();
 }
+//CHECK IF AN ASK NEED TO BE CREATED BEFORE A BID CAN BE CREATED OR ACCEPTED - acceptBidForPunk()
+
+//In PunkNoLonger for sale, if it fires alone, it means the owner withdrew their ask without selling it
+//TransferEVENT, PunkNoLongerForSaleEVENT, PunkBoughtEVENT - means the ask was accepted and the sale went through
+//Ask - Close
+//createSaleEvent
+//createAskRemoved
 
 /*
   step one: Create a SaleEvent
@@ -316,9 +324,8 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 export function handlePunkBought(event: PunkBought): void {
   //Catch acceptBidForPunk()
   if (event.params.toAddress.toHexString() == ZERO_ADDRESS) {
-    //BidAccepted - createBidRemovedEvent
-    //              createAskRemovedEvent
-    //            - close Old Ask
+    //BidAccepted - We only close the oldBid when it is ACCEPTED
+    //Actions - createBidRemovedEvent
     //            - close Old Bid
     //PunkBought - createSaleEvent
     //cToken Transfer_EVENT fires then PunkBought_EVENT (2 Events)
@@ -337,18 +344,12 @@ export function handlePunkBought(event: PunkBought): void {
       event.params.fromAddress.toHexString(),
       event
     );
-    //Create new AskRemovedEvent
-    let askRemoved = createAskRemoved(event.params.punkIndex, event);
-
-    //Update Ask status of Punk
-    let ask = getOrCreateAsk(event.params.fromAddress.toHexString(), event);
-    //Update Ask fields
-    ask.removed = askRemoved.id;
-    ask.open = false;
-    ask.nft = punk.id;
 
     //Update Old bid from cTokenTRANSFER to close it
-    let oldBid = updateOldBid(fromAccount.id, getLatestBidFromCToken(event));
+    let oldBid = updateOldBid(
+      fromAccount.id,
+      getIdforReferenceFromCToken(event)
+    );
 
     //Update Old bid fields with new state
     oldBid.removed = bidRemoved.id;
@@ -356,9 +357,7 @@ export function handlePunkBought(event: PunkBought): void {
     oldBid.nft = punk.id;
 
     //Create relationship with OldBid
-    //Create relationship with Ask
     bidRemoved.bid = oldBid.id;
-    askRemoved.ask = ask.id;
 
     //Update Sale status of Punk
     let sale = getOrCreateSale(
@@ -367,12 +366,12 @@ export function handlePunkBought(event: PunkBought): void {
       event
     );
     //Update Sale fields
-    sale.to = getLatestOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
+    sale.to = getCurrentOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
     sale.amount = event.params.value;
 
     //Update Punk entity
-    punk.purchasedBy = getLatestOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
-    punk.owner = getLatestOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
+    punk.purchasedBy = getCurrentOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
+    punk.owner = getCurrentOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
 
     //Update tradeValues
     contract.totalAmountTraded = contract.totalAmountTraded.plus(
@@ -386,7 +385,7 @@ export function handlePunkBought(event: PunkBought): void {
     );
     //We get the true owner from CTokenTRANSFER event and decrement their holdings
     let toAccount = getOrCreateAccount(
-      Address.fromString(getLatestOwnerFromCToken(event))
+      Address.fromString(getCurrentOwnerFromCToken(event))
     );
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BigInt.fromI32(1)
@@ -394,9 +393,7 @@ export function handlePunkBought(event: PunkBought): void {
 
     contract.save();
     bidRemoved.save();
-    askRemoved.save();
     punk.save();
-    ask.save();
     oldBid.save();
     sale.save();
     toAccount.save();
@@ -410,43 +407,15 @@ export function handlePunkBought(event: PunkBought): void {
     let toAccount = getOrCreateAccount(event.params.toAddress);
     let fromAccount = getOrCreateAccount(event.params.fromAddress);
 
-    //Create new AskRemoved
-    let askRemoved = createAskRemoved(event.params.punkIndex, event);
-    //Create new BidRemoved
-    let bidRemoved = createBidRemoved(
-      event.params.punkIndex,
-      event.params.fromAddress.toHexString(),
-      event
-    );
-
     //Create Sale Event
     let sale = getOrCreateSale(event.params.fromAddress, punk.id, event);
     //Update sale fields
     sale.amount = event.params.value;
     sale.to = event.params.toAddress.toHexString();
 
-    //Create or load Bid of Punk and Close it
-    let bid = getOrCreateBid(event.params.fromAddress.toHexString(), event);
-    //Update Bids fields
-    bid.removed = bidRemoved.id;
-    bid.open = false;
-    bid.nft = punk.id;
-
-    //Create or load Ask of Punk and Close it
-    let ask = getOrCreateAsk(event.params.fromAddress.toHexString(), event);
-    //Update Ask fields
-    ask.removed = askRemoved.id;
-    ask.open = false;
-    ask.nft = punk.id;
-
     //Update Punk entity
     punk.purchasedBy = toAccount.id;
     punk.owner = toAccount.id;
-
-    //Create relationship with Bid
-    //Create relationship with Ask
-    bidRemoved.bid = bid.id;
-    askRemoved.ask = ask.id;
 
     //Update trade values
     contract.totalAmountTraded = contract.totalAmountTraded.plus(
@@ -462,12 +431,8 @@ export function handlePunkBought(event: PunkBought): void {
       BigInt.fromI32(1)
     );
 
-    ask.save();
-    askRemoved.save();
     punk.save();
     fromAccount.save();
-    bid.save();
-    bidRemoved.save();
     toAccount.save();
     contract.save();
     sale.save();
@@ -477,19 +442,34 @@ export function handlePunkBought(event: PunkBought): void {
 export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   log.debug("handlePunkNoLongerForSale", []);
 
-  let askRemoved = createAskRemoved(event.params.punkIndex, event);
-  let punk = Punk.load(event.params.punkIndex.toString())!;
-  let ask = getOrCreateAsk(punk.owner, event);
-  //Update Ask fields
-  ask.removed = askRemoved.id;
-  ask.open = false;
-  ask.nft = punk.id;
+  //This event fires when the owner removes their ask
+  //Also fires when the owner's Ask is accepted which removes their ask and creates a SaleEvent
+  //SaleEvent is a regular punkBought which we already captured in handlePunkBought
 
-  askRemoved.ask = ask.id;
+  //Actions - createAskRemovedEvent
+  //            - close Old Ask
+
+  let punk = Punk.load(event.params.punkIndex.toString())!;
+  let askRemoved = createAskRemoved(event.params.punkIndex, event);
+
+  //Create or load Ask of Punk and Close it
+  //get previous owner from CToken and update Ask since this event doesn't emit the owner or any Address
+  let oldAsk = updateOldAsk(
+    getPreviousOwnerFromCToken(event), //Summon the address of the previous owner from cToken entity
+    getIdforReferenceFromCToken(event) //This makes sure both the PunkNoLongerForSale event and cTokenTransfer are in the same transaction
+  );
+
+  //Update OldAsk fields
+  oldAsk.removed = askRemoved.id;
+  oldAsk.open = false;
+  oldAsk.nft = punk.id;
+
+  //Create relationship with OldAsk
+  askRemoved.ask = oldAsk.id;
 
   punk.save();
+  oldAsk.save();
   askRemoved.save();
-  ask.save();
 }
 
 // This function is called for three events: Mint (Wrap), Burn (Unwrap) and Transfer
