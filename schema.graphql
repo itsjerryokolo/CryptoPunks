@@ -89,7 +89,9 @@ type Punk implements NFT @entity {
   currentAsk: Ask
   currentBid: Bid
   currentAskCreated: AskCreated
-  currentBidCreated: AskRemoved
+  currentBidCreated: BidCreated
+  currentAskRemoved: AskRemoved
+  currentBidRemoved: BidRemoved
 }
 
 type MetaData @entity(immutable: true) {
