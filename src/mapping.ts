@@ -118,7 +118,7 @@ export function handleAssign(event: Assigned): void {
     BigInt.fromI32(1)
   );
 
-  contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
+  // contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
 
   //Write
   account.save();
@@ -348,6 +348,11 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   let punk = Punk.load(event.params.punkIndex.toString())!;
   let askRemoved = createAskRemoved(event.params.punkIndex, event);
 
+  //Update Punk Entity
+  //Update the currentAskRemoved for the punk in Punk entity for future reference
+  //      e.g (When a bid is accepted to close Ask with the right relationship to AskRemoved because we can reference this field elsewhere)
+  punk.currentAskRemoved = askRemoved.id;
+
   //Load old Ask of Punk and Close it
   let oldAskId = punk.currentAsk;
   if (oldAskId !== null) {
@@ -364,14 +369,9 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
     //Update OldAsk fields
     oldAsk.nft = punk.id;
     oldAsk.open = false;
-    oldAsk.from = getOwnerFromCToken(event);
+    oldAsk.from = event.transaction.from.toHexString();
     oldAsk.save();
   }
-
-  //Update Punk Entity
-  //Update the currentAskRemoved for the punk in Punk entity for future reference
-  //      e.g (When a bid is accepted to close Ask with the right relationship to AskRemoved because we can reference this field elsewhere)
-  punk.currentAskRemoved = askRemoved.id;
 
   //Write
   punk.save();
@@ -563,7 +563,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       event
     );
 
-    contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
+    // contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
 
     wrap.to = event.params.to.toHexString();
     wrap.save();
@@ -576,7 +576,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       event
     );
 
-    contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
+    // contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
 
     unWrap.save();
   } else {
