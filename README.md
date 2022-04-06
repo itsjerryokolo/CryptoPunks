@@ -3,6 +3,51 @@
 The CryptoPunks are 10,000 uniquely generated characters.
 No two are exactly alike, and each one of them can be officially owned by a single person on the Ethereum blockchain.
 
+## Subgraph Url
+```
+https://thegraph.com/hosted-service/subgraph/itsjerryokolo/cryptopunks
+```
+
+## GraphQL endpoint
+Query the subgraph via its endpoint
+```
+https://api.thegraph.com/subgraphs/name/itsjerryokolo/cryptopunks
+```
+## Entities
+You'll find the description of the various fields in the `schema.graphql`
+
+- `ASK`: This is entity captures the ASKS for a punk or from a user. It also show's the `current ASK state` of the Punk.
+        An ask can be `open` or `closed`.  You can also query when the ask was `created` and when it was `removed`
+- `BID`: This is entity captures the BIDS for a punk or from a user. It also show's the `current BID state` of the Punk.
+        An ask can be `open` or `closed`. You can also query when the bid was `created` and when it was `removed`
+- `PUNK`: This entity holds useful information about the Punks; `Traits`, `Accessories`, `Gender`, `Owner` etc
+- `ACCOUNT`: Account contains the user data; `Trades`, `Hodlings` etc
+- `CONTRACT`: Contract metadata including `Trade Volume`
+
+
+## Query Asks for a Punk
+```graphql
+{
+  asks(orderDirection: desc, where: {nft: "365"}) {
+    id
+    open
+    amount
+    created {
+      blockNumber
+      timestamp
+    }
+    removed {
+      id
+      blockNumber
+      timestamp
+    }
+    from {
+      id
+    }
+  }
+}
+```
+
 ## Query Owner Data
 
 ```graphql
