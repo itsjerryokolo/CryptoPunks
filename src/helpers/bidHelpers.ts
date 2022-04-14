@@ -26,7 +26,7 @@ export function getOrCreateBid(
   return bid as Bid;
 }
 
-//Update the state of the last Bid using helper function
+//Update the state of the last Bid in the same Transaction using helper function
 export function updateOldBid(
   fromAddress: string,
   latestBidIdFromReferenceId: string //getIdforReferenceFromCToken()
