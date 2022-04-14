@@ -17,12 +17,13 @@ export function getOrCreateBid(
     bid.save(); //We have a new Bid entity in the store incase we need the ID elsewhere
   }
 
-  //bid.created = "" // non-nullable, needs to be the id of createBidCreated in same handler ***DONE
-  //nft - needs to be updated from somewhere else ***DONE
-  //amount: BigInt! - needs to be updated from somewhere else ***DONE
-  //bid.removed = "" //needs to be the id of createBidRemoved in same handler ***DONE
-  //bid.open = false;
-
+  /**
+    nft = "" - needs to be updated from somewhere else ***DONE
+    amount: BigInt! - needs to be updated from somewhere else ***DONE
+    bid.created = "" non-nullable, needs to be the id of createBidCreated in same handler ***DONE
+    bid.removed = "" - needs to be the id of createBidRemoved in same handler ***DONE
+    bid.open = false;
+  */
   return bid as Bid;
 }
 
@@ -35,8 +36,10 @@ export function updateOldBid(
   let oldBidId = latestBidIdFromReferenceId;
   let oldBid = Bid.load(oldBidId.concat("-BID"));
 
-  //We concat -BID here because this is where we actually create the Bid for acceptBidForPunk() using the globalId
-  //The reason we have the latestBidFromReferenceId is because it ensures that cTokenTransfer EVENT fired before the EVENT(eventHandler) this function is called from
+  /**
+    We concat -BID here because this is where we actually create the Bid for acceptBidForPunk() using the globalId
+    The reason we have the latestBidFromReferenceId is because it ensures that cTokenTransfer EVENT fired before the EVENT(eventHandler) this function is called from
+  */
   if (!oldBid) {
     oldBid = new Bid(oldBidId.concat("-BID"));
     oldBid.from = fromAddress;
@@ -91,10 +94,12 @@ export function createBidRemoved(
 }
 
 export function getBidIdforReferenceFromCToken(event: ethereum.Event): string {
-  //Load cToken which contains recent bidId
-  //The TransferEvent fires first, then the PunkBoughtEvent for BIDACCEPTED
-  //The TransferEvent fires first, PunkNoLongerForSale, then the PunkBoughtEvent for ASKACCEPTED
-  //To load the cToken entity, which contains the BidReferenceID in referenceId, into the PunkBought/PunkNoLongerForSale eventHandler, it will be the logIndex - 1
+  /**
+    Load cToken which contains recent bidId
+    The TransferEvent fires first, then the PunkBoughtEvent for BIDACCEPTED
+    The TransferEvent fires first, PunkNoLongerForSale, then the PunkBoughtEvent for ASKACCEPTED
+    To load the cToken entity, which contains the BidReferenceID in referenceId, into the PunkBought/PunkNoLongerForSale eventHandler, it will be the logIndex - 1
+  */
   let cTokenLogIndex = event.logIndex.minus(BigInt.fromI32(1));
 
   //This BidID will always be the cTokenTransferID following the PunkBought EVENT in the same Transaction
