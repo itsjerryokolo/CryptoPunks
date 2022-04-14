@@ -119,7 +119,7 @@ type MetaData @entity(immutable: true) {
   contractURI: String!
   punk: Punk!
   "Punk Traits"
-  traits: [Trait!]
+  traits: [Trait!]!
 }
 
 type Trait @entity {

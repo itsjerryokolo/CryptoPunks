@@ -83,7 +83,7 @@ export function getOrCreateSale(
     sale.blockHash = event.block.hash;
     sale.type = "SALE";
   }
-  //Find out where to properly update this fields
+  //Find out where to properly update this field ***DONE
   //sale.to = toAddress.toHexString();
   sale.from = fromAddress.toHexString();
   sale.nft = punk.toString();

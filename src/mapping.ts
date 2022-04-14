@@ -58,7 +58,7 @@ import {
   createBidCreated,
   createBidRemoved,
   updateOldBid,
-  getIdforReferenceFromCToken,
+  getBidIdforReferenceFromCToken,
 } from "../src/helpers/bidHelpers";
 
 export function handleAssign(event: Assigned): void {
@@ -118,8 +118,6 @@ export function handleAssign(event: Assigned): void {
     BigInt.fromI32(1)
   );
 
-  // contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
-
   //Write
   account.save();
   assign.save();
@@ -148,6 +146,7 @@ export function handleTransfer(event: cTokenTransfer): void {
     cToken.owner = event.params.to.toHexString();
     cToken.amount = event.params.value;
 
+    //Write
     cToken.save();
     toAccount.save();
     fromAccount.save();
@@ -289,12 +288,14 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 }
 
 export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
-  // This event first only fires when a bid is removed
+  /** 
+    This event first only fires when a bid is removed
 
-  //Actions:
-  //createBidRemovedEVENT
-  //create Bid or Load it, and close the BID - The higher level product of the event
-  //create relationship between Bid and BidRemoved
+  Actions:
+    - createBidRemovedEVENT
+    - create Bid or Load it, and close the BID - The higher level product of the event
+    - create relationship between Bid and BidRemoved
+  */
   log.debug("handlePunkBidCreatedWithdrawn", []);
 
   let fromAccount = getOrCreateAccount(event.params.fromAddress);
@@ -309,16 +310,16 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   bidRemoved.amount = event.params.value;
   bidRemoved.nft = punk.id;
 
-  //Create a Bid or Load it and close it
+  //Load Old Bid and close it
   let oldBidId = punk.currentBid;
   if (oldBidId !== null) {
     let oldBid = Bid.load(oldBidId.toString())!;
-
+    //summon currentBidCreated from Punk entity to provide creation EVENT on the bid that was removed
     oldBid.created = punk.currentBidCreated;
     oldBid.from = fromAccount.id;
     oldBid.open = false;
 
-    //Create relationship with BidRemoved
+    //Create relationship between the old Bid and BidRemoved to provide information on  the bid what was withdrawn/removed
     oldBid.removed = bidRemoved.id;
 
     //Create relationship with Bid
@@ -326,7 +327,7 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 
     oldBid.save();
   }
-  //Update Punk fields
+  //Update Punk fields with current bid removal EVENT so we can reference them elsewhere
   punk.currentBidRemoved = bidRemoved.id;
 
   //Write
@@ -334,23 +335,26 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   fromAccount.save();
   bidRemoved.save();
 }
-//CHECK IF AN ASK NEED TO BE CREATED BEFORE A BID CAN BE CREATED OR ACCEPTED - acceptBidForPunk()
 
 export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   log.debug("handlePunkNoLongerForSale", []);
-  //This event fires when the owner removes their ask
-  //Also fires when the owner's Ask is accepted which removes their ask and creates a SaleEvent
-  //SaleEvent is a regular punkBought which we already captured in handlePunkBought
+  /**
+   - This event fires when the owner removes their ask
+   - Also fires when the owner's Ask is accepted which removes their ask and creates a SaleEVENT
+   - SaleEvent is a regular PunkBoughtEVENT which we already captured in handlePunkBought()
 
-  //Actions - createAskRemovedEVENT
-  //            - close Old Ask
-
+    Actions 
+    - createAskRemovedEVENT
+    - close Old Ask
+  */
   let punk = Punk.load(event.params.punkIndex.toString())!;
   let askRemoved = createAskRemoved(event.params.punkIndex, event);
 
-  //Update Punk Entity
-  //Update the currentAskRemoved for the punk in Punk entity for future reference
-  //      e.g (When a bid is accepted to close Ask with the right relationship to AskRemoved because we can reference this field elsewhere)
+  /**
+     Update Punk Entity
+     Update the currentAskRemoved for the punk in Punk entity for future reference
+       e.g (When a bid is accepted, we close the Ask with the right relationship to AskRemoved, so we can reference this field from the Punk entity elsewhere)
+  */
   punk.currentAskRemoved = askRemoved.id;
 
   //Load old Ask of Punk and Close it
@@ -360,7 +364,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
     //Create relationship with AskRemoved
     oldAsk.removed = askRemoved.id;
 
-    //Create relationship with AskCreated by summoning creation EVENT
+    //Create relationship between the OldAsk with AskCreated by summoning creation EVENT from Punk entity to provide information on creation EVENT
     oldAsk.created = punk.currentAskCreated;
 
     //Create relationship between the OldAsk and the current AskRemoved to record removal
@@ -379,17 +383,20 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
 }
 
 export function handlePunkBought(event: PunkBought): void {
-  //Catch acceptBidForPunk()
-  if (event.params.toAddress.toHexString() == ZERO_ADDRESS) {
-    //BidAccepted - We only close the oldBid when it is ACCEPTED
-    //Actions:
-    //  - createBidRemovedEvent
-    //  - close Old Bid since it has been accepted
-    //  - close Old Ask since it has been sold
-    //  - createSaleEvent
+  /**
+     - Catch acceptBidForPunk(), BidAccepted
+     - cToken Transfer_EVENT fires then PunkBought_EVENT (2 Events)
+        e.g https://etherscan.io/tx/0x23d6e24628dabf4fa92fa93630e5fa6f679fac75071aab38d7e307a3c0f4a3ca#eventlog
+   */
 
-    //cToken Transfer_EVENT fires then PunkBought_EVENT (2 Events)
-    //e.g https://etherscan.io/tx/0x23d6e24628dabf4fa92fa93630e5fa6f679fac75071aab38d7e307a3c0f4a3ca#eventlog
+  if (event.params.toAddress.toHexString() == ZERO_ADDRESS) {
+    /**
+    Actions:
+      - createBidRemovedEvent
+      - close Old Bid since it has been accepted
+      - close Old Ask since it has been sold
+      - createSaleEvent
+    */
 
     let punk = Punk.load(event.params.punkIndex.toString())!;
     let contract = getOrCreateCryptoPunkContract(event.address);
@@ -402,22 +409,26 @@ export function handlePunkBought(event: PunkBought): void {
       event
     );
 
-    //Load OldBid from cToken by comparing their ID and loading it with the difference between their logIndex
-    //Close the bid since we only know about this bidAcceptedEVENT from the event
+    /**
+      - Load OldBid from cToken by comparing their ID, and loading it with the difference between their logIndex,
+        then close the bid with updateOldBid() since we only know about this bidAcceptedEVENT from this event
+    */
     let oldBid = updateOldBid(
       fromAccount.id,
-      getIdforReferenceFromCToken(event)
+      getBidIdforReferenceFromCToken(event)
     );
 
-    //Update Old bid fields with new state
+    //Update Old bid fields with new state in the same transaction to close it
     oldBid.removed = bidRemoved.id;
     oldBid.from = fromAccount.id;
     oldBid.created = punk.currentBidCreated;
     oldBid.open = false;
     oldBid.nft = punk.id;
 
-    //Load oldAsk from Punk, close it and create relationship with AskRemoved,
-    //summon currentAskCreated & currentAskRemoved from punk, and then close it since Bid has been accepted & Offer is closed
+    /**
+      - Load oldAsk from Punk, close it and create relationship with AskRemoved,
+        summon currentAskCreated & currentAskRemoved from punk, and then close it since Bid has been accepted & Offer is closed
+    */
     let oldAskId = punk.currentAsk;
     if (oldAskId !== null) {
       let oldAsk = Ask.load(oldAskId.toString())!;
@@ -425,6 +436,8 @@ export function handlePunkBought(event: PunkBought): void {
       oldAsk.open = false;
       oldAsk.created = punk.currentAskCreated;
       oldAsk.from = fromAccount.id;
+
+      //Write
       oldAsk.save();
     }
 
@@ -436,7 +449,7 @@ export function handlePunkBought(event: PunkBought): void {
     //Create relationship with OldBid
     bidRemoved.bid = oldBid.id;
 
-    //Create new SaleEvent
+    //Create new SaleEVENT
     let sale = getOrCreateSale(
       event.params.fromAddress,
       event.params.punkIndex.toString(),
@@ -464,6 +477,7 @@ export function handlePunkBought(event: PunkBought): void {
       BigInt.fromI32(1)
     );
 
+    //Write
     contract.save();
     bidRemoved.save();
     punk.save();
@@ -474,13 +488,15 @@ export function handlePunkBought(event: PunkBought): void {
   } else {
     log.debug("handlePunkBought", []);
 
-    //Regular PunkBought - This also implicitly captures AskAccepted for Punk which is updated in PunkNoLongerForSaleEVENT (Close Ask)
-    //https://etherscan.io/tx/0x0004ba250b29b0e2cda2e882c8bf5a14e7d2133e63bf0334fb1f44c716ccb187#eventlog
-    //Actions:
-    //  - createSaleEvent
-    //  - close Old Bid
-    //  - close Old Ask since it has been sold
+    /** 
+    Regular PunkBought - This also implicitly captures AskAccepted for Punk which is updated in PunkNoLongerForSaleEVENT (Close Ask)
+      e.g https://etherscan.io/tx/0x0004ba250b29b0e2cda2e882c8bf5a14e7d2133e63bf0334fb1f44c716ccb187#eventlog
 
+    Actions:
+     - createSaleEvent
+     - close Old Bid
+     - close Old Ask since it has been sold
+    */
     let punk = Punk.load(event.params.punkIndex.toString())!;
     let contract = getOrCreateCryptoPunkContract(event.address);
     let toAccount = getOrCreateAccount(event.params.toAddress);
@@ -488,12 +504,14 @@ export function handlePunkBought(event: PunkBought): void {
 
     //Create Sale Event
     let sale = getOrCreateSale(event.params.fromAddress, punk.id, event);
-    //Update sale fields
+    //Update Sale fields
     sale.amount = event.params.value;
     sale.to = event.params.toAddress.toHexString();
 
-    //Close oldBid since Punk has a new owner after SaleEvent, or PunkOfferAccepted which fires PunkNoLongerForSaleEVENT
-    //Load the correct Bid ID from Punk field
+    /**
+      Close oldBid since Punk has a new owner after SaleEvent, or PunkOfferAccepted which fires PunkNoLongerForSaleEVENT
+      load the correct Bid ID from Punk entity and close it
+    */
     let oldBidId = punk.currentBid;
     if (oldBidId !== null) {
       let oldBid = Bid.load(oldBidId.toString())!;
@@ -502,8 +520,8 @@ export function handlePunkBought(event: PunkBought): void {
       oldBid.open = false;
       oldBid.save();
     }
-    //Close oldAsk anytime a saleEvent occurs
 
+    //Close oldAsk anytime a saleEvent occurs
     let oldAskId = punk.currentAsk;
     if (oldAskId !== null) {
       let oldAsk = Ask.load(oldAskId.toString())!;
@@ -513,6 +531,8 @@ export function handlePunkBought(event: PunkBought): void {
       //Summon currentAskCreated from punk to update Ask with askCreation information
       oldAsk.created = punk.currentAskCreated; //current askCreated can be gotten from the punk which we opened in PunkOffered
       oldAsk.from = fromAccount.id;
+
+      //Write
       oldAsk.save();
     }
 
@@ -526,7 +546,8 @@ export function handlePunkBought(event: PunkBought): void {
     );
     contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
 
-    // Note: buyPunk() does not emit a PunkTransfer event, so we need to keep track
+    // buyPunk() does not emit a PunkTransfer event, so we need to keep track
+
     //Update account punk holdings
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BigInt.fromI32(1)
@@ -563,9 +584,11 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       event
     );
 
-    // contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
+    contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
 
     wrap.to = event.params.to.toHexString();
+
+    //Write
     wrap.save();
   } else if (event.params.to.toHexString() == ZERO_ADDRESS) {
     // A wrapped punk is burned (unwrapped)
@@ -576,12 +599,12 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       event
     );
 
-    // contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
+    contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
 
+    //Write
     unWrap.save();
   } else {
     // Wrapped Punk Transfer
-
     // We do not want to save a transfer for wrapped punk mints/burns
     let transfer = getOrCreateTransfer(event.params.tokenId, event);
     let toAccount = getOrCreateAccount(event.params.to);
@@ -596,6 +619,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     );
     punk.owner = toAccount.id;
 
+    //Write
     fromAccount.save();
     toAccount.save();
     transfer.save();

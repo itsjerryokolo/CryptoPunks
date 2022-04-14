@@ -29,11 +29,14 @@ export function getOrCreateBid(
 //Update the state of the last Bid in the same Transaction using helper function
 export function updateOldBid(
   fromAddress: string,
-  latestBidIdFromReferenceId: string //getIdforReferenceFromCToken()
+  latestBidIdFromReferenceId: string //getBidIdforReferenceFromCToken()
 ): Bid {
   //Update Old Bid or State of Bid
   let oldBidId = latestBidIdFromReferenceId;
   let oldBid = Bid.load(oldBidId.concat("-BID"));
+
+  //We concat -BID here because this is where we actually create the Bid for acceptBidForPunk() using the globalId
+  //The reason we have the latestBidFromReferenceId is because it ensures that cTokenTransfer EVENT fired before the EVENT(eventHandler) this function is called from
   if (!oldBid) {
     oldBid = new Bid(oldBidId.concat("-BID"));
     oldBid.from = fromAddress;
@@ -87,24 +90,24 @@ export function createBidRemoved(
   return bidRemoved as BidRemoved;
 }
 
-export function getIdforReferenceFromCToken(event: ethereum.Event): string {
+export function getBidIdforReferenceFromCToken(event: ethereum.Event): string {
   //Load cToken which contains recent bidId
   //The TransferEvent fires first, then the PunkBoughtEvent for BIDACCEPTED
   //The TransferEvent fires first, PunkNoLongerForSale, then the PunkBoughtEvent for ASKACCEPTED
-  //To load the cToken entity, which contains the referenceID in referenceId, into the PunkBought/PunkNoLongerForSale eventHandler, it will be the logIndex - 1
+  //To load the cToken entity, which contains the BidReferenceID in referenceId, into the PunkBought/PunkNoLongerForSale eventHandler, it will be the logIndex - 1
   let cTokenLogIndex = event.logIndex.minus(BigInt.fromI32(1));
 
-  //This ID will always be the eventID following the new event (PunkBought) in the same Transaction
+  //This BidID will always be the cTokenTransferID following the PunkBought EVENT in the same Transaction
   let cToken = CToken.load(
     event.transaction.hash
       .toHexString()
       .concat("-")
       .concat(cTokenLogIndex.toString())
-  )!;
+  )!; //Cannot be null
 
   //Summon the cToken bidID
   let referenceId = cToken.referenceId;
 
-  //returns the ID of the bid so we can update the bid with values not in that cTokenTransfer event, but in the (PunkBought) event
+  //returns the ID of the bid which was accepted in cTokenTransfer EVENT, so we can update the Bid with values not emitted in the cTokenTransfer EVENT, but in the PunkBought EVENT
   return referenceId as string;
 }
