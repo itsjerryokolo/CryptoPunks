@@ -22,9 +22,16 @@ enum OfferType {
 
 interface NFT {
   id: ID!
+  "Contract metadata"
   contract: Contract
+
+  "Punk index"
   tokenId: BigInt!
+
+  "Punk owner"
   owner: Account!
+
+  "All events"
   events: [Event!]! @derivedFrom(field: "nft")
   currentAsk: Ask
   currentBid: Bid
@@ -32,16 +39,23 @@ interface NFT {
 
 interface Event {
   id: ID!
+
+  "Contract metadata"
   contract: Contract
+
+  from: Account
+  to: Account
+  amount: BigInt
+
+  "Punk"
   nft: NFT #nullable because punk doesn't appear in all events
+  type: EventType!
+
+  "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
   timestamp: BigInt!
-  type: EventType!
-  from: Account
-  to: Account
-  amount: BigInt
 }
 
 type Account @entity {
@@ -60,64 +74,89 @@ type Account @entity {
   "Punks assigned to account (if any)"
   assigned: [Assign!]! @derivedFrom(field: "to")
 
-  "Punk transfer by Account"
+  "Punk transfers by Account"
   sent: [Transfer!]! @derivedFrom(field: "from")
 
+  "Punk transfers to Account"
   received: [Transfer!]! @derivedFrom(field: "to")
 
-  "Query bids to Account or by Account"
+  "Query bids by Account"
   bids: [Bid!]! @derivedFrom(field: "from")
 
   "Punks offered for sale by Account"
   asks: [Ask!]! @derivedFrom(field: "from")
 
+  "Total number of Punks owned by account"
   numberOfPunksOwned: BigInt!
 }
 
 type Punk implements NFT @entity {
   "Punk ID"
   id: ID!
+
+  "Account that received Punk"
   transferedTo: Account
+
   "Account that claimed Punk"
   assignedTo: Account
+
   "Punk buyers"
   purchasedBy: Account
+
   "Punk metadata"
   metadata: MetaData
+
   "Contract data"
   contract: Contract
+
   "Punk tokenId"
   tokenId: BigInt!
+
   "Current owner of Punk"
   owner: Account!
+
   "Wrap Status"
   wrapped: Boolean!
+
   "All Punk events"
   events: [Event!]! @derivedFrom(field: "nft")
+
   "Current Ask for Punk"
   currentAsk: Ask
+
   "Current Bid for Punk"
   currentBid: Bid
+
   "Current AskCreated event"
   currentAskCreated: AskCreated
+
   "Current BidCreated event"
   currentBidCreated: BidCreated
+
   "Current AskRemoved event"
   currentAskRemoved: AskRemoved
+
   "Current BidRemoved event"
   currentBidRemoved: BidRemoved
 }
 
 type MetaData @entity(immutable: true) {
   id: ID!
+
   tokenId: BigInt!
+
   "URI of Punk"
   tokenURI: String!
+
   "Punk image"
   imageURI: String!
+
   "Contract URI"
   contractURI: String!
+
+  "Punk"
   punk: Punk!
+
   "Punk Traits"
   traits: [Trait!]!
 }
@@ -127,88 +166,121 @@ type Trait @entity {
   id: ID!
   type: TraitType!
   metaDatas: [MetaData!]! @derivedFrom(field: "traits")
+
   "Number of Punks with this trait"
   numberOfNfts: BigInt!
 }
 
 interface Offer {
   id: ID!
+
+  "Punk owner"
   from: Account!
+
   "Open Status of Punk. Asks/Bids can be either Open or Closed"
   open: Boolean!
+
   "Bid/Ask for Punk in ETH"
   amount: BigInt!
+
   "Punk being offered/bidded"
   nft: NFT
+
   "Created at. Could be ASK or BID"
   created: Event
+
   "Removed at. Could be ASK or BID"
   removed: Event
+
   offerType: OfferType!
 }
 
 type Ask implements Offer @entity {
   id: ID!
+
   "Account that created Ask"
   from: Account!
+
   "Open Status of Punk. Asks can be either Open or Closed"
   open: Boolean!
+
   "Ask for Punk in ETH"
   amount: BigInt!
+
   "Punk being offered for sale"
   nft: NFT
+
   "Ask created at"
   created: Event
+
   "Ask removed at"
   removed: Event
+
   offerType: OfferType!
 }
 
 type Bid implements Offer @entity {
   id: ID!
+
   "Bidder"
   from: Account!
+
   "Open status of Punk. Bids can be either Open or Closed"
   open: Boolean!
+
   "Bid amount in ETH"
   amount: BigInt!
+
   "Punk bidded"
   nft: NFT
+
   "Bid created at"
   created: Event
-  "Bid created at"
+
+  "Bid removed at"
   removed: Event
+
   offerType: OfferType!
 }
 
 type Contract @entity {
   "Contract Address"
   id: ID!
+
   "Token Symbol"
   symbol: String
+
   "Token name"
   name: String
+
   "Total supply of tokens"
   totalSupply: BigInt!
+
   "Total number of Punk sales"
   totalSales: BigInt!
+
   "Total Sales in ETH for Punks"
   totalAmountTraded: BigInt!
+
   "The hash of the composite image of all the Punks"
   imageHash: String
 }
 
 type Assign implements Event @entity(immutable: true) {
   id: ID!
-  "Contract that assigned Punk"
+  "Contract metadata"
   contract: Contract
+
   "Punk that was assigned"
   nft: NFT
+
   "Account that claimed Punk"
   to: Account
+
   amount: BigInt
   from: Account
   type: EventType!
+
   "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
@@ -218,16 +290,24 @@ type Assign implements Event @entity(immutable: true) {
 
 type Sale implements Event @entity(immutable: true) {
   id: ID!
+
   "Punk buyer"
   to: Account
+
   "Amount in ETH"
   amount: BigInt
+
   "Punk seller"
   from: Account
+
+  "Contract metadata"
   contract: Contract
+
   "Punk being sold"
   nft: NFT
+
   type: EventType!
+
   "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
@@ -237,16 +317,24 @@ type Sale implements Event @entity(immutable: true) {
 
 type AskCreated implements Event @entity(immutable: true) {
   id: ID!
+
   "Account that created Ask"
   from: Account
+
   to: Account
   ask: Ask!
+
   "Ask in ETH"
   amount: BigInt
+
+  "Contract metadata"
   contract: Contract
+
   "Punk being offered for sale"
   nft: NFT
+
   type: EventType!
+
   "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
@@ -256,16 +344,24 @@ type AskCreated implements Event @entity(immutable: true) {
 
 type BidCreated implements Event @entity(immutable: true) {
   id: ID!
+
   "Account that created Bid"
   from: Account
+
   to: Account
   bid: Bid!
+
   "Bid in ETH"
   amount: BigInt
+
+  "Contract metadata"
   contract: Contract
+
   "Punk being bidded"
   nft: NFT
+
   type: EventType!
+
   "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
@@ -275,16 +371,23 @@ type BidCreated implements Event @entity(immutable: true) {
 
 type BidRemoved implements Event @entity(immutable: true) {
   id: ID!
+
   "Account that removed Bid"
   from: Account
   to: Account
+
   "Bid that was removed, in ETH"
   amount: BigInt
+
   bid: Bid!
+
+  "Contract metadata"
   contract: Contract
+
   "Punk whose Bid was removed"
   nft: NFT
   type: EventType!
+
   "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
@@ -294,16 +397,25 @@ type BidRemoved implements Event @entity(immutable: true) {
 
 type AskRemoved implements Event @entity(immutable: true) {
   id: ID!
+
   ask: Ask!
+
   "Account that removed Ask"
   from: Account
+
   to: Account
+
   "Ask that was removed, in ETH"
   amount: BigInt
+
+  "Contract metadata"
   contract: Contract
+
   "Punk whose asked was removed"
   nft: NFT
+
   type: EventType!
+
   "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
@@ -313,12 +425,23 @@ type AskRemoved implements Event @entity(immutable: true) {
 
 type Transfer implements Event @entity(immutable: true) {
   id: ID!
+
+  "Sender"
   from: Account
+
+  "Receiver"
   to: Account
+
   amount: BigInt
+
+  "Contract metadata"
   contract: Contract
+
+  "Punk being transferred"
   nft: NFT
+
   type: EventType!
+
   "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
@@ -330,16 +453,22 @@ type CToken
   @entity { #TransferEvents
   "TxHash + LogIndex" #This ID/Entity is used for referencing events in the same transaction
   id: ID!
+
   "Receipent"
   from: Account!
+
   "Sender"
   to: Account!
+
   "New owner of Punk"
   owner: String!
+
   "Amount of cToken transferred"
   amount: BigInt
+
   "Field for storing BidAcceptedID"
   referenceId: String!
+
   "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
@@ -349,15 +478,22 @@ type CToken
 
 type Wrap implements Event @entity(immutable: true) {
   id: ID!
+
   "Account that wrapped Punk"
   from: Account
+
   to: Account
   amount: BigInt
+
+  "Contract metadata"
   contract: Contract
+
   "Punk being wrapped"
   nft: NFT
+
   type: EventType!
-  "//Transaction details"
+
+  "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -368,13 +504,19 @@ type Unwrap implements Event @entity(immutable: true) {
   id: ID!
   "Account that unwrapped Punk"
   from: Account
+
   to: Account
   amount: BigInt
+
+  "Contract metadata"
   contract: Contract
+
   "Punk being unwrapped"
   nft: NFT
+
   type: EventType!
-  "//Transaction details"
+
+  "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
   txHash: Bytes!
@@ -384,8 +526,10 @@ type Unwrap implements Event @entity(immutable: true) {
 type UserProxy @entity {
   "Contract Address of UserProxy"
   id: ID!
+
   "Account that owns the Proxy"
   user: Account!
+
   "Transaction details"
   blockNumber: BigInt!
   blockHash: Bytes!
