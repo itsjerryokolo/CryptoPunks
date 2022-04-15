@@ -16,9 +16,9 @@ https://api.thegraph.com/subgraphs/name/itsjerryokolo/cryptopunks
 ## Entities
 You'll find the description of the various fields in the `schema.graphql`
 
-- ASK: This is entity captures the ASKS for a punk or from a user. It also show's the `current ASK state` of the Punk.
+- ASK: This entity captures the ASKS for a punk or from a user. It also show's the `current ASK state` of the Punk.
        An ask can be `open` or `closed`.  You can also query when the ask was `created` and when it was `removed`
-- BID: This is entity captures the BIDS for a punk or from a user. It also show's the `current BID state` of the Punk.
+- BID: This entity captures the BIDS for a punk or from a user. It also show's the `current BID state` of the Punk.
         An ask can be `open` or `closed`. You can also query when the bid was `created` and when it was `removed`
 - PUNK: This entity holds useful information about the Punks; `Traits`, `Accessories`, `Gender`, `Owner` etc
 - ACCOUNT: Account contains the user data; `Trades`, `Hodlings` etc
