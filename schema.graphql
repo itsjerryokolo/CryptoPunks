@@ -33,7 +33,11 @@ interface NFT {
 
   "All events"
   events: [Event!]! @derivedFrom(field: "nft")
+
+  "ID of current ask for Punk"
   currentAsk: Ask
+
+  "ID of current bid for Punk"
   currentBid: Bid
 }
 
