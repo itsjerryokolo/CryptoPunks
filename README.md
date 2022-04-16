@@ -16,16 +16,19 @@ https://api.thegraph.com/subgraphs/name/itsjerryokolo/cryptopunks
 ## Entities
 You'll find the description of the various fields in the `schema.graphql`
 
-- ASK: This entity captures the ASKS for a punk or from a user. It also show's the `current ASK state` of the Punk.
+- ASK: This entity captures the ASKS for a punk or from a user. It also shows the `current ASK` of the Punk.
        An ask can be `open` or `closed`.  You can also query when the ask was `created` and when it was `removed`
-- BID: This entity captures the BIDS for a punk or from a user. It also show's the `current BID state` of the Punk.
+- BID: This entity captures the BIDS for a punk or from a user. It also shows the `current BID` of the Punk.
         An ask can be `open` or `closed`. You can also query when the bid was `created` and when it was `removed`
-- PUNK: This entity holds useful information about the Punks; `Traits`, `Accessories`, `Gender`, `Owner` etc
+- PUNK: This entity holds useful information about the Punks; `traits`, `accessories`, `gender`, `owner` etc
 - ACCOUNT: Account contains the user data; `Trades`, `Hodlings` etc
 - CONTRACT: Contract metadata including `Trade Volume`
+- METADATA: Here, you can retrieve the punk tokenURI, image URI, traits, and other useful metadata
+- SALE - Query punk sale events
 
 
-## Query Asks for a Punk
+## Queries
+### Query the Asks for a Punk
 ```graphql
 {
   asks(orderDirection: desc, where: {nft: "365"}) {
@@ -48,7 +51,7 @@ You'll find the description of the various fields in the `schema.graphql`
 }
 ```
 
-## Query Owner Data
+### Query Owner Data
 
 ```graphql
 {
@@ -109,7 +112,7 @@ You'll find the description of the various fields in the `schema.graphql`
 - alien
 - ape
 
-## Query male Punks
+### Query male Punks
 
 ```graphql
 {
