@@ -479,18 +479,19 @@ export function handlePunkBought(event: PunkBought): void {
     if (oldPunkBidId !== null) {
       let oldPunkBid = Bid.load(oldPunkBidId.toString())!;
       sale.amount = oldPunkBid.amount;
-    }
 
-    //Update tradeValues
-    contract.totalAmountTraded = contract.totalAmountTraded.plus(
-      event.params.value
-    );
-    contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
+      //Update tradeValues
+      contract.totalAmountTraded = contract.totalAmountTraded.plus(
+        oldBid.amount
+      );
+      contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
+    }
 
     //Update account
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BigInt.fromI32(1)
     );
+
     //We get the true owner from CToken and increment their holdings
     let toAccount = getOrCreateAccount(
       Address.fromString(getOwnerFromCToken(event))
