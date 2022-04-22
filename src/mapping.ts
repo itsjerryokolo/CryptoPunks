@@ -473,7 +473,14 @@ export function handlePunkBought(event: PunkBought): void {
     );
     //Update Sale fields
     sale.to = getOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
-    sale.amount = oldBid.amount;
+
+    //Summon currentBid and update the sale amount from the acceptedBid which was created transactions ago.
+    let oldPunkBidId = punk.currentBid;
+    if (oldPunkBidId !== null) {
+      let oldPunkBid = Bid.load(oldPunkBidId.toString())!;
+      sale.amount = oldPunkBid.amount;
+    }
+
     //Update tradeValues
     contract.totalAmountTraded = contract.totalAmountTraded.plus(
       event.params.value
