@@ -243,6 +243,14 @@ export function handlePunkOffered(event: PunkOffered): void {
 
   let punk = Punk.load(event.params.punkIndex.toString())!;
 
+  //We close the old Ask anytime a new Bid is created
+  let oldAskId = punk.currentAsk;
+  if (oldAskId !== null) {
+    let oldAsk = Ask.load(oldAskId)!;
+    oldAsk.open = false;
+    oldAsk.save();
+  }
+
   let askCreated = createAskCreated(event.params.punkIndex, event);
   askCreated.from = punk.owner;
   askCreated.amount = event.params.minValue;
@@ -282,6 +290,13 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   let punk = Punk.load(event.params.punkIndex.toString())!;
   let account = getOrCreateAccount(event.params.fromAddress);
 
+  //We close the old bid anytime a new Bid is created
+  let oldBidId = punk.currentBid;
+  if (oldBidId !== null) {
+    let oldBid = Bid.load(oldBidId)!;
+    oldBid.open = false;
+    oldBid.save();
+  }
   let bid = getOrCreateBid(event.params.fromAddress.toHexString(), event);
   //Update bid fields
   bid.amount = event.params.value;
