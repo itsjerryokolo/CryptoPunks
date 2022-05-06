@@ -74,6 +74,8 @@ export function handleAssign(event: Assigned): void {
   punk.wrapped = false;
   punk.tokenId = event.params.punkIndex;
   punk.owner = event.params.to.toHexString();
+  punk.numberOfTransfers = BigInt.fromI32(0);
+  punk.numberOfSales = BigInt.fromI32(0);
 
   let assign = getOrCreateAssign(
     event.params.punkIndex,
@@ -179,6 +181,8 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     let toAccount = getOrCreateAccount(event.params.to);
     let fromAccount = getOrCreateAccount(event.params.from);
     let punk = Punk.load(event.params.punkIndex.toString())!;
+
+    punk.numberOfTransfers = punk.numberOfTransfers.plus(BigInt.fromI32(1));
 
     let transfer = getOrCreateTransfer(event.params.punkIndex, event); //TODO: Update remaining transfer fields, use schema as reference
     transfer.from = fromAccount.id;
@@ -476,6 +480,7 @@ export function handlePunkBought(event: PunkBought): void {
     punk.purchasedBy = getOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
     punk.owner = getOwnerFromCToken(event);
     punk.currentBidRemoved = bidRemoved.id; //Save the current BidRemoved for future reference
+    punk.numberOfSales = punk.numberOfSales.plus(BigInt.fromI32(1)); //Increment number of sales
 
     //Create relationship with OldBid
     bidRemoved.bid = oldBid.id;
@@ -579,6 +584,7 @@ export function handlePunkBought(event: PunkBought): void {
     //Update Punk entity
     punk.purchasedBy = toAccount.id;
     punk.owner = toAccount.id;
+    punk.numberOfSales = punk.numberOfSales.plus(BigInt.fromI32(1)); //Increment number of sales
 
     //Update trade values
     contract.totalAmountTraded = contract.totalAmountTraded.plus(
@@ -656,6 +662,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       BigInt.fromI32(1)
     );
     punk.owner = toAccount.id;
+    punk.numberOfTransfers = punk.numberOfTransfers.plus(BigInt.fromI32(1));
 
     //Write
     fromAccount.save();
