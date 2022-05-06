@@ -25,6 +25,10 @@ interface NFT {
   "Contract metadata"
   contract: Contract
 
+  numberOfTransfers: BigInt!
+
+  numberOfSales: BigInt!
+
   "Punk index"
   tokenId: BigInt!
 
@@ -136,6 +140,10 @@ type Punk implements NFT @entity {
 
   "Current BidCreated event"
   currentBidCreated: BidCreated
+
+  numberOfTransfers: BigInt!
+
+  numberOfSales: BigInt!
 
   "Current AskRemoved event"
   currentAskRemoved: AskRemoved
