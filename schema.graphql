@@ -141,8 +141,10 @@ type Punk implements NFT @entity {
   "Current BidCreated event"
   currentBidCreated: BidCreated
 
+  "Number of times Punk has been transferred"
   numberOfTransfers: BigInt!
 
+  "Number of times Punk was sold"
   numberOfSales: BigInt!
 
   "Current AskRemoved event"
@@ -334,7 +336,7 @@ type AskCreated implements Event @entity(immutable: true) {
   from: Account
 
   to: Account
-  ask: Ask!
+  ask: Ask
 
   "Ask in ETH"
   amount: BigInt
@@ -361,7 +363,7 @@ type BidCreated implements Event @entity(immutable: true) {
   from: Account
 
   to: Account
-  bid: Bid!
+  bid: Bid
 
   "Bid in ETH"
   amount: BigInt
