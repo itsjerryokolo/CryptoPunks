@@ -457,6 +457,7 @@ export function handlePunkBought(event: PunkBought): void {
     oldBid.removed = bidRemoved.id;
     oldBid.from = fromAccount.id;
     oldBid.created = punk.currentBidCreated;
+    oldBid.amount = event.params.value;
     oldBid.open = false;
     oldBid.nft = punk.id;
 
@@ -502,7 +503,7 @@ export function handlePunkBought(event: PunkBought): void {
 
       //Update tradeValues
       contract.totalAmountTraded = contract.totalAmountTraded.plus(
-        oldBid.amount
+        event.params.value
       );
       contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
     }
