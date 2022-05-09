@@ -28,28 +28,7 @@ You'll find the description of the various fields in the `schema.graphql`
 
 
 ## Queries
-### Query the Asks for a Punk
-```graphql
-{
-  asks(orderDirection: desc, where: {nft: "365"}) {
-    id
-    open
-    amount
-    created {
-      blockNumber
-      timestamp
-    }
-    removed {
-      id
-      blockNumber
-      timestamp
-    }
-    from {
-      id
-    }
-  }
-}
-```
+See the [Queries.md](Queries.md) for example queries.
 
 ### Query Owner Data
 
