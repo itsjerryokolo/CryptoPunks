@@ -15,7 +15,6 @@ export function createAskCreated(
   askCreated.txHash = event.transaction.hash;
   askCreated.blockHash = event.block.hash;
   askCreated.contract = event.address.toHexString();
-  askCreated.save();
 
   return askCreated as AskCreated;
 }
@@ -33,7 +32,6 @@ export function createAskRemoved(
   askRemoved.txHash = event.transaction.hash;
   askRemoved.blockHash = event.block.hash;
   askRemoved.contract = event.address.toHexString();
-  askRemoved.save();
 
   return askRemoved as AskRemoved;
 }
@@ -44,9 +42,9 @@ export function updateOldAsk(
 ): Ask {
   //Update Old Ask or State of Ask
   let oldAskId = latestAskIdFromReferenceId;
-  let oldAsk = Ask.load(oldAskId.concat("-ASK"));
+  let oldAsk = Ask.load(oldAskId);
   if (!oldAsk) {
-    oldAsk = new Ask(oldAskId.concat("-ASK"));
+    oldAsk = new Ask(oldAskId);
     oldAsk.from = fromAddress;
     oldAsk.offerType = "ASK";
     oldAsk.open = true;
@@ -67,7 +65,6 @@ export function getOrCreateAsk(
     ask.from = fromAddress;
     ask.open = true;
     ask.offerType = "ASK";
-    ask.save(); //We have a new Ask entity in the store incase we need the ID elsewhere
   }
 
   //ask.created = "" // nullable, needs to be the id of createAskCreated in same handler if it exists.

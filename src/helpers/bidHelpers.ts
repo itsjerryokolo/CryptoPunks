@@ -14,7 +14,6 @@ export function getOrCreateBid(
     bid.from = fromAddress;
     bid.offerType = "BID";
     bid.open = true;
-    bid.save(); //We have a new Bid entity in the store incase we need the ID elsewhere
   }
 
   /**
@@ -45,7 +44,6 @@ export function updateOldBid(
     oldBid.from = fromAddress;
     oldBid.offerType = "BID";
     oldBid.open = true;
-    oldBid.save();
   }
 
   return oldBid as Bid;
@@ -67,7 +65,6 @@ export function createBidCreated(
   bidCreated.txHash = event.transaction.hash;
   bidCreated.blockHash = event.block.hash;
   bidCreated.contract = event.address.toHexString();
-  bidCreated.save();
 
   return bidCreated as BidCreated;
 }
@@ -88,7 +85,6 @@ export function createBidRemoved(
   bidRemoved.txHash = event.transaction.hash;
   bidRemoved.blockHash = event.block.hash;
   bidRemoved.type = "BID_REMOVED";
-  bidRemoved.save();
 
   return bidRemoved as BidRemoved;
 }

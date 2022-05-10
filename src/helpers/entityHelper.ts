@@ -103,7 +103,6 @@ export function getOrCreateCToken(event: ethereum.Event): CToken {
     cToken.blockHash = event.block.hash;
     cToken.txHash = event.transaction.hash;
     cToken.timestamp = event.block.timestamp;
-    cToken.save();
   }
   return cToken as CToken;
 }
