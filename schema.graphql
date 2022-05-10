@@ -468,10 +468,10 @@ type CToken
   "TxHash + LogIndex" #This ID/Entity is used for referencing events in the same transaction
   id: ID!
 
-  "Receipent"
+  "Sender"
   from: Account!
 
-  "Sender"
+  "Receipent"
   to: Account!
 
   "New owner of Punk"
