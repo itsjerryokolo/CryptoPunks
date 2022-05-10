@@ -403,7 +403,6 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
      Update the currentAskRemoved for the punk in Punk entity for future reference
        e.g (When a bid is accepted, we close the Ask with the right relationship to AskRemoved, so we can reference this field from the Punk entity elsewhere)
   */
-  punk.currentAskRemoved = askRemoved.id;
 
   //Load old Ask of Punk and Close it
   let oldAskId = punk.currentAsk;
@@ -423,7 +422,24 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
     oldAsk.open = false;
     oldAsk.from = event.transaction.from.toHexString();
     oldAsk.save();
+  } else {
+    //https://cryptopunks.app/cryptopunks/details/2158
+    //This is a weird case where an offer can be withdrawn before it's created
+
+    let ask = getOrCreateAsk(punk.owner, event);
+    ask.nft = punk.id;
+    ask.open = false;
+    ask.from = punk.owner;
+    ask.removed = askRemoved.id;
+    ask.amount = BigInt.fromI32(0);
+
+    askRemoved.amount = BigInt.fromI32(0);
+    askRemoved.ask = ask.id;
+
+    ask.save();
   }
+
+  punk.currentAskRemoved = askRemoved.id;
 
   //Write
   askRemoved.save();
