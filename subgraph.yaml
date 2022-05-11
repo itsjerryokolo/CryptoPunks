@@ -63,13 +63,7 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
-        - OwnershipTransferred
-        - Paused
         - ProxyRegistered
-        - Transfer
-        - Unpaused
       abis:
         - name: WrappedPunks
           file: ./abis/WrappedPunks.json
