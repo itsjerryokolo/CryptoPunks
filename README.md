@@ -28,80 +28,15 @@ You'll find the description of the various fields in the `schema.graphql`
 
 
 ## Queries
-See the [Queries.md](Queries.md) for example queries.
+A list of example queries you can make can be found here: [Queries.md](Queries.md) 
 
-### Query Owner Data
-
-```graphql
-{
-  accounts(where: {id: "0x6aeda057364cc4aad943cac04a1c149d90e10a3b"}) {
-    id
-    nftsOwned {
-      id
-    }
-    bids{
-      id
-    }
-    asks{
-      id
-      created{
-        id
-        txHash
-        timestamp
-      }
-    }
-    bought{
-      id
-      timestamp
-      nft{
-        id
-      }
-    }
-    sent{
-      id
-      nft{
-        id
-      }
-      txHash
-      timestamp
-    }
-    received{
-      id
-      nft{
-        id
-      }
-      txHash
-      timestamp
-    }
-    assigned{
-      id
-      nft{id}
-      timestamp
-      txHash
-    }
-  }
-}
-```
-
-## Available Enums for Punk
-
+### Available Enums for Punk
 - male
 - female
 - zombie
 - alien
 - ape
 
-### Query male Punks
-
-```graphql
-{
-  punks(where: { type: male }) {
-    id
-    accessories
-    type
-  }
-}
-```
 
 ## Run your local Graph Node
 
