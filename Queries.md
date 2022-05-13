@@ -1,11 +1,13 @@
 # Queries
+
 ## Sales for the last 30 days
+
 ```graphql
-query MyQuery {
+query Last30DaysSales($timestamp_gt: String) {
   sales(
     orderBy: timestamp
     orderDirection: desc
-    where: {timestamp_gt: "1649238346"}
+    where: { timestamp_gt: $timestamp_gt }
   ) {
     id
     to {
@@ -18,27 +20,47 @@ query MyQuery {
 }
 ```
 
+With `$timestamp_gt` set like this:
+
+```javascript
+{
+  $timestamp_gt: Math.round(Date.now() / 1000) - 30 * 24 * 60 * 60;
+}
+```
+
 ## Query Punk data
+
 ```graphql
 {
-punks(where:{id: "1000"}){
+  punks(where: { id: "1000" }) {
     id
-    owner{id}
-    assignedTo{id}
+    owner {
+      id
+    }
+    assignedTo {
+      id
+    }
     wrapped
-    currentBidCreated{id}
-    currentAskCreated{id}
+    currentBidCreated {
+      id
+    }
+    currentAskCreated {
+      id
+    }
     numberOfTransfers
     numberOfSales
-    events{id}
+    events {
+      id
+    }
   }
 }
 ```
 
 ## Query the Asks for a Punk
+
 ```graphql
 {
-  asks(orderDirection: desc, where: {nft: "365"}) {
+  asks(orderDirection: desc, where: { nft: "365" }) {
     id
     open
     amount
@@ -62,54 +84,57 @@ punks(where:{id: "1000"}){
 
 ```graphql
 {
-  accounts(where: {id: "0x6aeda057364cc4aad943cac04a1c149d90e10a3b"}) {
+  accounts(where: { id: "0x6aeda057364cc4aad943cac04a1c149d90e10a3b" }) {
     id
     nftsOwned {
       id
     }
-    bids{
+    bids {
       id
     }
-    asks{
+    asks {
       id
-      created{
+      created {
         id
         txHash
         timestamp
       }
     }
-    bought{
+    bought {
       id
       timestamp
-      nft{
+      nft {
         id
       }
     }
-    sent{
+    sent {
       id
-      nft{
-        id
-      }
-      txHash
-      timestamp
-    }
-    received{
-      id
-      nft{
+      nft {
         id
       }
       txHash
       timestamp
     }
-    assigned{
+    received {
       id
-      nft{id}
+      nft {
+        id
+      }
+      txHash
+      timestamp
+    }
+    assigned {
+      id
+      nft {
+        id
+      }
       timestamp
       txHash
     }
   }
 }
 ```
+
 ## Query male Punks
 
 ```graphql
@@ -121,3 +146,25 @@ punks(where:{id: "1000"}){
   }
 }
 ```
+
+Who owns the most expensive punk?
+What are the total sales for the last 30days
+Which punk has had the most transfers?
+Which punk has be sold the most?
+Who has spent the most on punks?
+Who owns the most punk?
+Average total sales over 7days
+Average total sales in 30 days
+Punk with the most trait
+Percentage difference in sale from previous day
+How many punks were sold in 7 day and 30day period
+How many male punks?
+How many female punks?
+Which male punk has been sold the most?
+Which female punk has been sold the most?
+The most expensive ask for a male punk?
+The most expensive ask for a female punk?
+The most expensive bid for a male punk?
+The most expensive bid for a female punk?
+Which punks hasn’t been moved since assign event?
+Which address own a punk but haven’t moved it?
