@@ -50,7 +50,6 @@ import {
   createAskCreated,
   createAskRemoved,
   getOrCreateAsk,
-  updateOldAsk,
 } from "./helpers/askHelpers";
 
 import {
@@ -248,34 +247,31 @@ export function handlePunkOffered(event: PunkOffered): void {
   if (oldAskId !== null) {
     log.debug("Old askId: {}", [punk.currentAsk!]);
 
-    let oldAsk = updateOldAsk(punk.owner, oldAskId);
-    oldAsk.amount = event.params.minValue;
+    let oldAsk = Ask.load(oldAskId)!;
     oldAsk.nft = punk.id;
     oldAsk.open = false;
     oldAsk.save();
-  } else {
-    let ask = getOrCreateAsk(punk.owner, event);
-    //Update Ask fields
-    ask.nft = punk.id;
-    ask.from = punk.owner;
-
-    ask.amount = event.params.minValue;
-    ask.created = askCreated.id;
-
-    punk.currentAsk = ask.id;
-    askCreated.ask = ask.id;
-
-    askCreated.from = punk.owner;
-    askCreated.amount = event.params.minValue;
-    ask.open = true;
-
-    punk.currentAskCreated = askCreated.id; //Update the currentAsk for the punk in Punk entity for future reference
-
-    //Write
-    askCreated.save();
-    punk.save();
-    ask.save();
   }
+
+  let ask = getOrCreateAsk(punk.owner, event);
+  //Update Ask fields
+  ask.nft = punk.id;
+  ask.from = punk.owner;
+  ask.amount = event.params.minValue;
+  ask.created = askCreated.id;
+  ask.open = true;
+
+  askCreated.ask = ask.id;
+  askCreated.from = punk.owner;
+  askCreated.amount = event.params.minValue;
+
+  punk.currentAskCreated = askCreated.id;
+  punk.currentAsk = ask.id; //Update the currentAsk for the punk in Punk entity for future reference
+
+  //Write
+  askCreated.save();
+  punk.save();
+  ask.save();
 }
 
 export function handlePunkBidEntered(event: PunkBidEntered): void {
@@ -357,7 +353,7 @@ export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
     oldBid.from = fromAccount.id;
     oldBid.open = false;
 
-    //Create relationship between the old Bid and BidRemoved to provide information on  the bid what was withdrawn/removed
+    //Create relationship between the old Bid and BidRemoved to provide information on the bid what was withdrawn/removed
     oldBid.removed = bidRemoved.id;
 
     //Create relationship with Bid

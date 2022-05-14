@@ -36,24 +36,6 @@ export function createAskRemoved(
   return askRemoved as AskRemoved;
 }
 
-export function updateOldAsk(
-  fromAddress: string,
-  latestAskIdFromReferenceId: string //getIdforReferenceFromCToken()
-): Ask {
-  //Update Old Ask or State of Ask
-  let oldAskId = latestAskIdFromReferenceId;
-  let oldAsk = Ask.load(oldAskId);
-  if (!oldAsk) {
-    oldAsk = new Ask(oldAskId);
-    oldAsk.from = fromAddress;
-    oldAsk.offerType = "ASK";
-    oldAsk.open = true;
-    oldAsk.save();
-  }
-
-  return oldAsk as Ask;
-}
-
 export function getOrCreateAsk(
   fromAddress: string,
   event: ethereum.Event
