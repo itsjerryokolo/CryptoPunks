@@ -258,31 +258,24 @@ export function handlePunkOffered(event: PunkOffered): void {
     //Update Ask fields
     ask.nft = punk.id;
     ask.from = punk.owner;
-    log.debug("Amount detected:{}", [event.params.minValue.toString()]);
 
     ask.amount = event.params.minValue;
-
-    log.debug("Ask Details detected:{}", [
-      event.params.minValue.toString(),
-      ask.amount.toString(),
-    ]);
-
     ask.created = askCreated.id;
 
     punk.currentAsk = ask.id;
     askCreated.ask = ask.id;
 
+    askCreated.from = punk.owner;
+    askCreated.amount = event.params.minValue;
+    ask.open = true;
+
+    punk.currentAskCreated = askCreated.id; //Update the currentAsk for the punk in Punk entity for future reference
+
+    //Write
+    askCreated.save();
+    punk.save();
     ask.save();
   }
-
-  askCreated.from = punk.owner;
-  askCreated.amount = event.params.minValue;
-
-  punk.currentAskCreated = askCreated.id; //Update the currentAsk for the punk in Punk entity for future reference
-
-  //Write
-  askCreated.save();
-  punk.save();
 }
 
 export function handlePunkBidEntered(event: PunkBidEntered): void {
@@ -310,19 +303,16 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
     let oldBid = Bid.load(oldBidId)!;
     oldBid.open = false;
     oldBid.save();
-  } else {
-    let bid = getOrCreateBid(event.params.fromAddress.toHexString(), event);
-    //Update bid fields
-    bid.amount = event.params.value;
-    bid.nft = punk.id;
-    bid.from = account.id;
-    bid.created = bidCreated.id;
-
-    punk.currentBid = bid.id;
-    bidCreated.bid = bid.id;
-
-    bid.save();
   }
+  let bid = getOrCreateBid(event.params.fromAddress.toHexString(), event);
+  //Update bid fields
+  bid.amount = event.params.value;
+  bid.nft = punk.id;
+  bid.from = account.id;
+  bid.created = bidCreated.id;
+
+  punk.currentBid = bid.id;
+  bidCreated.bid = bid.id;
 
   //Create relationship with Bid
   bidCreated.amount = event.params.value;
@@ -332,9 +322,9 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   //Write
   punk.save();
   account.save();
+  bid.save();
   bidCreated.save();
 }
-
 export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   /** 
     This event first only fires when a bid is removed
@@ -414,7 +404,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
     //Create relationship between the OldAsk with AskCreated by summoning creation EVENT from Punk entity to provide information on creation EVENT
     oldAsk.created = punk.currentAskCreated;
 
-    //Create relationship between the OldAsk and the current AskRemoved to record removal
+    //Create relationship between the OldAsk and the current AskRemoved to provide information on removal EVENT
     askRemoved.ask = oldAsk.id;
 
     //Update OldAsk fields
@@ -431,8 +421,11 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
     ask.open = false;
     ask.from = punk.owner;
     ask.removed = askRemoved.id;
-    ask.amount = BigInt.fromI32(0);
 
+    //Amount is 0 because this field is non-nullable & this basically initializes the field so it doesn't fail.
+    //Also, this event doesn't emit the amount.
+
+    ask.amount = BigInt.fromI32(0);
     askRemoved.amount = BigInt.fromI32(0);
     askRemoved.ask = ask.id;
 
