@@ -26,7 +26,12 @@ import {
   Bid,
 } from "../generated/schema";
 
-import { ZERO_ADDRESS, WRAPPED_PUNK_ADDRESS } from "./constant";
+import {
+  ZERO_ADDRESS,
+  WRAPPED_PUNK_ADDRESS,
+  BIGINT_ONE,
+  BIGINT_ZERO,
+} from "./constant";
 import {
   getOrCreateAccount,
   createMetadata,
@@ -37,7 +42,7 @@ import {
 
 import { getOrCreateTransfer } from "./helpers/transferHelper";
 
-import { getOwnerFromCToken } from "./utils";
+import { calculateAverage, getOwnerFromCToken } from "./utils";
 
 import {
   getOrCreateCryptoPunkContract,
@@ -74,8 +79,10 @@ export function handleAssign(event: Assigned): void {
   punk.wrapped = false;
   punk.tokenId = event.params.punkIndex;
   punk.owner = event.params.to.toHexString();
-  punk.numberOfTransfers = BigInt.fromI32(0);
-  punk.numberOfSales = BigInt.fromI32(0);
+  punk.numberOfTransfers = BIGINT_ZERO;
+  punk.numberOfSales = BIGINT_ZERO;
+  punk.totalAmountSpentOnPunk = BIGINT_ZERO;
+  punk.averageSalePrice = BIGINT_ZERO;
 
   let assign = getOrCreateAssign(
     event.params.punkIndex,
@@ -90,10 +97,10 @@ export function handleAssign(event: Assigned): void {
     if (!type) {
       type = new Trait(trait.type);
       type.type = "TYPE";
-      type.numberOfNfts = BigInt.fromI32(0);
+      type.numberOfNfts = BIGINT_ZERO;
     }
 
-    type.numberOfNfts = type.numberOfNfts.plus(BigInt.fromI32(1));
+    type.numberOfNfts = type.numberOfNfts.plus(BIGINT_ONE);
     type.save();
     traits.push(type.id);
 
@@ -105,9 +112,9 @@ export function handleAssign(event: Assigned): void {
       if (accessory == null) {
         accessory = new Trait(acessoryId);
         accessory.type = "ACCESSORY";
-        accessory.numberOfNfts = BigInt.fromI32(0);
+        accessory.numberOfNfts = BIGINT_ZERO;
       }
-      accessory.numberOfNfts = accessory.numberOfNfts.plus(BigInt.fromI32(1));
+      accessory.numberOfNfts = accessory.numberOfNfts.plus(BIGINT_ONE);
       accessory.save();
       traits.push(accessory.id);
     }
@@ -116,11 +123,9 @@ export function handleAssign(event: Assigned): void {
   }
 
   //Update account punk holdings
-  account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
-    BigInt.fromI32(1)
-  );
+  account.numberOfPunksOwned = account.numberOfPunksOwned.plus(BIGINT_ONE);
   account.numberOfPunksAssigned = account.numberOfPunksAssigned.plus(
-    BigInt.fromI32(1)
+    BIGINT_ONE
   );
 
   //Write
@@ -185,7 +190,7 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     let fromAccount = getOrCreateAccount(event.params.from);
     let punk = Punk.load(event.params.punkIndex.toString())!;
 
-    punk.numberOfTransfers = punk.numberOfTransfers.plus(BigInt.fromI32(1));
+    punk.numberOfTransfers = punk.numberOfTransfers.plus(BIGINT_ONE);
 
     let transfer = getOrCreateTransfer(event.params.punkIndex, event); //TODO: Update remaining transfer fields, use schema as reference
     transfer.from = fromAccount.id;
@@ -193,18 +198,16 @@ export function handlePunkTransfer(event: PunkTransfer): void {
 
     //Update toAccount aggregates
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BigInt.fromI32(1)
+      BIGINT_ONE
     );
-    toAccount.numberOfTransfers = toAccount.numberOfTransfers.plus(
-      BigInt.fromI32(1)
-    );
+    toAccount.numberOfTransfers = toAccount.numberOfTransfers.plus(BIGINT_ONE);
 
     //Update fromAccount aggregates
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BigInt.fromI32(1)
+      BIGINT_ONE
     );
     fromAccount.numberOfTransfers = fromAccount.numberOfTransfers.plus(
-      BigInt.fromI32(1)
+      BIGINT_ONE
     );
 
     //Capture punk transfers and owners if not transfered to WRAPPED PUNK ADDRESS
@@ -432,8 +435,8 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
     //Amount is 0 because this field is non-nullable & this basically initializes the field so it doesn't fail.
     //Also, this event doesn't emit the amount.
 
-    ask.amount = BigInt.fromI32(0);
-    askRemoved.amount = BigInt.fromI32(0);
+    ask.amount = BIGINT_ZERO;
+    askRemoved.amount = BIGINT_ZERO;
     askRemoved.ask = ask.id;
 
     ask.save();
@@ -512,12 +515,6 @@ export function handlePunkBought(event: PunkBought): void {
       oldAsk.save();
     }
 
-    //Update Punk entity
-    punk.purchasedBy = getOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
-    punk.owner = getOwnerFromCToken(event);
-    punk.currentBidRemoved = bidRemoved.id; //Save the current BidRemoved for future reference
-    punk.numberOfSales = punk.numberOfSales.plus(BigInt.fromI32(1)); //Increment number of sales
-
     //Create new SaleEVENT
     let sale = getOrCreateSale(
       event.params.fromAddress,
@@ -539,26 +536,46 @@ export function handlePunkBought(event: PunkBought): void {
       sale.amount = oldPunkBid.amount;
       toAccount.totalSpent = toAccount.totalSpent.plus(oldPunkBid.amount);
       fromAccount.totalEarned = fromAccount.totalEarned.plus(oldPunkBid.amount);
+      punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(
+        oldPunkBid.amount
+      );
+      contract.totalAmountTraded = contract.totalAmountTraded.plus(
+        oldBid.amount
+      );
     }
+
+    //Update Punk entity
+    punk.purchasedBy = getOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
+    punk.owner = getOwnerFromCToken(event);
+    punk.currentBidRemoved = bidRemoved.id; //Save the current BidRemoved for future reference
+    punk.numberOfSales = punk.numberOfSales.plus(BIGINT_ONE); //Increment number of sales
+    if (punk.numberOfSales != BIGINT_ZERO) {
+      punk.averageSalePrice = calculateAverage(
+        punk.totalAmountSpentOnPunk,
+        punk.numberOfSales
+      );
+    }
+
     //Update tradeValues
-    contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
+    contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
 
     //Update fromAccount aggregates
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BigInt.fromI32(1)
+      BIGINT_ONE
     );
-    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(
-      BigInt.fromI32(1)
-    );
+    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
 
     //Update toAccount aggregates
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BigInt.fromI32(1)
+      BIGINT_ONE
     );
-    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(
-      BigInt.fromI32(1)
-    );
-
+    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
+    if (toAccount.numberOfPurchases != BIGINT_ZERO) {
+      toAccount.averageAmountSpent = calculateAverage(
+        toAccount.totalSpent,
+        toAccount.numberOfPurchases
+      );
+    }
     //Write
     contract.save();
     punk.save();
@@ -622,34 +639,41 @@ export function handlePunkBought(event: PunkBought): void {
     //Update Punk entity
     punk.purchasedBy = toAccount.id;
     punk.owner = toAccount.id;
-    punk.numberOfSales = punk.numberOfSales.plus(BigInt.fromI32(1)); //Increment number of sales
-
+    punk.numberOfSales = punk.numberOfSales.plus(BIGINT_ONE); //Increment number of sales
+    punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(
+      event.params.value
+    );
+    if (punk.numberOfSales != BIGINT_ZERO) {
+      punk.averageSalePrice = calculateAverage(
+        punk.totalAmountSpentOnPunk,
+        punk.numberOfSales
+      );
+    }
     //Update trade values
     contract.totalAmountTraded = contract.totalAmountTraded.plus(
       event.params.value
     );
-    contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
+    contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
 
     //Update toAccount aggregates
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BigInt.fromI32(1)
-    );
-    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BigInt.fromI32(1)
+      BIGINT_ONE
     );
     toAccount.totalSpent = toAccount.totalSpent.plus(event.params.value);
-    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(
-      BigInt.fromI32(1)
-    );
-
+    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
+    if (toAccount.numberOfSales != BIGINT_ZERO) {
+      toAccount.averageAmountSpent = calculateAverage(
+        toAccount.totalSpent,
+        toAccount.numberOfPurchases
+      );
+    }
     //Update fromAccount aggregates
-    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(
-      BigInt.fromI32(1)
-    );
+    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BigInt.fromI32(1)
+      BIGINT_ONE
     );
     fromAccount.totalEarned = fromAccount.totalEarned.plus(event.params.value);
+
     //Write
     punk.save();
     fromAccount.save();
@@ -678,7 +702,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       event
     );
 
-    contract.totalSupply = contract.totalSupply.plus(BigInt.fromI32(1));
+    contract.totalSupply = contract.totalSupply.plus(BIGINT_ONE);
 
     wrap.to = event.params.to.toHexString();
 
@@ -693,7 +717,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
       event
     );
 
-    contract.totalSupply = contract.totalSupply.minus(BigInt.fromI32(1));
+    contract.totalSupply = contract.totalSupply.minus(BIGINT_ONE);
 
     //Write
     unWrap.save();
@@ -706,13 +730,13 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let punk = Punk.load(event.params.tokenId.toString())!;
 
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BigInt.fromI32(1)
+      BIGINT_ONE
     );
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BigInt.fromI32(1)
+      BIGINT_ONE
     );
     punk.owner = toAccount.id;
-    punk.numberOfTransfers = punk.numberOfTransfers.plus(BigInt.fromI32(1));
+    punk.numberOfTransfers = punk.numberOfTransfers.plus(BIGINT_ONE);
 
     //Write
     fromAccount.save();

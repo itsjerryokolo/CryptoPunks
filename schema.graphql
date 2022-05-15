@@ -114,6 +114,9 @@ type Account @entity {
 
   "Total amount earned from selling Punks by Account"
   totalEarned: BigInt!
+
+  "Average amount spent buying Punks by Account"
+  averageAmountSpent: BigInt!
 }
 
 type Punk implements NFT @entity {
@@ -170,6 +173,12 @@ type Punk implements NFT @entity {
 
   "Current BidRemoved event"
   currentBidRemoved: BidRemoved
+
+  "Total amount spent purchasing Punk"
+  totalAmountSpentOnPunk: BigInt!
+
+  "Average price for Punk"
+  averageSalePrice: BigInt!
 }
 
 type MetaData @entity(immutable: true) {
