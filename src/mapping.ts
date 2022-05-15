@@ -119,6 +119,9 @@ export function handleAssign(event: Assigned): void {
   account.numberOfPunksOwned = account.numberOfPunksOwned.plus(
     BigInt.fromI32(1)
   );
+  account.numberOfPunksAssigned = account.numberOfPunksAssigned.plus(
+    BigInt.fromI32(1)
+  );
 
   //Write
   account.save();
@@ -188,11 +191,19 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     transfer.from = fromAccount.id;
     transfer.to = toAccount.id;
 
-    //Update account punk holdings
+    //Update toAccount aggregates
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BigInt.fromI32(1)
     );
+    toAccount.numberOfTransfers = toAccount.numberOfTransfers.plus(
+      BigInt.fromI32(1)
+    );
+
+    //Update fromAccount aggregates
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BigInt.fromI32(1)
+    );
+    fromAccount.numberOfTransfers = fromAccount.numberOfTransfers.plus(
       BigInt.fromI32(1)
     );
 
@@ -516,25 +527,35 @@ export function handlePunkBought(event: PunkBought): void {
     //Update Sale fields
     sale.to = getOwnerFromCToken(event); //Get the current owner from the cTokenTRANSFER event using the same globalID
 
+    //We get the true owner from CToken and increment their holdings
+    let toAccount = getOrCreateAccount(
+      Address.fromString(getOwnerFromCToken(event))
+    );
+
     //Summon currentBid and update the sale amount from the acceptedBid which was created transactions ago.
     let oldPunkBidId = punk.currentBid;
     if (oldPunkBidId !== null) {
       let oldPunkBid = Bid.load(oldPunkBidId.toString())!;
       sale.amount = oldPunkBid.amount;
+      toAccount.totalSpent = toAccount.totalSpent.plus(oldPunkBid.amount);
+      fromAccount.totalEarned = fromAccount.totalEarned.plus(oldPunkBid.amount);
     }
     //Update tradeValues
     contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
 
-    //Update account
+    //Update fromAccount aggregates
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BigInt.fromI32(1)
     );
-
-    //We get the true owner from CToken and increment their holdings
-    let toAccount = getOrCreateAccount(
-      Address.fromString(getOwnerFromCToken(event))
+    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(
+      BigInt.fromI32(1)
     );
+
+    //Update toAccount aggregates
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(
       BigInt.fromI32(1)
     );
 
@@ -609,14 +630,26 @@ export function handlePunkBought(event: PunkBought): void {
     );
     contract.totalSales = contract.totalSales.plus(BigInt.fromI32(1));
 
-    //Update account punk holdings
+    //Update toAccount aggregates
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
+      BigInt.fromI32(1)
+    );
+    toAccount.totalSpent = toAccount.totalSpent.plus(event.params.value);
+    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(
+      BigInt.fromI32(1)
+    );
+
+    //Update fromAccount aggregates
+    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(
       BigInt.fromI32(1)
     );
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BigInt.fromI32(1)
     );
-
+    fromAccount.totalEarned = fromAccount.totalEarned.plus(event.params.value);
     //Write
     punk.save();
     fromAccount.save();

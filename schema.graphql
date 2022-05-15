@@ -96,6 +96,24 @@ type Account @entity {
 
   "Total number of Punks owned by account"
   numberOfPunksOwned: BigInt!
+
+  "Total number of Punks assigned to account"
+  numberOfPunksAssigned: BigInt!
+
+  "Total number of transfer by Account"
+  numberOfTransfers: BigInt!
+
+  "Total number of sales by Account"
+  numberOfSales: BigInt!
+
+  "Total number of purchases by Account"
+  numberOfPurchases: BigInt!
+
+  "Total amount spent buying Punks by Account"
+  totalSpent: BigInt!
+
+  "Total amount earned from selling Punks by Account"
+  totalEarned: BigInt!
 }
 
 type Punk implements NFT @entity {

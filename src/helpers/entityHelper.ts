@@ -17,6 +17,12 @@ export function getOrCreateAccount(address: Address): Account {
   if (!account) {
     account = new Account(id);
     account.numberOfPunksOwned = BigInt.fromI32(0);
+    account.numberOfSales = BigInt.fromI32(0);
+    account.totalEarned = BigInt.fromI32(0);
+    account.numberOfTransfers = BigInt.fromI32(0);
+    account.numberOfPunksAssigned = BigInt.fromI32(0);
+    account.numberOfPurchases = BigInt.fromI32(0);
+    account.totalSpent = BigInt.fromI32(0);
     account.save();
   }
 
