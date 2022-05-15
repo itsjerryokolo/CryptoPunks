@@ -31,3 +31,8 @@ export function getOwnerFromCToken(event: ethereum.Event): string {
 
   return owner;
 }
+
+export function calculateAverage(totalAmount: BigInt, qty: BigInt): BigInt {
+  let average = totalAmount.div(qty);
+  return average;
+}

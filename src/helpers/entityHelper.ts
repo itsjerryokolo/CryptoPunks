@@ -7,7 +7,7 @@ import {
   CToken,
   Sale,
 } from "../../generated/schema";
-import { TOKEN_URI, CONTRACT_URI, IMAGE_URI } from "../constant";
+import { TOKEN_URI, CONTRACT_URI, IMAGE_URI, BIGINT_ZERO } from "../constant";
 import { getGlobalId } from "../utils";
 
 export function getOrCreateAccount(address: Address): Account {
@@ -16,13 +16,14 @@ export function getOrCreateAccount(address: Address): Account {
 
   if (!account) {
     account = new Account(id);
-    account.numberOfPunksOwned = BigInt.fromI32(0);
-    account.numberOfSales = BigInt.fromI32(0);
-    account.totalEarned = BigInt.fromI32(0);
-    account.numberOfTransfers = BigInt.fromI32(0);
-    account.numberOfPunksAssigned = BigInt.fromI32(0);
-    account.numberOfPurchases = BigInt.fromI32(0);
-    account.totalSpent = BigInt.fromI32(0);
+    account.numberOfPunksOwned = BIGINT_ZERO;
+    account.numberOfSales = BIGINT_ZERO;
+    account.totalEarned = BIGINT_ZERO;
+    account.numberOfTransfers = BIGINT_ZERO;
+    account.numberOfPunksAssigned = BIGINT_ZERO;
+    account.numberOfPurchases = BIGINT_ZERO;
+    account.totalSpent = BIGINT_ZERO;
+    account.averageAmountSpent = BIGINT_ZERO;
     account.save();
   }
 
