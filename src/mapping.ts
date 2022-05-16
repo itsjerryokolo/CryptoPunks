@@ -661,7 +661,7 @@ export function handlePunkBought(event: PunkBought): void {
     );
     toAccount.totalSpent = toAccount.totalSpent.plus(event.params.value);
     toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
-    if (toAccount.numberOfSales != BIGINT_ZERO) {
+    if (toAccount.numberOfPurchases != BIGINT_ZERO) {
       toAccount.averageAmountSpent = calculateAverage(
         toAccount.totalSpent,
         toAccount.numberOfPurchases
