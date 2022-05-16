@@ -146,25 +146,25 @@ With `$timestamp_gt` set like this:
   }
 }
 ```
-
-Who owns the most expensive punk?
-What are the total sales for the last 30days
-Which punk has had the most transfers?
-Which punk has be sold the most?
-Who has spent the most on punks?
-Who owns the most punk?
-Average total sales over 7days
-Average total sales in 30 days
-Punk with the most trait
-Percentage difference in sale from previous day
-How many punks were sold in 7 day and 30day period
-How many male punks?
-How many female punks?
-Which male punk has been sold the most?
-Which female punk has been sold the most?
-The most expensive ask for a male punk?
-The most expensive ask for a female punk?
-The most expensive bid for a male punk?
-The most expensive bid for a female punk?
-Which punks hasn’t been moved since assign event?
-Which address own a punk but haven’t moved it?
+### TODO
+  - Who owns the most expensive punk?
+  - What are the total sales for the last 30days
+  - Which punk has had the most transfers?
+  - Which punk has be sold the most?
+  - Who has spent the most on punks?
+  - Who owns the most punk?
+  - Average total sales over 7days
+  - Average total sales in 30 days
+  - Punk with the most trait
+  - Percentage difference in sale from previous day
+  - How many punks were sold in 7 day and 30day period
+  - How many male punks?
+  - How many female punks?
+  - Which male punk has been sold the most?
+  - Which female punk has been sold the most?
+  - The most expensive ask for a male punk?
+  - The most expensive ask for a female punk?
+  - The most expensive bid for a male punk?
+  - The most expensive bid for a female punk?
+  - Which punks hasn’t been moved since assign event?
+  - Which address own a punk but haven’t moved it?
