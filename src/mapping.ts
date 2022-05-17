@@ -17,6 +17,8 @@ import {
 
 import { getTrait } from "./traits";
 
+import { Buy } from "../generated/ERC721Sale/ERC721Sale";
+
 import {
   Punk,
   Trait,
@@ -24,6 +26,7 @@ import {
   UserProxy,
   Ask,
   Bid,
+  CToken,
 } from "../generated/schema";
 
 import {
@@ -42,7 +45,11 @@ import {
 
 import { getOrCreateTransfer } from "./helpers/transferHelper";
 
-import { calculateAverage, getOwnerFromCToken } from "./utils";
+import {
+  calculateAverage,
+  getHashFromCToken,
+  getOwnerFromCToken,
+} from "./utils";
 
 import {
   getOrCreateCryptoPunkContract,
@@ -389,7 +396,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
   /**
    - This event fires when the owner removes their ask
    - Also fires when the owner's Ask is accepted which removes their ask and creates a SaleEVENT
-   - SaleEvent is a regular PunkBoughtEVENT which we already captured in handlePunkBought()
+      - SaleEvent is a regular PunkBoughtEVENT which we already captured in handlePunkBought()
 
     Actions 
       - createAskRemovedEVENT
@@ -549,6 +556,8 @@ export function handlePunkBought(event: PunkBought): void {
     punk.owner = getOwnerFromCToken(event);
     punk.currentBidRemoved = bidRemoved.id; //Save the current BidRemoved for future reference
     punk.numberOfSales = punk.numberOfSales.plus(BIGINT_ONE); //Increment number of sales
+
+    //We only want to calculate the average if the punk has been sold at least once
     if (punk.numberOfSales != BIGINT_ZERO) {
       punk.averageSalePrice = calculateAverage(
         punk.totalAmountSpentOnPunk,
@@ -643,6 +652,8 @@ export function handlePunkBought(event: PunkBought): void {
     punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(
       event.params.value
     );
+
+    //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
     if (punk.numberOfSales != BIGINT_ZERO) {
       punk.averageSalePrice = calculateAverage(
         punk.totalAmountSpentOnPunk,
@@ -659,6 +670,15 @@ export function handlePunkBought(event: PunkBought): void {
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BIGINT_ONE
     );
+
+    //Update fromAccount aggregates
+
+    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
+    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+      BIGINT_ONE
+    );
+    fromAccount.totalEarned = fromAccount.totalEarned.plus(event.params.value);
+
     toAccount.totalSpent = toAccount.totalSpent.plus(event.params.value);
     toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
     if (toAccount.numberOfPurchases != BIGINT_ZERO) {
@@ -667,12 +687,6 @@ export function handlePunkBought(event: PunkBought): void {
         toAccount.numberOfPurchases
       );
     }
-    //Update fromAccount aggregates
-    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
-    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BIGINT_ONE
-    );
-    fromAccount.totalEarned = fromAccount.totalEarned.plus(event.params.value);
 
     //Write
     punk.save();
@@ -729,6 +743,11 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let fromAccount = getOrCreateAccount(event.params.from);
     let punk = Punk.load(event.params.tokenId.toString())!;
 
+    //We create a cToken Entity here to store ID for future comparison
+    let cToken = getOrCreateCToken(event);
+    cToken.from = event.params.from.toHexString();
+    cToken.to = event.params.to.toHexString();
+
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BIGINT_ONE
     );
@@ -742,6 +761,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     fromAccount.save();
     toAccount.save();
     transfer.save();
+    cToken.save();
     punk.save();
   }
 
@@ -756,4 +776,69 @@ export function handleProxyRegistered(event: ProxyRegistered): void {
   userProxy.blockNumber = event.block.number;
   userProxy.blockHash = event.block.hash;
   userProxy.save();
+}
+
+export function handleBuy(event: Buy): void {
+  /**
+   * ROOT ISSUE: 
+     https://cryptopunks.app/cryptopunks/accountinfo?account=0x0c8e854729144ab6405939819f461764647f52ed
+     - Punk 4216 was sold while wrapped.
+            - https://etherscan.io/tx/0xae3fc4123415e985850f9d41dc162a84c0b6a976ead1deedecf0c2bad66685e2#eventlog
+              This is an example of a sale that occurs before a punk is unwrapped.
+      - We want to capture this so we can calculate average prices & update other aggregates both for punk & account
+  */
+
+  let wrappedPunkTransferHash = getHashFromCToken(event);
+
+  //We filter out punk transactions by comparing the hash with the hash from the WrappedPunk contract transfer event
+  if (wrappedPunkTransferHash == event.transaction.hash.toHexString()) {
+    let contract = getOrCreateCryptoPunkContract(event.address);
+    let fromAccount = getOrCreateAccount(event.params.seller);
+    let toAccount = getOrCreateAccount(event.params.buyer);
+    let punk = Punk.load(event.params.tokenId.toString())!;
+
+    let sale = getOrCreateSale(
+      event.params.seller,
+      event.params.tokenId.toString(),
+      event
+    );
+
+    sale.amount = event.params.price;
+    sale.to = event.params.buyer.toHexString();
+
+    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
+    fromAccount.totalEarned = fromAccount.totalEarned.plus(event.params.price);
+
+    //Update trade values
+    contract.totalAmountTraded = contract.totalAmountTraded.plus(
+      event.params.price
+    );
+    contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
+
+    toAccount.totalSpent = toAccount.totalSpent.plus(event.params.price);
+    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
+    if (toAccount.numberOfPurchases != BIGINT_ZERO) {
+      toAccount.averageAmountSpent = calculateAverage(
+        toAccount.totalSpent,
+        toAccount.numberOfPurchases
+      );
+    }
+
+    punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(
+      event.params.price
+    );
+
+    //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
+    if (punk.numberOfSales != BIGINT_ZERO) {
+      punk.averageSalePrice = calculateAverage(
+        punk.totalAmountSpentOnPunk,
+        punk.numberOfSales
+      );
+    }
+    toAccount.save();
+    fromAccount.save();
+    contract.save();
+    sale.save();
+    punk.save();
+  }
 }
