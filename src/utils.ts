@@ -33,17 +33,31 @@ export function getOwnerFromCToken(event: ethereum.Event): string {
   return owner;
 }
 
-export function getHashFromCToken(event: ethereum.Event): string {
+export function getContractAddress(event: ethereum.Event): string | null {
+  //The transfer always come first, so we need to provide the correct logIndex for cToken
   let cTokenLogIndex = event.logIndex.minus(BIGINT_ONE);
+
   let id = event.transaction.hash
     .toHexString()
     .concat("-")
     .concat(cTokenLogIndex.toString());
 
-  let cToken = CToken.load(id)!;
-  let txHash = cToken.txHash.toHexString();
-  return txHash;
+  /**
+   * We only care about transactions concerning WrappedPunk contract
+   * cToken should exist with the given ID.
+   */
+  let cToken = CToken.load(id);
+
+  // if it doesn't then it's not a WrappedPunk transaction
+  if (!cToken) {
+    return null;
+  }
+
+  //if it does, then return the contract Address to enable us validate the transaction in handleBuy()
+  let contractAddress = cToken.referenceId;
+  return contractAddress as string;
 }
+
 export function calculateAverage(totalAmount: BigInt, qty: BigInt): BigInt {
   let average = totalAmount.div(qty);
   return average;
