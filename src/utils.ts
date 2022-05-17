@@ -53,7 +53,7 @@ export function getContractAddress(event: ethereum.Event): string | null {
     return null;
   }
 
-  //if it does, then return the contract Address to enable us validate the transaction in handleBuy()
+  // if it does, then return the contract Address to enable us validate the transaction in handleBuy()
   let contractAddress = cToken.referenceId;
   return contractAddress as string;
 }

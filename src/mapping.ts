@@ -748,6 +748,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let cToken = getOrCreateCToken(event);
     cToken.from = event.params.from.toHexString();
     cToken.to = event.params.to.toHexString();
+    cToken.owner = event.params.to.toHexString();
 
     //We need the contract address to filter our transactions from ERC721Sale(Rarible) Contract
     cToken.referenceId = event.address.toHexString();
