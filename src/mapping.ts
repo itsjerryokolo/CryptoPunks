@@ -27,6 +27,7 @@ import {
   Ask,
   Bid,
   CToken,
+  Contract,
 } from "../generated/schema";
 
 import {
@@ -792,7 +793,6 @@ export function handleBuy(event: Buy): void {
 
   //We filter out punk transactions by comparing the hash with the hash from the WrappedPunk contract transfer event
   if (wrappedPunkTransferHash == event.transaction.hash.toHexString()) {
-    let contract = getOrCreateCryptoPunkContract(event.address);
     let fromAccount = getOrCreateAccount(event.params.seller);
     let toAccount = getOrCreateAccount(event.params.buyer);
     let punk = Punk.load(event.params.tokenId.toString())!;
@@ -808,12 +808,6 @@ export function handleBuy(event: Buy): void {
 
     fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
     fromAccount.totalEarned = fromAccount.totalEarned.plus(event.params.price);
-
-    //Update trade values
-    contract.totalAmountTraded = contract.totalAmountTraded.plus(
-      event.params.price
-    );
-    contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
 
     toAccount.totalSpent = toAccount.totalSpent.plus(event.params.price);
     toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
@@ -837,7 +831,6 @@ export function handleBuy(event: Buy): void {
     }
     toAccount.save();
     fromAccount.save();
-    contract.save();
     sale.save();
     punk.save();
   }
