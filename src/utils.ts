@@ -40,18 +40,8 @@ export function getHashFromCToken(event: ethereum.Event): string {
     .concat("-")
     .concat(cTokenLogIndex.toString());
 
-  let cToken = CToken.load(id);
-  if (!cToken) {
-    cToken = new CToken(id);
-    cToken.blockNumber = event.block.number;
-    cToken.referenceId = cToken.id;
-    cToken.blockHash = event.block.hash;
-    cToken.txHash = event.transaction.hash;
-    cToken.timestamp = event.block.timestamp;
-  }
-
+  let cToken = CToken.load(id)!;
   let txHash = cToken.txHash.toHexString();
-
   return txHash;
 }
 export function calculateAverage(totalAmount: BigInt, qty: BigInt): BigInt {
