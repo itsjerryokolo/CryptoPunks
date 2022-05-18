@@ -95,3 +95,23 @@ dataSources:
         - event: Buy(indexed address,indexed uint256,address,address,uint256,uint256)
           handler: handleBuy
       file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: RaribleExchangeV1
+    network: mainnet
+    source:
+      address: "0xcd4ec7b66fbc029c116ba9ffb3e59351c20b5b06"
+      startBlock: 11274515
+      abi: RaribleExchangeV1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Buy
+      abis:
+        - name: RaribleExchangeV1
+          file: ./abis/RaribleExchangeV1.json
+      eventHandlers:
+        - event: Buy(indexed address,indexed uint256,uint256,address,address,uint256,uint256,address,uint256,uint256)
+          handler: handleExchangeV1Buy
+      file: ./src/mapping.ts
