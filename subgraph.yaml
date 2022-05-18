@@ -94,7 +94,7 @@ dataSources:
       eventHandlers:
         - event: Buy(indexed address,indexed uint256,address,address,uint256,uint256)
           handler: handleBuy
-      file: ./src/mapping.ts
+      file: ./src/Marketplaces/ERC721Sale.ts
   - kind: ethereum/contract
     name: RaribleExchangeV1
     network: mainnet
@@ -114,4 +114,24 @@ dataSources:
       eventHandlers:
         - event: Buy(indexed address,indexed uint256,uint256,address,address,uint256,uint256,address,uint256,uint256)
           handler: handleExchangeV1Buy
-      file: ./src/mapping.ts
+      file: ./src/Marketplaces/RaribleExchangeV1.ts
+  - kind: ethereum/contract
+    name: Opensea
+    network: mainnet
+    source:
+      address: "0x7be8076f4ea4a4ad08075c2508e481d6c946d12b"
+      abi: Opensea
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - OrdersMatched
+      abis:
+        - name: Opensea
+          file: ./abis/Opensea.json
+      eventHandlers:
+        - event: OrdersMatched(bytes32,bytes32,indexed address,indexed address,uint256,indexed bytes32)
+          handler: handleOpenSeaSale
+      file: ./src/Marketplaces/OpenSea.ts
+
