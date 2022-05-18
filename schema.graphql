@@ -507,6 +507,8 @@ type CToken
   "Amount of cToken transferred"
   amount: BigInt
 
+  punkId: String
+
   "Field for storing BidAcceptedID"
   referenceId: String!
 
