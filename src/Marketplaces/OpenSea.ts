@@ -1,19 +1,16 @@
 import { OrdersMatched } from "../../generated/Opensea/Opensea";
 import { Punk } from "../../generated/schema";
-
 import { WRAPPED_PUNK_ADDRESS, BIGINT_ONE, BIGINT_ZERO } from "../constant";
-
 import { getOrCreateAccount, getOrCreateSale } from "../helpers/entityHelper";
 import { calculateAverage, getContractAddress, getPunkId } from "../utils";
 
 export function handleOpenSeaSale(event: OrdersMatched): void {
-  //OpenSea Contract - Track WRAPPEDPUNK SALE
+  //OpenSea Contract - Track WRAPPEDPUNK sale
   /**
      * ROOT ISSUE:  Punk 7443 was sold on Opensea while wrapped.
-          https://cryptopunks.app/cryptopunks/accountinfo?account=0x0eb9a7ff5cbf719251989caf1599c1270eafb531
-  
-            example:
-              - https://etherscan.io/tx/0xac6acdca9aeb00238ff885dcd4e697afd1cfa8ba75ef69622f786b96f8d164cf#eventlog
+       Account: https://cryptopunks.app/cryptopunks/accountinfo?account=0x0eb9a7ff5cbf719251989caf1599c1270eafb531
+        - Example:
+            - https://etherscan.io/tx/0xac6acdca9aeb00238ff885dcd4e697afd1cfa8ba75ef69622f786b96f8d164cf#eventlog
         - We want to capture this so we can calculate average prices & update other aggregates both for punk & account
     */
 
