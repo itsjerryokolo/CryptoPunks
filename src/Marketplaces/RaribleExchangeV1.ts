@@ -12,7 +12,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
      * ROOT ISSUE:  Punk 509 was sold while wrapped.
           https://cryptopunks.app/cryptopunks/accountinfo?account=0x0eb9a7ff5cbf719251989caf1599c1270eafb531
   
-            example:
+        - Example:
               - https://etherscan.io/tx/0x51583622e0dcfda43c6481ba073eb1bbd6b7f3ef98c28d3564918491344d8ce3#eventlog
         - We want to capture this so we can calculate average prices & update other aggregates both for punk & account
     */
@@ -50,7 +50,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
     toAccount.totalSpent = toAccount.totalSpent.plus(event.params.buyValue);
     toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
 
-    //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
+    //We only calculate average amount spent if there are more than 0 purchases so we don't divide by 0
     if (toAccount.numberOfPurchases != BIGINT_ZERO) {
       toAccount.averageAmountSpent = calculateAverage(
         toAccount.totalSpent,

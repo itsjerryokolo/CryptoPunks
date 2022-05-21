@@ -28,7 +28,7 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
     //We get the tokenId from the Transfer event because OrderMatched doesn't emit it.
     let tokenId = getPunkId(event);
 
-    //All the operations below wouldn't be possible without the punkId so we ensure it exists.
+    //All the operations below wouldn't make sense without the punkId so we ensure it exists.
     if (tokenId !== null) {
       let fromAccount = getOrCreateAccount(event.params.maker);
       let toAccount = getOrCreateAccount(event.params.taker);
@@ -50,7 +50,7 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
         BIGINT_ONE
       );
 
-      //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
+      //We only calculate average amount spent if there are more than 0 purchases so we don't divide by 0
       if (toAccount.numberOfPurchases != BIGINT_ZERO) {
         toAccount.averageAmountSpent = calculateAverage(
           toAccount.totalSpent,

@@ -743,14 +743,14 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     let fromAccount = getOrCreateAccount(event.params.from);
     let punk = Punk.load(event.params.tokenId.toString())!;
 
-    //We create a cToken Entity here to store ID for future comparison
+    //We create a cToken Entity here to store IDs for future comparison
     let cToken = getOrCreateCToken(event);
     cToken.from = event.params.from.toHexString();
     cToken.to = event.params.to.toHexString();
     cToken.owner = event.params.to.toHexString();
     cToken.punkId = event.params.tokenId.toString();
 
-    //We need the contract address to filter our transactions from ERC721Sale(Rarible) Contract
+    //We need the contract address to filter our transactions from Other marketplace(OpenSea, ERC721Sale) sales
     cToken.referenceId = event.address.toHexString();
 
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
