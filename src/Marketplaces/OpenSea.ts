@@ -30,10 +30,10 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
 
     //All the operations below wouldn't make sense without the punkId so we ensure it exists.
     if (tokenId !== null) {
-      let fromAccount = getOrCreateAccount(event.params.maker);
-      let toAccount = getOrCreateAccount(event.params.taker);
+      let fromAccount = getOrCreateAccount(event.params.taker);
+      let toAccount = getOrCreateAccount(event.params.maker);
       let punk = Punk.load(tokenId)!;
-      let sale = getOrCreateSale(event.params.maker, tokenId, event);
+      let sale = getOrCreateSale(event.params.taker, tokenId, event);
 
       sale.amount = event.params.price;
       sale.to = event.params.taker.toHexString();
