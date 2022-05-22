@@ -498,7 +498,7 @@ type CToken
   "Sender"
   from: Account!
 
-  "Receipent"
+  "Recepient"
   to: Account!
 
   "New owner of Punk"
@@ -509,7 +509,7 @@ type CToken
 
   punkId: String
 
-  "Field for storing BidAcceptedID"
+  "Field for storing referenceIDs of other events in the same transaction"
   referenceId: String!
 
   "Transaction details"
