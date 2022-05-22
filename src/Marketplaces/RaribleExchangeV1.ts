@@ -1,9 +1,11 @@
+import { Address } from "@graphprotocol/graph-ts";
 import { Buy as RaribleExchangeV1Buy } from "../../generated/RaribleExchangeV1/RaribleExchangeV1";
 import { Punk } from "../../generated/schema";
 
 import { WRAPPED_PUNK_ADDRESS, BIGINT_ONE, BIGINT_ZERO } from "../constant";
 
 import { getOrCreateAccount, getOrCreateSale } from "../helpers/entityHelper";
+import { getOrCreateWrappedPunkContract } from "../helpers/contractHelper";
 import { calculateAverage, getContractAddress } from "../utils";
 
 export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
@@ -28,6 +30,9 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
     wrappedPunkContractAddress !== null &&
     wrappedPunkContractAddress == WRAPPED_PUNK_ADDRESS
   ) {
+    let contract = getOrCreateWrappedPunkContract(
+      Address.fromString(wrappedPunkContractAddress)
+    );
     let fromAccount = getOrCreateAccount(event.params.owner);
     let toAccount = getOrCreateAccount(event.params.buyer);
     let punk = Punk.load(event.params.buyTokenId.toString())!;
@@ -39,6 +44,12 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
 
     sale.amount = event.params.buyValue;
     sale.to = event.params.buyer.toHexString();
+
+    //Update contract aggregates
+    contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
+    contract.totalAmountTraded = contract.totalAmountTraded.plus(
+      event.params.buyValue
+    );
 
     //Update fromAccount aggregates
     fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
@@ -73,6 +84,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
     toAccount.save();
     fromAccount.save();
     sale.save();
+    contract.save();
     punk.save();
   }
 }

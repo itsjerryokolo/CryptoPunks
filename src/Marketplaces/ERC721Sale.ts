@@ -1,7 +1,9 @@
-import { Account, Punk, Sale } from "../../generated/schema";
+import { Address } from "@graphprotocol/graph-ts";
+import { Punk } from "../../generated/schema";
 import { Buy as ERC721Sale } from "../../generated/ERC721Sale/ERC721Sale";
 import { getContractAddress, calculateAverage } from "../utils";
 import { getOrCreateAccount, getOrCreateSale } from "../helpers/entityHelper";
+import { getOrCreateWrappedPunkContract } from "../helpers/contractHelper";
 import { BIGINT_ONE, BIGINT_ZERO, WRAPPED_PUNK_ADDRESS } from "../constant";
 
 export function handleBuy(event: ERC721Sale): void {
@@ -26,6 +28,9 @@ export function handleBuy(event: ERC721Sale): void {
     wrappedPunkContractAddress !== null &&
     wrappedPunkContractAddress == WRAPPED_PUNK_ADDRESS
   ) {
+    let contract = getOrCreateWrappedPunkContract(
+      Address.fromString(wrappedPunkContractAddress)
+    );
     let fromAccount = getOrCreateAccount(event.params.seller);
     let toAccount = getOrCreateAccount(event.params.buyer);
     let punk = Punk.load(event.params.tokenId.toString())!;
@@ -54,6 +59,12 @@ export function handleBuy(event: ERC721Sale): void {
       );
     }
 
+    //Update contract aggregates
+    contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
+    contract.totalAmountTraded = contract.totalAmountTraded.plus(
+      event.params.price
+    );
+
     //Update punk aggregates
     punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(
       event.params.price
@@ -70,5 +81,6 @@ export function handleBuy(event: ERC721Sale): void {
     fromAccount.save();
     sale.save();
     punk.save();
+    contract.save();
   }
 }
