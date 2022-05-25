@@ -104,7 +104,7 @@ export function getMakerAddress(event: ethereum.Event): string | null {
   }
 
   // if it does, then return the maker address to enable us validate the transaction in OrderMatched()
-  let makerAddress = cToken.from;
+  let makerAddress = cToken.to;
   return makerAddress as string;
 }
 

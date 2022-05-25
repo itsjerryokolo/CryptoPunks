@@ -21,19 +21,20 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
         - We want to capture this so we can calculate average prices & update other aggregates both for punk & account
     */
 
-  let wrappedPunkContractAddress = getContractAddress(event);
-
   /**
    * We filter out wrappedPunk transactions by ensuring
    *    - both events occur in the same transaction
-   *    - it's the wrappedPunk contract address that emitted it
+   *    - the wrappedPunk contract address emitted it
    */
+  let wrappedPunkContractAddress = getContractAddress(event);
   if (
     wrappedPunkContractAddress !== null &&
     wrappedPunkContractAddress == WRAPPED_PUNK_ADDRESS
   ) {
     //We get the tokenId from the Transfer event because OrderMatched doesn't emit it.
     let tokenId = getPunkId(event);
+
+    //We need the makerAddress to differentiate a regular sale from a bidAccepted sale
     let makerAddress = getMakerAddress(event);
 
     //All the operations below wouldn't make sense without the punkId, so we ensure it exists.
@@ -47,23 +48,21 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
         makerAddress !== null &&
         makerAddress == event.params.taker.toHexString()
       ) {
-        //Regular WrappedPunk Sale
-
+        //Regular wrappedPunk sale
+        let price = event.params.price;
         let fromAccount = getOrCreateAccount(event.params.maker);
         let toAccount = getOrCreateAccount(event.params.taker);
         let sale = getOrCreateSale(event.params.maker, tokenId, event);
 
-        sale.amount = event.params.price;
+        sale.amount = price;
         sale.to = event.params.taker.toHexString();
 
         //Update fromAccount aggregates
         fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
-        fromAccount.totalEarned = fromAccount.totalEarned.plus(
-          event.params.price
-        );
+        fromAccount.totalEarned = fromAccount.totalEarned.plus(price);
 
         //Update toAccount aggregates
-        toAccount.totalSpent = toAccount.totalSpent.plus(event.params.price);
+        toAccount.totalSpent = toAccount.totalSpent.plus(price);
         toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(
           BIGINT_ONE
         );
@@ -78,13 +77,10 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
 
         //Update contract aggregates
         contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
-        contract.totalAmountTraded = contract.totalAmountTraded.plus(
-          event.params.price
-        );
+        contract.totalAmountTraded = contract.totalAmountTraded.plus(price);
+
         //Update punk aggregates
-        punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(
-          event.params.price
-        );
+        punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(price);
 
         //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
         if (punk.numberOfSales != BIGINT_ZERO) {
@@ -106,34 +102,35 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
         /**
          * A wrappedPunk bid can be accepted on OpenSea.
          * We want to capture this sale.
-         *      - The major difference between this and a regular sale is that
-         *          - the maker becomes the buyer --> (toAccount)
-         *          - the taker becomes the seller --> (fromAccount)
-         *    Example: https://etherscan.io/tx/0x0e44a5eb1d553ab2daacf43fd50bcd73f030e739de009368a9f2897150e1215d#eventlog
+                - The major difference between this and a regular sale is that
+                    - the maker becomes the buyer --> (toAccount)
+                    - the taker becomes the seller --> (fromAccount)
+                - Example:
+                     https://etherscan.io/tx/0x0e44a5eb1d553ab2daacf43fd50bcd73f030e739de009368a9f2897150e1215d#eventlog
          */
 
-        // Getting the maker address from the toAccount in the wrappedPunk transfer event confirms that the maker is the buyer
-        // because in the OrderMatched event, the maker is the seller.
-
+        /**
+             Getting the maker address from the toAccount in the wrappedPunk Transfer event confirms that the maker is the buyer,
+             because in the OrderMatched event, the maker is the seller.
+        */
+        let price = event.params.price;
         let sale = getOrCreateSale(event.params.taker, tokenId, event);
-
         let fromAccount = getOrCreateAccount(event.params.taker);
         let toAccount = getOrCreateAccount(event.params.maker);
 
-        sale.amount = event.params.price;
+        sale.amount = price;
         sale.to = event.params.maker.toHexString();
 
         //Update fromAccount aggregates
         fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
-        fromAccount.totalEarned = fromAccount.totalEarned.plus(
-          event.params.price
-        );
+        fromAccount.totalEarned = fromAccount.totalEarned.plus(price);
 
         //Update toAccount aggregates
         toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(
           BIGINT_ONE
         );
-        toAccount.totalSpent = toAccount.totalSpent.plus(event.params.price);
+        toAccount.totalSpent = toAccount.totalSpent.plus(price);
+
         //We only calculate average amount spent if there are more than 0 purchases so we don't divide by 0
         if (toAccount.numberOfPurchases != BIGINT_ZERO) {
           toAccount.averageAmountSpent = calculateAverage(
@@ -144,14 +141,10 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
 
         //Update contract aggregates
         contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
-        contract.totalAmountTraded = contract.totalAmountTraded.plus(
-          event.params.price
-        );
+        contract.totalAmountTraded = contract.totalAmountTraded.plus(price);
 
         //Update punk aggregates
-        punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(
-          event.params.price
-        );
+        punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(price);
 
         //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
         if (punk.numberOfSales != BIGINT_ZERO) {
