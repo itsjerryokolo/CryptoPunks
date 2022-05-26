@@ -1,12 +1,18 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { Buy as RaribleExchangeV1Buy } from "../../generated/RaribleExchangeV1/RaribleExchangeV1";
 import { Punk } from "../../generated/schema";
-
-import { WRAPPED_PUNK_ADDRESS, BIGINT_ONE, BIGINT_ZERO } from "../constant";
-
-import { getOrCreateAccount, getOrCreateSale } from "../helpers/entityHelper";
-import { getOrCreateWrappedPunkContract } from "../helpers/contractHelper";
-import { calculateAverage, getContractAddress } from "../utils";
+import { WRAPPED_PUNK_ADDRESS } from "../constant";
+import { getOrCreateSale } from "../helpers/saleHelper";
+import {
+  getOrCreateAccount,
+  updateAccountAggregates,
+} from "../helpers/accountHelper";
+import {
+  getOrCreateWrappedPunkContract,
+  updateContractAggregates,
+} from "../helpers/contractHelper";
+import { updateSale } from "../helpers/saleHelper";
+import { getContractAddress, updatePunkSaleAggregates } from "../utils";
 
 export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
   //RaribleExchangeV1 Contract - Track WRAPPEDPUNK SALE
@@ -26,56 +32,30 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
    *    - both events occur in the same transaction
    *    - it's the wrappedPunk contract address that emitted it
    */
+
   if (
     wrappedPunkContractAddress !== null &&
     wrappedPunkContractAddress == WRAPPED_PUNK_ADDRESS
   ) {
+    let price = event.params.buyValue;
+    let buyer = event.params.buyer;
+    let seller = event.params.owner;
+    let tokenId = event.params.buyTokenId.toString();
+
     let contract = getOrCreateWrappedPunkContract(
       Address.fromString(wrappedPunkContractAddress)
     );
-    let price = event.params.buyValue;
-    let fromAccount = getOrCreateAccount(event.params.owner);
-    let toAccount = getOrCreateAccount(event.params.buyer);
-    let punk = Punk.load(event.params.buyTokenId.toString())!;
-    let sale = getOrCreateSale(
-      event.params.owner,
-      event.params.buyTokenId.toString(),
-      event
-    );
+    let fromAccount = getOrCreateAccount(seller);
+    let toAccount = getOrCreateAccount(buyer);
+    let punk = Punk.load(tokenId)!;
+    let sale = getOrCreateSale(seller, tokenId, event);
 
-    sale.amount = price;
-    sale.to = event.params.buyer.toHexString();
+    updateSale(sale, price, seller);
+    updateContractAggregates(contract, price);
+    updateAccountAggregates(fromAccount, toAccount, price);
+    updatePunkSaleAggregates(punk, price);
 
-    //Update contract aggregates
-    contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
-    contract.totalAmountTraded = contract.totalAmountTraded.plus(price);
-
-    //Update fromAccount aggregates
-    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
-    fromAccount.totalEarned = fromAccount.totalEarned.plus(price);
-
-    //Update toAccount aggregates
-    toAccount.totalSpent = toAccount.totalSpent.plus(price);
-    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
-
-    //We only calculate average amount spent if there are more than 0 purchases so we don't divide by 0
-    if (toAccount.numberOfPurchases != BIGINT_ZERO) {
-      toAccount.averageAmountSpent = calculateAverage(
-        toAccount.totalSpent,
-        toAccount.numberOfPurchases
-      );
-    }
-
-    //Update punk aggregates
-    punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(price);
-
-    //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
-    if (punk.numberOfSales != BIGINT_ZERO) {
-      punk.averageSalePrice = calculateAverage(
-        punk.totalAmountSpentOnPunk,
-        punk.numberOfSales
-      );
-    }
+    //Write
     toAccount.save();
     fromAccount.save();
     sale.save();

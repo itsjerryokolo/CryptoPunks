@@ -1,14 +1,21 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { OrdersMatched } from "../../generated/Opensea/Opensea";
 import { Punk } from "../../generated/schema";
-import { WRAPPED_PUNK_ADDRESS, BIGINT_ONE, BIGINT_ZERO } from "../constant";
-import { getOrCreateAccount, getOrCreateSale } from "../helpers/entityHelper";
-import { getOrCreateWrappedPunkContract } from "../helpers/contractHelper";
+import { WRAPPED_PUNK_ADDRESS } from "../constant";
 import {
-  calculateAverage,
+  getOrCreateAccount,
+  updateAccountAggregates,
+} from "../helpers/accountHelper";
+import {
+  getOrCreateWrappedPunkContract,
+  updateContractAggregates,
+} from "../helpers/contractHelper";
+import { getOrCreateSale, updateSale } from "../helpers/saleHelper";
+import {
   getContractAddress,
   getPunkId,
   getMakerAddress,
+  updatePunkSaleAggregates,
 } from "../utils";
 
 export function handleOpenSeaSale(event: OrdersMatched): void {
@@ -50,45 +57,17 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
       ) {
         //Regular wrappedPunk sale
         let price = event.params.price;
-        let fromAccount = getOrCreateAccount(event.params.maker);
-        let toAccount = getOrCreateAccount(event.params.taker);
-        let sale = getOrCreateSale(event.params.maker, tokenId, event);
+        let buyer = event.params.taker;
+        let seller = event.params.maker;
 
-        sale.amount = price;
-        sale.to = event.params.taker.toHexString();
+        let fromAccount = getOrCreateAccount(seller);
+        let toAccount = getOrCreateAccount(buyer);
+        let sale = getOrCreateSale(seller, tokenId, event);
 
-        //Update fromAccount aggregates
-        fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
-        fromAccount.totalEarned = fromAccount.totalEarned.plus(price);
-
-        //Update toAccount aggregates
-        toAccount.totalSpent = toAccount.totalSpent.plus(price);
-        toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(
-          BIGINT_ONE
-        );
-
-        //We only calculate average amount spent if there are more than 0 purchases so we don't divide by 0
-        if (toAccount.numberOfPurchases != BIGINT_ZERO) {
-          toAccount.averageAmountSpent = calculateAverage(
-            toAccount.totalSpent,
-            toAccount.numberOfPurchases
-          );
-        }
-
-        //Update contract aggregates
-        contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
-        contract.totalAmountTraded = contract.totalAmountTraded.plus(price);
-
-        //Update punk aggregates
-        punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(price);
-
-        //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
-        if (punk.numberOfSales != BIGINT_ZERO) {
-          punk.averageSalePrice = calculateAverage(
-            punk.totalAmountSpentOnPunk,
-            punk.numberOfSales
-          );
-        }
+        updateSale(sale, price, seller);
+        updateAccountAggregates(fromAccount, toAccount, price);
+        updateContractAggregates(contract, price);
+        updatePunkSaleAggregates(punk, price);
 
         punk.save();
         contract.save();
@@ -114,45 +93,17 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
              because in the OrderMatched event, the maker is the seller.
         */
         let price = event.params.price;
-        let sale = getOrCreateSale(event.params.taker, tokenId, event);
-        let fromAccount = getOrCreateAccount(event.params.taker);
-        let toAccount = getOrCreateAccount(event.params.maker);
+        let seller = event.params.taker;
+        let buyer = event.params.maker;
 
-        sale.amount = price;
-        sale.to = event.params.maker.toHexString();
+        let sale = getOrCreateSale(seller, tokenId, event);
+        let fromAccount = getOrCreateAccount(seller);
+        let toAccount = getOrCreateAccount(buyer);
 
-        //Update fromAccount aggregates
-        fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
-        fromAccount.totalEarned = fromAccount.totalEarned.plus(price);
-
-        //Update toAccount aggregates
-        toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(
-          BIGINT_ONE
-        );
-        toAccount.totalSpent = toAccount.totalSpent.plus(price);
-
-        //We only calculate average amount spent if there are more than 0 purchases so we don't divide by 0
-        if (toAccount.numberOfPurchases != BIGINT_ZERO) {
-          toAccount.averageAmountSpent = calculateAverage(
-            toAccount.totalSpent,
-            toAccount.numberOfPurchases
-          );
-        }
-
-        //Update contract aggregates
-        contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
-        contract.totalAmountTraded = contract.totalAmountTraded.plus(price);
-
-        //Update punk aggregates
-        punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(price);
-
-        //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
-        if (punk.numberOfSales != BIGINT_ZERO) {
-          punk.averageSalePrice = calculateAverage(
-            punk.totalAmountSpentOnPunk,
-            punk.numberOfSales
-          );
-        }
+        updateSale(sale, price, seller);
+        updateAccountAggregates(fromAccount, toAccount, price);
+        updateContractAggregates(contract, price);
+        updatePunkSaleAggregates(punk, price);
 
         punk.save();
         contract.save();

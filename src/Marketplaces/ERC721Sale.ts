@@ -1,10 +1,18 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { Punk } from "../../generated/schema";
 import { Buy as ERC721Sale } from "../../generated/ERC721Sale/ERC721Sale";
-import { getContractAddress, calculateAverage } from "../utils";
-import { getOrCreateAccount, getOrCreateSale } from "../helpers/entityHelper";
-import { getOrCreateWrappedPunkContract } from "../helpers/contractHelper";
-import { BIGINT_ONE, BIGINT_ZERO, WRAPPED_PUNK_ADDRESS } from "../constant";
+import { getContractAddress, updatePunkSaleAggregates } from "../utils";
+import {
+  getOrCreateAccount,
+  updateAccountAggregates,
+} from "../helpers/accountHelper";
+import {
+  getOrCreateWrappedPunkContract,
+  updateContractAggregates,
+} from "../helpers/contractHelper";
+import { getOrCreateSale } from "../helpers/saleHelper";
+import { updateSale } from "../helpers/saleHelper";
+import { WRAPPED_PUNK_ADDRESS } from "../constant";
 
 export function handleBuy(event: ERC721Sale): void {
   //ERC721Sale Contract - Track WRAPPEDPUNK SALE
@@ -18,7 +26,6 @@ export function handleBuy(event: ERC721Sale): void {
     */
 
   let wrappedPunkContractAddress = getContractAddress(event);
-
   /**
    * We filter out wrappedPunk transactions by ensuring
    *    - both events occur in the same transaction
@@ -28,52 +35,24 @@ export function handleBuy(event: ERC721Sale): void {
     wrappedPunkContractAddress !== null &&
     wrappedPunkContractAddress == WRAPPED_PUNK_ADDRESS
   ) {
+    let price = event.params.price;
+    let buyer = event.params.buyer;
+    let seller = event.params.seller;
+    let tokenId = event.params.tokenId.toString();
+
     let contract = getOrCreateWrappedPunkContract(
       Address.fromString(wrappedPunkContractAddress)
     );
-    let price = event.params.price;
-    let fromAccount = getOrCreateAccount(event.params.seller);
-    let toAccount = getOrCreateAccount(event.params.buyer);
-    let punk = Punk.load(event.params.tokenId.toString())!;
-    let sale = getOrCreateSale(
-      event.params.seller,
-      event.params.tokenId.toString(),
-      event
-    );
+    let fromAccount = getOrCreateAccount(seller);
+    let toAccount = getOrCreateAccount(buyer);
+    let punk = Punk.load(tokenId)!;
+    let sale = getOrCreateSale(seller, tokenId, event);
 
-    sale.amount = price;
-    sale.to = event.params.buyer.toHexString();
+    updateSale(sale, price, seller);
+    updateAccountAggregates(fromAccount, toAccount, price);
+    updateContractAggregates(contract, price);
+    updatePunkSaleAggregates(punk, price);
 
-    //Update fromAccount aggregates
-    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
-    fromAccount.totalEarned = fromAccount.totalEarned.plus(price);
-
-    //Update toAccount aggregates
-    toAccount.totalSpent = toAccount.totalSpent.plus(price);
-    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
-
-    //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
-    if (toAccount.numberOfPurchases != BIGINT_ZERO) {
-      toAccount.averageAmountSpent = calculateAverage(
-        toAccount.totalSpent,
-        toAccount.numberOfPurchases
-      );
-    }
-
-    //Update contract aggregates
-    contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
-    contract.totalAmountTraded = contract.totalAmountTraded.plus(price);
-
-    //Update punk aggregates
-    punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(price);
-
-    //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
-    if (punk.numberOfSales != BIGINT_ZERO) {
-      punk.averageSalePrice = calculateAverage(
-        punk.totalAmountSpentOnPunk,
-        punk.numberOfSales
-      );
-    }
     toAccount.save();
     fromAccount.save();
     sale.save();

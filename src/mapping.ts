@@ -1,4 +1,4 @@
-import { BigInt, Address, log } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import {
   Assign as Assigned,
   PunkTransfer,
@@ -9,16 +9,11 @@ import {
   PunkNoLongerForSale,
   Transfer as cTokenTransfer,
 } from "../generated/cryptopunks/cryptopunks";
-
 import {
   Transfer as WrappedPunkTransfer,
   ProxyRegistered,
 } from "../generated/WrappedPunks/WrappedPunks";
-
 import { getTrait } from "./traits";
-
-import { Buy as ERC721Sale } from "../generated/ERC721Sale/ERC721Sale";
-
 import {
   Punk,
   Trait,
@@ -27,36 +22,30 @@ import {
   Ask,
   Bid,
 } from "../generated/schema";
-
 import {
   ZERO_ADDRESS,
   WRAPPED_PUNK_ADDRESS,
   BIGINT_ONE,
   BIGINT_ZERO,
 } from "./constant";
-
-import {
-  getOrCreateAccount,
-  createMetadata,
-  getOrCreateAssign,
-  getOrCreateSale,
-  getOrCreateCToken,
-} from "./helpers/entityHelper";
-
+import { getOrCreateAccount } from "../src/helpers/accountHelper";
+import { createMetadata } from "./helpers/metadataHelper";
 import { getOrCreateTransfer } from "./helpers/transferHelper";
-
+import { getOrCreateAssign } from "./helpers/assignHelper";
 import {
   calculateAverage,
-  getContractAddress,
   getOwnerFromCToken,
+  updatePunkSaleAggregates,
+  getOrCreateCToken,
 } from "./utils";
-
 import {
   getOrCreateCryptoPunkContract,
   getOrCreateWrappedPunkContract,
+  updateContractAggregates,
 } from "../src/helpers/contractHelper";
 
 import { createWrap, createUnwrap } from "../src/helpers/wrapAndUnwrap";
+import { getOrCreateSale } from "./helpers/saleHelper";
 
 import {
   createAskCreated,
@@ -71,6 +60,8 @@ import {
   updateOldBid,
   getBidIdforReferenceFromCToken,
 } from "../src/helpers/bidHelpers";
+import { updateSale } from "./helpers/saleHelper";
+import { updateAccountAggregates } from "./helpers/accountHelper";
 
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
@@ -471,14 +462,15 @@ export function handlePunkBought(event: PunkBought): void {
       - close Old Ask since it has been sold
       - createSaleEvent
     */
+    let tokenId = event.params.punkIndex;
 
-    let punk = Punk.load(event.params.punkIndex.toString())!;
+    let punk = Punk.load(tokenId.toString())!;
     let contract = getOrCreateCryptoPunkContract(event.address);
     let fromAccount = getOrCreateAccount(event.params.fromAddress);
 
     //Create new BidRemovedEvent
     let bidRemoved = createBidRemoved(
-      event.params.punkIndex,
+      tokenId,
       event.params.fromAddress.toHexString(),
       event
     );
@@ -525,7 +517,7 @@ export function handlePunkBought(event: PunkBought): void {
     //Create new SaleEVENT
     let sale = getOrCreateSale(
       event.params.fromAddress,
-      event.params.punkIndex.toString(),
+      tokenId.toString(),
       event
     );
     //Update Sale fields
@@ -606,16 +598,21 @@ export function handlePunkBought(event: PunkBought): void {
       - close Old Bid
       - close Old Ask since it has been sold
     */
-    let punk = Punk.load(event.params.punkIndex.toString())!;
+
+    let price = event.params.value;
+    let tokenId = event.params.punkIndex.toString();
+    let seller = event.params.fromAddress;
+    let buyer = event.params.toAddress;
+
+    let punk = Punk.load(tokenId)!;
     let contract = getOrCreateCryptoPunkContract(event.address);
-    let toAccount = getOrCreateAccount(event.params.toAddress);
-    let fromAccount = getOrCreateAccount(event.params.fromAddress);
+    let toAccount = getOrCreateAccount(buyer);
+    let fromAccount = getOrCreateAccount(seller);
 
     //Create Sale Event
-    let sale = getOrCreateSale(event.params.fromAddress, punk.id, event);
+    let sale = getOrCreateSale(seller, punk.id, event);
     //Update Sale fields
-    sale.amount = event.params.value;
-    sale.to = event.params.toAddress.toHexString();
+    updateSale(sale, price, buyer);
 
     /**
       Close oldBid since Punk has a new owner after SaleEvent, or PunkOfferAccepted which fires PunkNoLongerForSaleEVENT
@@ -648,45 +645,21 @@ export function handlePunkBought(event: PunkBought): void {
     //Update Punk entity
     punk.purchasedBy = toAccount.id;
     punk.owner = toAccount.id;
-    punk.numberOfSales = punk.numberOfSales.plus(BIGINT_ONE); //Increment number of sales
-    punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(
-      event.params.value
-    );
 
-    //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
-    if (punk.numberOfSales != BIGINT_ZERO) {
-      punk.averageSalePrice = calculateAverage(
-        punk.totalAmountSpentOnPunk,
-        punk.numberOfSales
-      );
-    }
-    //Update trade values
-    contract.totalAmountTraded = contract.totalAmountTraded.plus(
-      event.params.value
-    );
-    contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
+    updatePunkSaleAggregates(punk, price);
+    updateContractAggregates(contract, price);
 
-    //Update toAccount aggregates
+    //Update toAccount holdings
     toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
       BIGINT_ONE
     );
 
-    //Update fromAccount aggregates
-
-    fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
+    //Update fromAccount holdings
     fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
       BIGINT_ONE
     );
-    fromAccount.totalEarned = fromAccount.totalEarned.plus(event.params.value);
 
-    toAccount.totalSpent = toAccount.totalSpent.plus(event.params.value);
-    toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
-    if (toAccount.numberOfPurchases != BIGINT_ZERO) {
-      toAccount.averageAmountSpent = calculateAverage(
-        toAccount.totalSpent,
-        toAccount.numberOfPurchases
-      );
-    }
+    updateAccountAggregates(fromAccount, toAccount, price);
 
     //Write
     punk.save();

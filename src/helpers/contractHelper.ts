@@ -1,6 +1,6 @@
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { Contract } from "../../generated/schema";
-
+import { BIGINT_ONE } from "../constant";
 import { cryptopunks } from "../../generated/cryptopunks/cryptopunks";
 import { WrappedPunks } from "../../generated/WrappedPunks/WrappedPunks";
 
@@ -83,4 +83,13 @@ export function getOrCreateWrappedPunkContract(address: Address): Contract {
   }
 
   return contract as Contract;
+}
+
+export function updateContractAggregates(
+  contract: Contract,
+  price: BigInt
+): void {
+  //Update contract aggregates
+  contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
+  contract.totalAmountTraded = contract.totalAmountTraded.plus(price);
 }
