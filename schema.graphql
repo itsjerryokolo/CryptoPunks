@@ -112,7 +112,7 @@ type Account @entity {
   "Total amount spent buying Punks by Account"
   totalSpent: BigInt!
 
-  "Total amount earned from selling Punks by Account"
+  "Total amount earned by Account from selling Punks"
   totalEarned: BigInt!
 
   "Average amount spent buying Punks by Account"
@@ -174,10 +174,10 @@ type Punk implements NFT @entity {
   "Current BidRemoved event"
   currentBidRemoved: BidRemoved
 
-  "Total amount spent purchasing Punk"
+  "Total amount spent purchasing Punk across OpenSea & Rarible marketplaces"
   totalAmountSpentOnPunk: BigInt!
 
-  "Average price for Punk"
+  "Average price for Punk across OpenSea & Rarible marketplaces"
   averageSalePrice: BigInt!
 }
 

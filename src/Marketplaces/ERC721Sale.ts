@@ -31,6 +31,7 @@ export function handleBuy(event: ERC721Sale): void {
     let contract = getOrCreateWrappedPunkContract(
       Address.fromString(wrappedPunkContractAddress)
     );
+    let price = event.params.price;
     let fromAccount = getOrCreateAccount(event.params.seller);
     let toAccount = getOrCreateAccount(event.params.buyer);
     let punk = Punk.load(event.params.tokenId.toString())!;
@@ -40,15 +41,15 @@ export function handleBuy(event: ERC721Sale): void {
       event
     );
 
-    sale.amount = event.params.price;
+    sale.amount = price;
     sale.to = event.params.buyer.toHexString();
 
     //Update fromAccount aggregates
     fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
-    fromAccount.totalEarned = fromAccount.totalEarned.plus(event.params.price);
+    fromAccount.totalEarned = fromAccount.totalEarned.plus(price);
 
     //Update toAccount aggregates
-    toAccount.totalSpent = toAccount.totalSpent.plus(event.params.price);
+    toAccount.totalSpent = toAccount.totalSpent.plus(price);
     toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
 
     //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
@@ -61,14 +62,10 @@ export function handleBuy(event: ERC721Sale): void {
 
     //Update contract aggregates
     contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
-    contract.totalAmountTraded = contract.totalAmountTraded.plus(
-      event.params.price
-    );
+    contract.totalAmountTraded = contract.totalAmountTraded.plus(price);
 
     //Update punk aggregates
-    punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(
-      event.params.price
-    );
+    punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(price);
 
     //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
     if (punk.numberOfSales != BIGINT_ZERO) {
