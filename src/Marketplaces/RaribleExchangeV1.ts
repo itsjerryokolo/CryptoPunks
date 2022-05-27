@@ -50,7 +50,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
     let punk = Punk.load(tokenId)!;
     let sale = getOrCreateSale(seller, tokenId, event);
 
-    updateSale(sale, price, seller);
+    updateSale(sale, price, buyer);
     updateContractAggregates(contract, price);
     updateAccountAggregates(fromAccount, toAccount, price);
     updatePunkSaleAggregates(punk, price);

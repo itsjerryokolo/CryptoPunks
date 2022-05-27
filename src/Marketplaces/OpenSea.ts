@@ -64,7 +64,7 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
         let toAccount = getOrCreateAccount(buyer);
         let sale = getOrCreateSale(seller, tokenId, event);
 
-        updateSale(sale, price, seller);
+        updateSale(sale, price, buyer);
         updateAccountAggregates(fromAccount, toAccount, price);
         updateContractAggregates(contract, price);
         updatePunkSaleAggregates(punk, price);
@@ -79,9 +79,9 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
         makerAddress == event.params.maker.toHexString()
       ) {
         /**
-         * A wrappedPunk bid can be accepted on OpenSea.
-         * We want to capture this sale.
-                - The major difference between this and a regular sale is that
+         // Bid accepted sale
+            * We want to capture this sale.
+                - The major difference between this sale and a regular sale is that
                     - the maker becomes the buyer --> (toAccount)
                     - the taker becomes the seller --> (fromAccount)
                 - Example:
@@ -89,8 +89,9 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
          */
 
         /**
-             Getting the maker address from the toAccount in the wrappedPunk Transfer event confirms that the maker is the buyer,
-             because in the OrderMatched event, the maker is the seller.
+             Getting the maker address from the toAccount in the wrappedPunk Transfer event confirms that
+             this is a bid accepted sale because the maker is the buyer,
+             but in the OrderMatched event, the maker is the seller.
         */
         let price = event.params.price;
         let seller = event.params.taker;
@@ -100,7 +101,7 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
         let fromAccount = getOrCreateAccount(seller);
         let toAccount = getOrCreateAccount(buyer);
 
-        updateSale(sale, price, seller);
+        updateSale(sale, price, buyer);
         updateAccountAggregates(fromAccount, toAccount, price);
         updateContractAggregates(contract, price);
         updatePunkSaleAggregates(punk, price);

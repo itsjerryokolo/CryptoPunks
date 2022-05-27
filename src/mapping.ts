@@ -611,7 +611,6 @@ export function handlePunkBought(event: PunkBought): void {
 
     //Create Sale Event
     let sale = getOrCreateSale(seller, punk.id, event);
-    //Update Sale fields
     updateSale(sale, price, buyer);
 
     /**
@@ -631,11 +630,14 @@ export function handlePunkBought(event: PunkBought): void {
     let oldAskId = punk.currentAsk;
     if (oldAskId !== null) {
       let oldAsk = Ask.load(oldAskId.toString())!;
+
       //Create a relationship between OldAsk and currentAskRemoved to provide information on the Ask that was removed
       oldAsk.removed = punk.currentAskRemoved; //current askRemoved can be gotten from the punk which we closed in PunkNoLongerForSale
       oldAsk.open = false;
+
       //Summon currentAskCreated from Punk entity to update Old Ask with askCreation information
       oldAsk.created = punk.currentAskCreated; //we opened the Punk in PunkOffered() and saved the currentAskCreated to a field in the Punk entity
+
       oldAsk.from = fromAccount.id;
 
       //Write

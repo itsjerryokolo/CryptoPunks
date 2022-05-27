@@ -29,7 +29,7 @@ export function getOrCreateSale(
   return sale as Sale;
 }
 
-export function updateSale(sale: Sale, price: BigInt, seller: Address): void {
+export function updateSale(sale: Sale, price: BigInt, buyer: Address): void {
   sale.amount = price;
-  sale.to = seller.toHexString();
+  sale.to = buyer.toHexString();
 }
