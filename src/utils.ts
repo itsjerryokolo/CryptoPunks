@@ -1,6 +1,6 @@
 import { BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { CToken, Punk } from "../generated/schema";
-import { BIGINT_ONE, BIGINT_ZERO } from "./constant";
+import { CToken } from "../generated/schema";
+import { BIGINT_ONE } from "./constant";
 
 export function getGlobalId(event: ethereum.Event): string {
   let globalId = event.transaction.hash
@@ -110,20 +110,6 @@ export function getMakerAddress(event: ethereum.Event): string | null {
 export function calculateAverage(totalAmount: BigInt, qty: BigInt): BigInt {
   let average = totalAmount.div(qty);
   return average;
-}
-
-export function updatePunkSaleAggregates(punk: Punk, price: BigInt): void {
-  //Update punk aggregates
-  punk.totalAmountSpentOnPunk = punk.totalAmountSpentOnPunk.plus(price);
-  punk.numberOfSales = punk.numberOfSales.plus(BIGINT_ONE);
-
-  //We only calculate average sale price if there are more than 0 sales so we don't divide by 0
-  if (punk.numberOfSales != BIGINT_ZERO) {
-    punk.averageSalePrice = calculateAverage(
-      punk.totalAmountSpentOnPunk,
-      punk.numberOfSales
-    );
-  }
 }
 
 export function getOrCreateCToken(event: ethereum.Event): CToken {

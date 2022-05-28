@@ -11,12 +11,8 @@ import {
   updateContractAggregates,
 } from "../helpers/contractHelper";
 import { getOrCreateSale, updateSale } from "../helpers/saleHelper";
-import {
-  getContractAddress,
-  getPunkId,
-  getMakerAddress,
-  updatePunkSaleAggregates,
-} from "../utils";
+import { getContractAddress, getPunkId, getMakerAddress } from "../utils";
+import { updatePunkSaleAggregates } from "../../src/helpers/punkHelper";
 
 export function handleOpenSeaSale(event: OrdersMatched): void {
   //OpenSea Contract - Track WRAPPEDPUNK sale

@@ -1,7 +1,9 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { Punk } from "../../generated/schema";
 import { Buy as ERC721Sale } from "../../generated/ERC721Sale/ERC721Sale";
-import { getContractAddress, updatePunkSaleAggregates } from "../utils";
+import { getContractAddress } from "../utils";
+import { updatePunkSaleAggregates } from "../../src/helpers/punkHelper";
+
 import {
   getOrCreateAccount,
   updateAccountAggregates,
@@ -48,7 +50,7 @@ export function handleBuy(event: ERC721Sale): void {
     let punk = Punk.load(tokenId)!;
     let sale = getOrCreateSale(seller, tokenId, event);
 
-    updateSale(sale, price, seller);
+    updateSale(sale, price, buyer);
     updateAccountAggregates(fromAccount, toAccount, price);
     updateContractAggregates(contract, price);
     updatePunkSaleAggregates(punk, price);

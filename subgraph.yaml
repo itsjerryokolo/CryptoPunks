@@ -31,8 +31,6 @@ dataSources:
       abis:
         - name: cryptopunks
           file: ./abis/cryptopunks.json
-        - name: CryptopunksMetadata
-          file: ./abis/CryptopunksMetadata.json
       eventHandlers:
         - event: Assign(indexed address,uint256)
           handler: handleAssign

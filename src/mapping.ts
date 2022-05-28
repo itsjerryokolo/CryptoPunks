@@ -28,16 +28,19 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
 } from "./constant";
-import { getOrCreateAccount } from "../src/helpers/accountHelper";
+import {
+  getOrCreateAccount,
+  updateAccountHoldings,
+} from "../src/helpers/accountHelper";
 import { createMetadata } from "./helpers/metadataHelper";
 import { getOrCreateTransfer } from "./helpers/transferHelper";
 import { getOrCreateAssign } from "./helpers/assignHelper";
 import {
   calculateAverage,
   getOwnerFromCToken,
-  updatePunkSaleAggregates,
   getOrCreateCToken,
 } from "./utils";
+import { updatePunkSaleAggregates } from "../src/helpers/punkHelper";
 import {
   getOrCreateCryptoPunkContract,
   getOrCreateWrappedPunkContract,
@@ -62,26 +65,20 @@ import {
 } from "../src/helpers/bidHelpers";
 import { updateSale } from "./helpers/saleHelper";
 import { updateAccountAggregates } from "./helpers/accountHelper";
+import { createPunk } from "./helpers/punkHelper";
 
 export function handleAssign(event: Assigned): void {
   log.info("handleAssign {}", [event.params.punkIndex.toString()]);
   // This event fires when the user claims a Punk
 
   let trait = getTrait(event.params.punkIndex.toI32());
+  let tokenId = event.params.punkIndex;
   let account = getOrCreateAccount(event.params.to);
-  let metadata = createMetadata(event.params.punkIndex);
+  let metadata = createMetadata(tokenId);
   let contract = getOrCreateCryptoPunkContract(event.address);
 
   //Assign is always the first EVENTS that actually creates the punk
-  let punk = new Punk(event.params.punkIndex.toString());
-  punk.wrapped = false;
-  punk.tokenId = event.params.punkIndex;
-  punk.owner = event.params.to.toHexString();
-  punk.numberOfTransfers = BIGINT_ZERO;
-  punk.numberOfSales = BIGINT_ZERO;
-  punk.totalAmountSpentOnPunk = BIGINT_ZERO;
-  punk.averageSalePrice = BIGINT_ZERO;
-
+  let punk = createPunk(tokenId, event.params.to);
   let assign = getOrCreateAssign(
     event.params.punkIndex,
     event.params.to,
@@ -169,24 +166,25 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     event.params.from.toHexString(),
     event.params.to.toHexString(),
   ]);
+  let sender = event.params.from;
+  let receiver = event.params.to;
+  let tokenId = event.params.punkIndex.toString();
 
-  let fromProxy = UserProxy.load(event.params.from.toHexString());
-  let toProxy = UserProxy.load(event.params.to.toHexString());
+  let fromProxy = UserProxy.load(sender.toHexString());
+  let toProxy = UserProxy.load(receiver.toHexString());
 
   if (toProxy !== null) {
     log.debug("PunkTransfer to proxy detected toProxy: {} ", [toProxy.id]);
     return;
   } else if (
-    event.params.to.toHexString() != WRAPPED_PUNK_ADDRESS &&
-    event.params.from.toHexString() != WRAPPED_PUNK_ADDRESS
+    receiver.toHexString() != WRAPPED_PUNK_ADDRESS &&
+    sender.toHexString() != WRAPPED_PUNK_ADDRESS
   ) {
-    log.debug("Regular punk transfer check: {} ", [
-      event.params.punkIndex.toString(),
-    ]);
+    log.debug("Regular punk transfer check: {} ", [tokenId]);
 
     let toAccount = getOrCreateAccount(event.params.to);
     let fromAccount = getOrCreateAccount(event.params.from);
-    let punk = Punk.load(event.params.punkIndex.toString())!;
+    let punk = Punk.load(tokenId)!;
 
     punk.numberOfTransfers = punk.numberOfTransfers.plus(BIGINT_ONE);
 
@@ -194,16 +192,8 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     transfer.from = fromAccount.id;
     transfer.to = toAccount.id;
 
-    //Update toAccount aggregates
-    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BIGINT_ONE
-    );
+    updateAccountHoldings(toAccount, fromAccount);
     toAccount.numberOfTransfers = toAccount.numberOfTransfers.plus(BIGINT_ONE);
-
-    //Update fromAccount aggregates
-    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BIGINT_ONE
-    );
     fromAccount.numberOfTransfers = fromAccount.numberOfTransfers.plus(
       BIGINT_ONE
     );
@@ -218,20 +208,20 @@ export function handlePunkTransfer(event: PunkTransfer): void {
     punk.save();
   } else if (
     fromProxy !== null &&
-    event.params.from.toHexString() == fromProxy.id &&
-    event.params.to.toHexString() == WRAPPED_PUNK_ADDRESS
+    sender.toHexString() == fromProxy.id &&
+    receiver.toHexString() == WRAPPED_PUNK_ADDRESS
   ) {
-    log.info("Wrap detected of punk: {} ", [event.params.punkIndex.toString()]);
+    log.info("Wrap detected of punk: {} ", [tokenId]);
 
-    let punk = Punk.load(event.params.punkIndex.toString())!;
+    let punk = Punk.load(tokenId)!;
     punk.wrapped = true;
 
     punk.save();
-  } else if (event.params.from.toHexString() == WRAPPED_PUNK_ADDRESS) {
+  } else if (sender.toHexString() == WRAPPED_PUNK_ADDRESS) {
     //Burn/Unwrap
     log.debug("Unwrapped detected. From: {}, punk: {}", [
-      event.params.from.toHexString(),
-      event.params.punkIndex.toString(),
+      sender.toHexString(),
+      tokenId,
     ]);
 
     let punk = Punk.load(event.params.punkIndex.toString())!;
@@ -320,9 +310,8 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
   bid.created = bidCreated.id;
 
   punk.currentBid = bid.id;
-  bidCreated.bid = bid.id;
 
-  //Create relationship with Bid
+  bidCreated.bid = bid.id; //Create relationship with Bid
   bidCreated.amount = event.params.value;
 
   punk.currentBidCreated = bidCreated.id; //Update the currentBid for the punk in Punk entity for future reference
@@ -335,7 +324,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 }
 export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
   /** 
-    This event first only fires when a bid is removed
+    This event only fires when a bid is removed
 
   Actions:
     - createBidRemovedEVENT
@@ -461,6 +450,7 @@ export function handlePunkBought(event: PunkBought): void {
       - close Old Bid since it has been accepted
       - close Old Ask since it has been sold
       - createSaleEvent
+      - update aggregates for Account and Punk
     */
     let tokenId = event.params.punkIndex;
 
@@ -560,16 +550,8 @@ export function handlePunkBought(event: PunkBought): void {
     //Update tradeValues
     contract.totalSales = contract.totalSales.plus(BIGINT_ONE);
 
-    //Update fromAccount aggregates
-    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BIGINT_ONE
-    );
+    updateAccountHoldings(toAccount, fromAccount);
     fromAccount.numberOfSales = fromAccount.numberOfSales.plus(BIGINT_ONE);
-
-    //Update toAccount aggregates
-    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BIGINT_ONE
-    );
     toAccount.numberOfPurchases = toAccount.numberOfPurchases.plus(BIGINT_ONE);
     if (toAccount.numberOfPurchases != BIGINT_ZERO) {
       toAccount.averageAmountSpent = calculateAverage(
@@ -577,6 +559,7 @@ export function handlePunkBought(event: PunkBought): void {
         toAccount.numberOfPurchases
       );
     }
+
     //Write
     contract.save();
     punk.save();
@@ -650,17 +633,7 @@ export function handlePunkBought(event: PunkBought): void {
 
     updatePunkSaleAggregates(punk, price);
     updateContractAggregates(contract, price);
-
-    //Update toAccount holdings
-    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BIGINT_ONE
-    );
-
-    //Update fromAccount holdings
-    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BIGINT_ONE
-    );
-
+    updateAccountHoldings(toAccount, fromAccount);
     updateAccountAggregates(fromAccount, toAccount, price);
 
     //Write
@@ -728,12 +701,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
     //We need the contract address to filter our transactions from Other marketplace(OpenSea, ERC721Sale) sales
     cToken.referenceId = event.address.toHexString();
 
-    toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(
-      BIGINT_ONE
-    );
-    fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
-      BIGINT_ONE
-    );
+    updateAccountHoldings(toAccount, fromAccount);
     punk.owner = toAccount.id;
     punk.numberOfTransfers = punk.numberOfTransfers.plus(BIGINT_ONE);
 

@@ -44,3 +44,16 @@ export function updateAccountAggregates(
     );
   }
 }
+
+export function updateAccountHoldings(
+  toAccount: Account,
+  fromAccount: Account
+): void {
+  //Update toAccount holdings
+  toAccount.numberOfPunksOwned = toAccount.numberOfPunksOwned.plus(BIGINT_ONE);
+
+  //Update fromAccount holdings
+  fromAccount.numberOfPunksOwned = fromAccount.numberOfPunksOwned.minus(
+    BIGINT_ONE
+  );
+}

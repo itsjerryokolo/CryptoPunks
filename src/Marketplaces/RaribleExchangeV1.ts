@@ -11,8 +11,10 @@ import {
   getOrCreateWrappedPunkContract,
   updateContractAggregates,
 } from "../helpers/contractHelper";
+import { updatePunkSaleAggregates } from "../../src/helpers/punkHelper";
+
 import { updateSale } from "../helpers/saleHelper";
-import { getContractAddress, updatePunkSaleAggregates } from "../utils";
+import { getContractAddress } from "../utils";
 
 export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
   //RaribleExchangeV1 Contract - Track WRAPPEDPUNK SALE
