@@ -117,6 +117,9 @@ type Account @entity {
 
   "Average amount spent buying Punks by Account"
   averageAmountSpent: BigInt!
+
+  "Account URL"
+  accountUrl: String!
 }
 
 type Punk implements NFT @entity {

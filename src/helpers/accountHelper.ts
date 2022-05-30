@@ -6,6 +6,7 @@ import { calculateAverage } from "../utils";
 export function getOrCreateAccount(address: Address): Account {
   let id = address.toHexString();
   let account = Account.load(id);
+  let url = "https://cryptopunks.app/cryptopunks/accountinfo?account=";
 
   if (!account) {
     account = new Account(id);
@@ -17,6 +18,8 @@ export function getOrCreateAccount(address: Address): Account {
     account.numberOfPurchases = BIGINT_ZERO;
     account.totalSpent = BIGINT_ZERO;
     account.averageAmountSpent = BIGINT_ZERO;
+    account.accountUrl = url.concat(id);
+
     account.save();
   }
 
