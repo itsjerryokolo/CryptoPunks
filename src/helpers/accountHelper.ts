@@ -26,6 +26,19 @@ export function getOrCreateAccount(address: Address): Account {
   return account as Account;
 }
 
+/**
+ * @description This function:
+ *   - update the sales of the seller
+ *   - update the total earned by seller
+ *   - update the purchases of buyer
+ *   - update the spending of the buyer
+ *   - calculate average amount spent
+ * @param fromAccount This is the seller account
+ * @param toAccount This is the buyer account
+ * @param price This is the price of the punk
+ * @returns `void`
+ */
+
 export function updateAccountAggregates(
   fromAccount: Account,
   toAccount: Account,
