@@ -17,8 +17,8 @@ import { getContractAddress, getPriceAfterRaribleCut } from '../utils'
 
 export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
 	/**
-   	  @description RaribleExchangeV1 Contract - Track WRAPPEDPUNK SALE
-      @summary 
+   	  @summary RaribleExchangeV1 Contract - Track WRAPPEDPUNK SALE
+      @description 
 		ROOT ISSUE:  Punk 509 was sold while wrapped.
 			- Account: https://cryptopunks.app/cryptopunks/accountinfo?account=0x0eb9a7ff5cbf719251989caf1599c1270eafb531
 			- Example: https://etherscan.io/tx/0x51583622e0dcfda43c6481ba073eb1bbd6b7f3ef98c28d3564918491344d8ce3#eventlog
@@ -61,8 +61,8 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
 			punk.save()
 		} else if (sellToken == WETH_CONTRACT) {
 			/**
-		    @description Logic for validating a bidAccepted sale
-			@summary 
+		    @summary Logic for validating a bidAccepted sale
+			@description 
 			A wrapped punk bid can be accepted on RaribleExchangeV1.
 				- Example: https://etherscan.io/tx/0x26ad41d72737442ef108460bc25a69764b30e3df96344d95f8f3a03a551fd787#eventlog
 				- We know this through the sell token.

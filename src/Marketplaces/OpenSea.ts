@@ -16,8 +16,8 @@ import { updatePunkSaleAggregates } from '../../src/helpers/punkHelper'
 
 export function handleOpenSeaSale(event: OrdersMatched): void {
 	/**
-      @description OpenSea Contract - Track WRAPPEDPUNK sale
-	  @summary:
+      @summary OpenSea Contract - Track WRAPPEDPUNK sale
+	  @description:
     	 ROOT ISSUE:  Punk 7443 was sold on Opensea while wrapped.
       		- Account: https://cryptopunks.app/cryptopunks/accountinfo?account=0x0eb9a7ff5cbf719251989caf1599c1270eafb531
         	- Example: https://etherscan.io/tx/0xac6acdca9aeb00238ff885dcd4e697afd1cfa8ba75ef69622f786b96f8d164cf#eventlog
@@ -73,8 +73,8 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
 				makerAddress == event.params.maker.toHexString()
 			) {
 				/**
-           @description Logic for validating bidAccepted sale:
-		   @summary 
+           @summary Logic for validating bidAccepted sale:
+		   @description 
 		  	- We want to capture this sale.
                 - The major difference between this sale and a regular sale is that
                     - the maker becomes the buyer --> (toAccount)
