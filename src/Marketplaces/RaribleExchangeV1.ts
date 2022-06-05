@@ -25,7 +25,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
     	- We want to capture this so we can calculate average prices & update other aggregates both for punk & account
 		- We filter out wrappedPunk transactions by ensuring
 			- both events occur in the same transaction.
-			- the wrappedPunk contract address that emitted it.
+			- the wrappedPunk contract address emitted it.
     */
 
 	let wrappedPunkContractAddress = getContractAddress(event)
