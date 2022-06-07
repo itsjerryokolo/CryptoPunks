@@ -15,7 +15,7 @@ export function getOrCreateTransfer(
 	//find out how they differ & where to find them
 	//transfer.from = fromAddress.toHexString();
 	//transfer.to = toAddress.toHexString();
-	transfer.nft = punk.toString() // null by default
+	//transfer.nft = punk.toString() // null by default, updated in transfer handler
 
 	transfer.timestamp = event.block.timestamp
 	transfer.contract = event.address.toHexString()
