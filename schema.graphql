@@ -58,6 +58,7 @@ interface Event {
   "Punk"
   nft: NFT #nullable because punk doesn't appear in all events
   type: EventType!
+  logNumber: BigInt!
 
   "Transaction details"
   blockNumber: BigInt!
@@ -324,6 +325,7 @@ type Assign implements Event @entity(immutable: true) {
   amount: BigInt
   from: Account
   type: EventType!
+  logNumber: BigInt!
 
   "Transaction details"
   blockNumber: BigInt!
@@ -349,7 +351,7 @@ type Sale implements Event @entity(immutable: true) {
 
   "Punk being sold"
   nft: NFT
-
+  logNumber: BigInt!
   type: EventType!
 
   "Transaction details"
@@ -376,7 +378,7 @@ type AskCreated implements Event @entity(immutable: true) {
 
   "Punk being offered for sale"
   nft: NFT
-
+  logNumber: BigInt!
   type: EventType!
 
   "Transaction details"
@@ -397,13 +399,14 @@ type BidCreated implements Event @entity(immutable: true) {
 
   "Bid in ETH"
   amount: BigInt
+  logNumber: BigInt!
 
   "Contract metadata"
   contract: Contract
 
   "Punk being bidded"
   nft: NFT
-
+  logNumber: BigInt!
   type: EventType!
 
   "Transaction details"
@@ -430,6 +433,7 @@ type BidRemoved implements Event @entity(immutable: true) {
 
   "Punk whose Bid was removed"
   nft: NFT
+  logNumber: BigInt!
   type: EventType!
 
   "Transaction details"
@@ -457,7 +461,7 @@ type AskRemoved implements Event @entity(immutable: true) {
 
   "Punk whose asked was removed"
   nft: NFT
-
+  logNumber: BigInt!
   type: EventType!
 
   "Transaction details"
@@ -483,7 +487,7 @@ type Transfer implements Event @entity(immutable: true) {
 
   "Punk being transferred"
   nft: NFT
-
+  logNumber: BigInt!
   type: EventType!
 
   "Transaction details"
@@ -495,7 +499,7 @@ type Transfer implements Event @entity(immutable: true) {
 
 type CToken
   @entity { #TransferEvents
-  "TxHash + LogIndex" #This ID/Entity is used for referencing events in the same transaction
+  "TxHash + logNumber" #This ID/Entity is used for referencing events in the same transaction
   id: ID!
 
   "Sender"
@@ -536,7 +540,7 @@ type Wrap implements Event @entity(immutable: true) {
 
   "Punk being wrapped"
   nft: NFT
-
+  logNumber: BigInt!
   type: EventType!
 
   "Transaction details"
@@ -559,7 +563,7 @@ type Unwrap implements Event @entity(immutable: true) {
 
   "Punk being unwrapped"
   nft: NFT
-
+  logNumber: BigInt!
   type: EventType!
 
   "Transaction details"

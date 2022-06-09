@@ -1,5 +1,12 @@
 import { BigInt, ethereum } from '@graphprotocol/graph-ts'
-import { BidCreated, BidRemoved, Bid, CToken } from '../../generated/schema'
+import {
+	BidCreated,
+	BidRemoved,
+	Bid,
+	CToken,
+	Punk,
+	Account,
+} from '../../generated/schema'
 import { getGlobalId } from '../utils'
 
 //Update the state of the last Bid
@@ -38,6 +45,7 @@ export function createBidCreated(
 	bidCreated.nft = punkIndex.toString()
 	bidCreated.from = fromAddress
 	bidCreated.timestamp = event.block.timestamp
+	bidCreated.logNumber = event.logIndex
 	bidCreated.blockNumber = event.block.number
 	bidCreated.txHash = event.transaction.hash
 	bidCreated.blockHash = event.block.hash
@@ -59,9 +67,21 @@ export function createBidRemoved(
 	bidRemoved.nft = punkIndex.toString()
 	bidRemoved.timestamp = event.block.timestamp
 	bidRemoved.blockNumber = event.block.number
+	bidRemoved.logNumber = event.logIndex
 	bidRemoved.txHash = event.transaction.hash
 	bidRemoved.blockHash = event.block.hash
 	bidRemoved.type = 'BID_REMOVED'
 
 	return bidRemoved as BidRemoved
+}
+
+export function closeOldBid(punk: Punk, fromAccount: Account): void {
+	let oldBidId = punk.currentBid
+	if (oldBidId !== null) {
+		let oldBid = Bid.load(oldBidId.toString())!
+		oldBid.created = punk.currentBidCreated
+		oldBid.from = fromAccount.id
+		oldBid.open = false
+		oldBid.save()
+	}
 }

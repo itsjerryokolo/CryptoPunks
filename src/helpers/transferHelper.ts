@@ -21,6 +21,7 @@ export function getOrCreateTransfer(
 	transfer.contract = event.address.toHexString()
 	transfer.blockNumber = event.block.number
 	transfer.txHash = event.transaction.hash
+	transfer.logNumber = event.logIndex
 	transfer.blockHash = event.block.hash
 	transfer.type = 'TRANSFER'
 
