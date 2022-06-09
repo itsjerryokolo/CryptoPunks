@@ -27,7 +27,7 @@ export function handleBuy(event: ERC721Sale): void {
 
 		- We filter out wrappedPunk transactions by ensuring
 	 	    - both events occur in the same transaction
-	 	    - the wrappedPunk contract address that emitted it
+	 	    - the wrappedPunk contract address emitted it
     */
 
 	let wrappedPunkContractAddress = getContractAddress(event)
