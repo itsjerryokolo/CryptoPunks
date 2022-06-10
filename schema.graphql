@@ -399,7 +399,6 @@ type BidCreated implements Event @entity(immutable: true) {
 
   "Bid in ETH"
   amount: BigInt
-  logNumber: BigInt!
 
   "Contract metadata"
   contract: Contract

@@ -3,7 +3,6 @@ import {
 	BidCreated,
 	BidRemoved,
 	Bid,
-	CToken,
 	Punk,
 	Account,
 } from '../../generated/schema'
