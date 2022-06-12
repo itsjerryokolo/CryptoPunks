@@ -74,13 +74,14 @@ export function createBidRemoved(
 	return bidRemoved as BidRemoved
 }
 
-export function closeOldBid(punk: Punk, fromAccount: Account): void {
+export function closeOldBid(punk: Punk, toAccount: Account): void {
 	let oldBidId = punk.currentBid
 	if (oldBidId !== null) {
 		let oldBid = Bid.load(oldBidId.toString())!
-		oldBid.created = punk.currentBidCreated
-		oldBid.from = fromAccount.id
-		oldBid.open = false
-		oldBid.save()
+		if (oldBid.from == toAccount.id) {
+			oldBid.created = punk.currentBidCreated
+			oldBid.open = false
+			oldBid.save()
+		}
 	}
 }
