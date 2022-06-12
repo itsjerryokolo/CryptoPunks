@@ -101,7 +101,7 @@ export function handleAssign(event: Assigned): void {
 			let acessoryId = accessoryName.split(' ').join('-')
 			let accessory = Trait.load(acessoryId)
 
-			if (accessory == null) {
+			if (accessory === null) {
 				accessory = new Trait(acessoryId)
 				accessory.type = 'ACCESSORY'
 				accessory.numberOfNfts = BIGINT_ZERO
