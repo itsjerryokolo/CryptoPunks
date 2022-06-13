@@ -3,6 +3,7 @@ import { Punk } from '../../generated/schema'
 import { Buy as ERC721Sale } from '../../generated/ERC721Sale/ERC721Sale'
 import { getContractAddress } from '../utils'
 import { updatePunkSaleAggregates } from '../../src/helpers/punkHelper'
+import { closeOldBid } from '../helpers/bidHelpers'
 
 import {
 	getOrCreateAccount,
@@ -49,6 +50,7 @@ export function handleBuy(event: ERC721Sale): void {
 		let sale = getOrCreateSale(seller, tokenId, event)
 
 		updateSale(sale, price, buyer)
+		closeOldBid(punk, toAccount)
 		updateAccountAggregates(fromAccount, toAccount, price)
 		updateContractAggregates(contract, price)
 		updatePunkSaleAggregates(punk, price)
