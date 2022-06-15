@@ -252,6 +252,7 @@ export function handlePunkOffered(event: PunkOffered): void {
 	ask.open = true
 
 	askCreated.ask = ask.id
+	askCreated.to = event.params.toAddress.toHexString()
 	askCreated.from = punk.owner
 	askCreated.amount = event.params.minValue
 
