@@ -44,7 +44,7 @@ import {
 } from '../src/helpers/contractHelper'
 
 import { createWrap, createUnwrap } from '../src/helpers/wrapAndUnwrap'
-import { getOrCreateSale } from './helpers/saleHelper'
+import { getOrCreateSale, handleSaleNotification } from './helpers/saleHelper'
 
 import {
 	closeOldAsk,
@@ -507,6 +507,13 @@ export function handlePunkBought(event: PunkBought): void {
 		toAccount.save()
 		contract.save()
 		sale.save()
+
+		//Remove before deploying to The Graph Network
+		handleSaleNotification(
+			punk.id,
+			buyer.toHexString(),
+			price.toBigDecimal().toString()
+		)
 	}
 }
 

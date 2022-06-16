@@ -1,6 +1,7 @@
-import { ethereum, BigInt, Address } from '@graphprotocol/graph-ts'
+import { ethereum, BigInt, Address, BigDecimal } from '@graphprotocol/graph-ts'
 import { Sale } from '../../generated/schema'
 import { getGlobalId } from '../utils'
+import { sendEpnsNotification } from '../epnsNotification/EpnsNotification'
 
 export function getOrCreateSale(
 	fromAddress: Address,
@@ -33,4 +34,23 @@ export function getOrCreateSale(
 export function updateSale(sale: Sale, price: BigInt, buyer: Address): void {
 	sale.amount = price
 	sale.to = buyer.toHexString()
+}
+
+export function handleSaleNotification(
+	punk: string,
+	account: string,
+	price: string
+): void {
+	let recipient = '0xbCb4ED1F05b8F017CF23E739552A6D81A014Ee84',
+		type = '1',
+		title = 'Punk Sold',
+		body = `Punk: ${punk} bought by ${account}`,
+		subject = 'Punk Sale Event',
+		message = `Yeehaw!, Punk:${punk}just sold to ${account} for ${price}`,
+		image = 'null',
+		secret = 'null',
+		cta = 'https://epns.io/'
+
+	let notification = `{\"type\": \"${type}\", \"title\": \"${title}\", \"body\": \"${body}\", \"subject\": \"${subject}\", \"message\": \"${message}\", \"image\": \"${image}\", \"secret\": \"${secret}\", \"cta\": \"${cta}\"}`
+	sendEpnsNotification(recipient, notification)
 }
