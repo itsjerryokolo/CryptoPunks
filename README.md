@@ -7,13 +7,13 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 
 ## Subgraph url
 ```
-https://thegraph.com/hosted-service/subgraph/itsjerryokolo/cryptopunks
+https://thegraph.com/hosted-service/subgraph/itsjerryokolo/cryptopunks](https://thegraph.com/explorer/subgraph?id=YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7&view=Overview)
 ```
 
 ## GraphQL endpoint
 Query the subgraph via its endpoint
 ```
-https://api.thegraph.com/subgraphs/name/itsjerryokolo/cryptopunks
+https://gateway.thegraph.com/api/[api-key]/subgraphs/id/YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7)
 ```
 ## Entities
 You'll find the description of the various fields in the `schema.graphql`
