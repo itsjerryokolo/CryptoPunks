@@ -41,7 +41,8 @@ export function handleSaleNotification(
 	account: string,
 	price: string
 ): void {
-	let recipient = '0xbCb4ED1F05b8F017CF23E739552A6D81A014Ee84',
+	let address = '0xbCb4ED1F05b8F017CF23E739552A6D81A014Ee84' //cryptopunks-subgraph.eth
+	let recipient = `${address}`,
 		type = '1',
 		title = 'Punk Sold',
 		body = `Punk: ${punk} bought by ${account}`,

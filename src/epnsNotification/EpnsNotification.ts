@@ -1,4 +1,3 @@
-import { log } from '@graphprotocol/graph-ts'
 import { BIGINT_ONE, subgraphID } from '../constant'
 import {
 	getOrCreateEpnsNotificationCounter,
