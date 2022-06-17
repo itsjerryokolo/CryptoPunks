@@ -1,6 +1,6 @@
 import { BigInt } from '@graphprotocol/graph-ts'
 
-export const TOKEN_URI = 'https://cryptopunks.app/cryptopunks/details'
+export const TOKEN_URI = 'https://cryptopunks.app/cryptopunks/details/'
 export const CONTRACT_URI = 'https://cryptopunks.app/cryptopunks'
 export const IMAGE_URI =
 	'https://www.larvalabs.com/public/images/cryptopunks/punk'

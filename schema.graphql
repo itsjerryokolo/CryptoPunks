@@ -193,8 +193,8 @@ type MetaData @entity(immutable: true) {
   "URI of Punk"
   tokenURI: String!
 
-  "Punk image"
-  imageURI: String!
+  "Punk Svg image"
+  image: String
 
   "Contract URI"
   contractURI: String!
