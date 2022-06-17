@@ -1,4 +1,4 @@
-import { Address } from '@graphprotocol/graph-ts'
+import { Address, log } from '@graphprotocol/graph-ts'
 import { Buy as RaribleExchangeV1Buy } from '../../generated/RaribleExchangeV1/RaribleExchangeV1'
 import { Punk } from '../../generated/schema'
 import { WRAPPED_PUNK_ADDRESS } from '../constant'
@@ -55,6 +55,17 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
 			let tokenId = event.params.buyTokenId.toString()
 
 			let bidPrice = getPriceAfterRaribleCut(price)
+
+			log.info('Price before rarible cut: {}, txHash: {}', [
+				price.toString(),
+				event.transaction.hash.toHexString(),
+			])
+
+			log.info('Price after rarible cut: {}, txHash: {}', [
+				bidPrice.toString(),
+				event.transaction.hash.toHexString(),
+			])
+
 			let contract = getOrCreateWrappedPunkContract(
 				Address.fromString(wrappedPunkContractAddress)
 			)
