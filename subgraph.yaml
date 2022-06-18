@@ -137,3 +137,22 @@ dataSources:
         - event: OrdersMatched(bytes32,bytes32,indexed address,indexed address,uint256,indexed bytes32)
           handler: handleOpenSeaSale
       file: ./src/marketplaces/OpenSea.ts
+  - kind: ethereum/contract
+    name: CryptoPunksData
+    network: mainnet
+    source:
+      address: "0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2"
+      startBlock: 13047091
+      abi: CryptoPunksData
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Punk
+      abis:
+        - name: CryptoPunksData
+          file: ./abis/CryptoPunksData.json
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/data.ts
