@@ -509,11 +509,11 @@ export function handlePunkBought(event: PunkBought): void {
 		sale.save()
 
 		//Remove before deploying to The Graph Network
-		handleSaleNotification(
-			punk.id,
-			buyer.toHexString(),
-			price.toBigDecimal().toString()
-		)
+		// handleSaleNotification(
+		// 	punk.id,
+		// 	buyer.toHexString(),
+		// 	price.toBigDecimal().toString()
+		// )
 	}
 }
 
