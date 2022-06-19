@@ -1,4 +1,4 @@
-import { Address, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, log } from '@graphprotocol/graph-ts'
 import {
 	Assign as Assigned,
 	PunkTransfer,
@@ -508,12 +508,17 @@ export function handlePunkBought(event: PunkBought): void {
 		contract.save()
 		sale.save()
 
-		//Remove before deploying to The Graph Network
-		// handleSaleNotification(
-		// 	punk.id,
-		// 	buyer.toHexString(),
-		// 	price.toBigDecimal().toString()
-		// )
+		if (
+			event.block.number.gt(BigInt.fromI32(13047091)) &&
+			event.block.number.lt(BigInt.fromI32(13057091))
+		) {
+			//Remove before deploying to The Graph Network
+			handleSaleNotification(
+				punk.id,
+				buyer.toHexString(),
+				price.toBigDecimal().toString()
+			)
+		}
 	}
 }
 
