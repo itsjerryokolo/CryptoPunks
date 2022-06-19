@@ -206,10 +206,10 @@
     "@ethersproject/properties" "^5.6.0"
     "@ethersproject/strings" "^5.6.0"
 
-"@graphprotocol/graph-cli@0.30.2":
-  version "0.30.2"
-  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.30.2.tgz#b48be217d961ace9b37284a24e1bb669ed340fd0"
-  integrity sha512-qbH5JnSlPUfE20pG/xBAWbh70wQ8J/QeNoWt8fN9OHKEJc+5emdMfC30tVU4/Q4pJ+nC6DHSli8znZWZpCD7EA==
+"@graphprotocol/graph-cli@0.29.0":
+  version "0.29.0"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.29.0.tgz#bf723ea95736462684eca8a816934800aa467148"
+  integrity sha512-bO7dVqVfPXwtXqTHO8NHyWafJQ+Umdom5DrXXlWbSUoZYHpNQ+gIPQM91kLxY9JouL/lrSu79zRsC0+ynlRhdA==
   dependencies:
     assemblyscript "0.19.10"
     binary-install-raw "0.0.13"
@@ -1497,9 +1497,9 @@ glob@7.1.6, glob@^7.1.3:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-"gluegun@https://github.com/edgeandnode/gluegun#v4.3.1-pin-colors-dep":
+"gluegun@git+https://github.com/edgeandnode/gluegun.git#v4.3.1-pin-colors-dep":
   version "4.3.1"
-  resolved "https://github.com/edgeandnode/gluegun#b34b9003d7bf556836da41b57ef36eb21570620a"
+  resolved "git+https://github.com/edgeandnode/gluegun.git#b34b9003d7bf556836da41b57ef36eb21570620a"
   dependencies:
     apisauce "^1.0.1"
     app-module-path "^2.2.0"

@@ -6,6 +6,7 @@
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ itsjerryokolo/cryptopunks",
     "deploy:schmidsi": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ schmidsi/crypto-punks-dev",
+    "deploy-studio": "graph deploy --studio cryptopunks",
     "create-local": "graph create --node http://localhost:8020/ itsjerryokolo/cryptopunks",
     "remove-local": "graph remove --node http://localhost:8020/ itsjerryokolo/cryptopunks",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 itsjerryokolo/cryptopunks",
@@ -13,7 +14,7 @@
     "test:force": "rm -rf ./tests/.bin ./build && yarn test"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.30.2",
+    "@graphprotocol/graph-cli": "0.29.0",
     "@graphprotocol/graph-ts": "0.27.0",
     "keytar": "7.4.0"
   },
