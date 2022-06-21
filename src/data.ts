@@ -15,14 +15,14 @@ export function handleBlock(block: ethereum.Block): void {
 		)
 
 		//  let attributes = data.punkAttributes(BigInt.fromI32(index));
-		let svg = data.punkImageSvg(index)
-		let image = data.punkImage(index)
+		let svgCall = data.try_punkImageSvg(index)
+		let imageCall = data.try_punkImage(index)
 
 		let punk = Punk.load(index.toString())!
 		let metadata = MetaData.load(index.toString())!
 
-		metadata.image = image.toString()
-		metadata.svg = svg.toString()
+		metadata.svg = svgCall.reverted ? ' ' : svgCall.value
+		metadata.image = imageCall.reverted ? ' ' : imageCall.value.toString()
 
 		punk.metadata = metadata.id
 
