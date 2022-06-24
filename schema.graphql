@@ -185,7 +185,7 @@ type Punk implements NFT @entity {
   averageSalePrice: BigInt!
 }
 
-type MetaData @entity(immutable: true) {
+type MetaData @entity {
   id: ID!
 
   tokenId: BigInt!

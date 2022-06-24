@@ -508,14 +508,14 @@ export function handlePunkBought(event: PunkBought): void {
 		contract.save()
 		sale.save()
 
-		// if (event.block.number.gt(BigInt.fromI32(15000000))) {
-		// 	//Remove before deploying to The Graph Network
-		// 	handleSaleNotification(
-		// 		punk.id,
-		// 		buyer.toHexString(),
-		// 		price.toBigDecimal().toString()
-		// 	)
-		// }
+		//Remove before deploying to The Graph Network
+		if (event.block.number.gt(BigInt.fromI32(15000000))) {
+			handleSaleNotification(
+				punk.id,
+				buyer.toHexString(),
+				price.toBigDecimal().toString()
+			)
+		}
 	}
 }
 
