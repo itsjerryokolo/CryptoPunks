@@ -14,7 +14,7 @@ export function sendEpnsNotification(
 		BIGINT_ONE
 	)
 
-	let count = epnsNotificationCounter.totalCount.toHexString()
+	let count = epnsNotificationCounter.totalCount.toString()
 	let id2 = `${subgraphID}+${count}`
 
 	let epnsPushNotification = getOrCreateEpnsNotification(id2)
