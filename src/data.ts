@@ -11,7 +11,7 @@ export function handleBlock(block: ethereum.Block): void {
 		let index = block.number.minus(BigInt.fromI32(13047091)).toI32()
 
 		let data = CryptoPunksData.bind(
-			Address.fromString('0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2')
+			Address.fromString('0x16f5a35647d6f03d5d3da7b35409d65ba03af3b2')
 		)
 
 		//  let attributes = data.punkAttributes(BigInt.fromI32(index));
