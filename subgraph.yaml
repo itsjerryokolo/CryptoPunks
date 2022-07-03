@@ -1,4 +1,6 @@
 specVersion: 0.0.4
+description: "Subgraph for the Cryptopunks marketplace"
+repository: "https://github.com/itsjerryokolo/cryptopunks"
 schema:
   file: ./schema.graphql
 #graft:

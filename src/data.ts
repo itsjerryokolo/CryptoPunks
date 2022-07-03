@@ -22,7 +22,7 @@ export function handleBlock(block: ethereum.Block): void {
 		let metadata = MetaData.load(index.toString())!
 
 		metadata.svg = svgCall.reverted ? ' ' : svgCall.value.toString()
-		metadata.image = imageCall.reverted ? ' ' : imageCall.value.toString()
+		metadata.image = imageCall.reverted ? ' ' : imageCall.value.toHexString()
 
 		punk.metadata = metadata.id
 
