@@ -3,9 +3,11 @@ description: "Subgraph for the Cryptopunks marketplace"
 repository: "https://github.com/itsjerryokolo/cryptopunks"
 schema:
   file: ./schema.graphql
-#graft:
-#  base: Qmf9kah4dfYmaEBrRiqXEuHXMGRUCKNHcytYSasCygAF9K
-#  block: 10821737
+features:
+  - grafting
+graft:
+  base: QmZQdcffJwkSA6bVQbyjD3ddnKPTrmPysNBkNjMnEY5nB1
+  block: 13047085
 dataSources:
   - kind: ethereum/contract
     name: cryptopunks

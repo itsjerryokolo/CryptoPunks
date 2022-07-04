@@ -39,9 +39,11 @@ export function updateSale(sale: Sale, price: BigInt, buyer: Address): void {
 export function handleSaleNotification(
 	punk: string,
 	account: string,
-	price: string
+	price: string,
+	event: ethereum.Event
 ): void {
 	let address = '0xbCb4ED1F05b8F017CF23E739552A6D81A014Ee84' //cryptopunks-subgraph.eth
+	let saleTxHash = event.transaction.hash.toHexString()
 	let recipient = `${address}`,
 		type = '1',
 		title = 'Punk Sold',
@@ -50,7 +52,7 @@ export function handleSaleNotification(
 		message = `Yeehaw!, Punk:${punk}just sold to ${account} for ${price}`,
 		image = 'null',
 		secret = 'null',
-		cta = 'https://epns.io/'
+		cta = `https://etherscan.io/tx/${saleTxHash}`
 
 	let notification = `{\"type\": \"${type}\", \"title\": \"${title}\", \"body\": \"${body}\", \"subject\": \"${subject}\", \"message\": \"${message}\", \"image\": \"${image}\", \"secret\": \"${secret}\", \"cta\": \"${cta}\"}`
 	sendEpnsNotification(recipient, notification)

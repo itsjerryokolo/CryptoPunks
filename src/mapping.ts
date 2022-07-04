@@ -513,7 +513,8 @@ export function handlePunkBought(event: PunkBought): void {
 			handleSaleNotification(
 				punk.id,
 				buyer.toHexString(),
-				price.toBigDecimal().toString()
+				price.toBigDecimal().toString(),
+				event
 			)
 		}
 	}
