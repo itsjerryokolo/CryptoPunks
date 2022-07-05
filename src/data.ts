@@ -5,7 +5,7 @@ import { Punk, MetaData } from '../generated/schema'
 
 export function handleBlock(block: ethereum.Block): void {
 	if (
-		block.number.gt(BigInt.fromI32(13047091)) &&
+		block.number.ge(BigInt.fromI32(13047091)) &&
 		block.number.lt(BigInt.fromI32(13057091))
 	) {
 		let index = block.number.minus(BigInt.fromI32(13047091)).toI32()
