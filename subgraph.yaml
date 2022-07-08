@@ -1,13 +1,13 @@
 specVersion: 0.0.4
-description: "Subgraph for the Cryptopunks marketplace"
+description: "Subgraph for the CryptoPunks marketplace"
 repository: "https://github.com/itsjerryokolo/cryptopunks"
 schema:
   file: ./schema.graphql
 features:
   - grafting
 graft:
-  base: QmZQdcffJwkSA6bVQbyjD3ddnKPTrmPysNBkNjMnEY5nB1
-  block: 13047085
+  base: QmRSEhG4tXKmFaKzP1RCzwR2FueDWi8QT2RJ7AqzJgvS2D
+  block: 15000000
 dataSources:
   - kind: ethereum/contract
     name: cryptopunks

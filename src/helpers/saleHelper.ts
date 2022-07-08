@@ -47,10 +47,10 @@ export function handleSaleNotification(
 	let recipient = `${address}`,
 		type = '1',
 		title = 'Punk Sold',
-		body = `Punk: ${punk} bought by ${account}`,
+		body = `Yeehaw!, Punk: ${punk} bought by ${account}`,
 		subject = 'Punk Sale Event',
 		message = `Yeehaw!, Punk:${punk}just sold to ${account} for ${price}`,
-		image = 'null',
+		image = `https://cryptopunks.app/public/images/cryptopunks/punk${punk}.png`,
 		secret = 'null',
 		cta = `https://etherscan.io/tx/${saleTxHash}`
 
