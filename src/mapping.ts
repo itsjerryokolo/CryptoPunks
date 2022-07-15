@@ -257,7 +257,9 @@ export function handlePunkOffered(event: PunkOffered): void {
 	askCreated.amount = event.params.minValue
 
 	punk.currentAskCreated = askCreated.id
-	punk.currentAsk = ask.id //Update the currentAsk for the punk in Punk entity for future reference
+
+	//Update the currentAsk for the punk in Punk entity for future reference
+	punk.currentAsk = ask.id
 
 	//Write
 	askCreated.save()

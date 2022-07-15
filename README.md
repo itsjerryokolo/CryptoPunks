@@ -5,40 +5,31 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 
 ![Punks](punks.png)
 
-## Subgraph url
+## Subgraph Url
 ```
 https://thegraph.com/explorer/subgraph?id=YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7&view=Overview
 ```
 
-## GraphQL endpoint
-Query the subgraph via its endpoint
+## GraphQL Endpoint
+
+Query the subgraph via its endpoint.
+You first need to create an API KEY. This video show how: https://youtu.be/UrfIpm-Vlgs
 ```
-https://gateway.thegraph.com/api/[api-key]/subgraphs/id/YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7
+https://gateway.thegraph.com/api/[API-KEY]/subgraphs/id/YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7
 ```
-## Entities
-You'll find the description of the various fields in the `schema.graphql`
-
-- ASK: This entity captures the ASKS for a punk or from a user. It also shows the `current ASK` of the Punk.
-       An ask can be `open` or `closed`.  You can also query when the ask was `created` and when it was `removed`
-- BID: This entity captures the BIDS for a punk or from a user. It also shows the `current BID` of the Punk.
-        An ask can be `open` or `closed`. You can also query when the bid was `created` and when it was `removed`
-- PUNK: This entity holds useful information about the Punks; `traits`, `accessories`, `gender`, `owner` etc
-- ACCOUNT: Account contains the user data; `Trades`, `Hodlings` etc
-- CONTRACT: Contract metadata including `Trade Volume`
-- METADATA: Here, you can retrieve the punk tokenURI, image URI, traits, and other useful metadata
-- SALE - Query punk sale events
-
-
 ## Queries
 A list of example queries you can make can be found here: [Queries.md](Queries.md) 
 
-### Available Enums for Punk
-- male
-- female
-- zombie
-- alien
-- ape
+## Links
 
+- Protocol: https://cryptopunks.app/
+- Contract addresses:
+    - Cryptopunks: `0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB`
+    - CryptopunksData: `0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2`
+    - WrappedPunks: `0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6`
+    - Opensea: `0x7be8076f4ea4a4ad08075c2508e481d6c946d12b`
+    - RaribleExchangeV1: `0xcd4ec7b66fbc029c116ba9ffb3e59351c20b5b06`
+    - ERC721Sale: `0x131aebbfe55bca0c9eaad4ea24d386c5c082dd58`
 
 ## Run your local Graph Node
 
@@ -74,3 +65,31 @@ ETHEREUM_RPC=mainnet:https://eth-mainnet.alchemyapi.io/v2/${YOUR_API_KEY} docker
     - increment to
     - set owner
     - create Transfer event
+
+## EPNS Notifications
+Subscribe to event notifications from the subgraph via the link below.
+Search for `Cryptopunks Marketplace` and opt-in.
+
+```
+https://staging.epns.io#/channels
+```
+
+## Build
+
+- Initialize subgraph (Subgraph Studio):
+  ```
+  graph init --product subgraph-studio
+  --from-contract <CONTRACT_ADDRESS> [--network <ETHEREUM_NETWORK>] [--abi <FILE>] <SUBGRAPH_SLUG> [<DIRECTORY>]
+  ```
+- Initialize subgraph (Hosted Service):
+  ```
+  graph init --product hosted-service --from-contract <CONTRACT_ADDRESS> <GITHUB_USER>/<SUBGRAPH_NAME>[<DIRECTORY>]
+  ```
+- Generate code from manifest and schema: `graph codegen`
+- Build subgraph: `graph build`
+
+## Deploy
+
+- Authenticate (just once): `graph auth --product hosted-service <ACCESS_TOKEN>`
+- Deploy to Subgraph Studio: `graph deploy --studio <SUBGRAPH_NAME>`
+- Deploy to Hosted Service: `graph deploy --product hosted-service <GITHUB_USER>/<SUBGRAPH_NAME>`
