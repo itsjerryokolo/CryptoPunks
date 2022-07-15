@@ -13,7 +13,8 @@ https://thegraph.com/explorer/subgraph?id=YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5
 ## GraphQL Endpoint
 
 Query the subgraph via its endpoint.
-You first need to create an API KEY. This video show how: https://youtu.be/UrfIpm-Vlgs
+You first need to create an API KEY.
+This video show how to do that: https://youtu.be/UrfIpm-Vlgs
 ```
 https://gateway.thegraph.com/api/[API-KEY]/subgraphs/id/YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7
 ```
@@ -30,6 +31,13 @@ A list of example queries you can make can be found here: [Queries.md](Queries.m
     - Opensea: `0x7be8076f4ea4a4ad08075c2508e481d6c946d12b`
     - RaribleExchangeV1: `0xcd4ec7b66fbc029c116ba9ffb3e59351c20b5b06`
     - ERC721Sale: `0x131aebbfe55bca0c9eaad4ea24d386c5c082dd58`
+
+## EPNS Notifications
+Subscribe to get realtime event notifications from the subgraph via the link below.
+Search for `Cryptopunks Marketplace` and opt-in.
+```
+https://staging.epns.io#/channels
+```
 
 ## Run your local Graph Node
 
@@ -65,14 +73,6 @@ ETHEREUM_RPC=mainnet:https://eth-mainnet.alchemyapi.io/v2/${YOUR_API_KEY} docker
     - increment to
     - set owner
     - create Transfer event
-
-## EPNS Notifications
-Subscribe to event notifications from the subgraph via the link below.
-Search for `Cryptopunks Marketplace` and opt-in.
-
-```
-https://staging.epns.io#/channels
-```
 
 ## Build
 
