@@ -22,6 +22,8 @@ import {
 	BIGINT_ZERO,
 } from './constant'
 
+import { handleBidNotification } from '../src/helpers/bidHelpers'
+
 import {
 	getOrCreateAccount,
 	updateAccountHoldings,
@@ -308,6 +310,16 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 	punk.save()
 	account.save()
 	bidCreated.save()
+
+	//Remove before deploying to The Graph Network
+	if (event.block.number.gt(BigInt.fromI32(15000000))) {
+		handleBidNotification(
+			punk.id,
+			account.id,
+			convertPriceToBigDecimal(event.params.value).toString(),
+			event
+		)
+	}
 }
 export function handlePunkBidWithdrawn(event: PunkBidWithdrawn): void {
 	/** 
