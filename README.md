@@ -12,8 +12,7 @@ https://thegraph.com/explorer/subgraph?id=YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5
 
 ## GraphQL Endpoint
 
-You first need to create an API KEY.
-See: https://youtu.be/UrfIpm-Vlgs
+You first need to create an `API-KEY`. See: https://youtu.be/UrfIpm-Vlgs
 ```
 https://gateway.thegraph.com/api/[API-KEY]/subgraphs/id/YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7
 ```
