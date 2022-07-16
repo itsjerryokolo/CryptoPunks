@@ -30,7 +30,11 @@ import {
 import { createMetadata } from './helpers/metadataHelper'
 import { getOrCreateTransfer } from './helpers/transferHelper'
 import { getOrCreateAssign } from './helpers/assignHelper'
-import { getOwnerFromCToken, getOrCreateCToken } from './utils'
+import {
+	getOwnerFromCToken,
+	getOrCreateCToken,
+	convertPriceToBigDecimal,
+} from './utils'
 
 import {
 	updatePunkOwner,
@@ -455,6 +459,15 @@ export function handlePunkBought(event: PunkBought): void {
 			updateAccountAggregates(fromAccount, toAccount, oldBid.amount)
 			updatePunkSaleAggregates(punk, oldBid.amount)
 			updateContractAggregates(contract, oldBid.amount)
+
+			if (event.block.number.gt(BigInt.fromI32(15000000))) {
+				handleSaleNotification(
+					punk.id,
+					toAccount.id,
+					convertPriceToBigDecimal(oldBid.amount).toString(),
+					event
+				)
+			}
 		}
 
 		updatePunkOwner(punk, Address.fromString(getOwnerFromCToken(event)))
@@ -515,7 +528,7 @@ export function handlePunkBought(event: PunkBought): void {
 			handleSaleNotification(
 				punk.id,
 				buyer.toHexString(),
-				price.toBigDecimal().toString(),
+				convertPriceToBigDecimal(price).toString(),
 				event
 			)
 		}
