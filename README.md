@@ -32,11 +32,12 @@ A list of example queries you can make can be found here: [Queries.md](Queries.m
 
 ## EPNS Notifications
 
+Subscribe to get realtime event notifications from the subgraph.
+
 ```
 https://staging.epns.io#/channels
 ```
 
-Subscribe to get realtime event notifications from the subgraph.
 Search for `Cryptopunks Marketplace` and opt-in.
 ## Run your local Graph Node
 
