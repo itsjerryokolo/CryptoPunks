@@ -32,12 +32,13 @@ A list of example queries you can make can be found here: [Queries.md](Queries.m
     - ERC721Sale: `0x131aebbfe55bca0c9eaad4ea24d386c5c082dd58`
 
 ## EPNS Notifications
-Subscribe to get realtime event notifications from the subgraph.
-Search for `Cryptopunks Marketplace` and opt-in.
+
 ```
 https://staging.epns.io#/channels
 ```
 
+Subscribe to get realtime event notifications from the subgraph.
+Search for `Cryptopunks Marketplace` and opt-in.
 ## Run your local Graph Node
 
 ```bash
