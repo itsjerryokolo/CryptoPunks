@@ -12,9 +12,8 @@ https://thegraph.com/explorer/subgraph?id=YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5
 
 ## GraphQL Endpoint
 
-Query the subgraph via its endpoint.
 You first need to create an API KEY.
-This video show how to do that: https://youtu.be/UrfIpm-Vlgs
+See: https://youtu.be/UrfIpm-Vlgs
 ```
 https://gateway.thegraph.com/api/[API-KEY]/subgraphs/id/YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7
 ```
@@ -33,7 +32,7 @@ A list of example queries you can make can be found here: [Queries.md](Queries.m
     - ERC721Sale: `0x131aebbfe55bca0c9eaad4ea24d386c5c082dd58`
 
 ## EPNS Notifications
-Subscribe to get realtime event notifications from the subgraph via the link below.
+Subscribe to get realtime event notifications from the subgraph.
 Search for `Cryptopunks Marketplace` and opt-in.
 ```
 https://staging.epns.io#/channels
@@ -42,9 +41,10 @@ https://staging.epns.io#/channels
 ## Run your local Graph Node
 
 ```bash
-ETHEREUM_RPC=mainnet:https://eth-mainnet.alchemyapi.io/v2/${YOUR_API_KEY} docker compose up
+ETHEREUM_RPC=mainnet:https://eth-mainnet.alchemyapi.io/v2/${YOUR_API_KEY}
 ```
 
+Run the command: `docker compose up`
 ## Logic for Transfers/Wraps
 
 - Regular PunkTransfer
