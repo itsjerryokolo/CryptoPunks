@@ -172,3 +172,14 @@ export function getPriceAfterRaribleCut(price: BigInt): BigInt {
 		return priceAfterCut
 	}
 }
+
+export function convertPriceToBigDecimal(
+	quantity: BigInt,
+	decimals: i32 = 18
+): BigDecimal {
+	return quantity.divDecimal(
+		BigInt.fromI32(10)
+			.pow(decimals as u8)
+			.toBigDecimal()
+	)
+}
