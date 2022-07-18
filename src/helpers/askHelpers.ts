@@ -7,6 +7,7 @@ import {
 	Account,
 } from '../../generated/schema'
 import { getGlobalId } from '../utils'
+import { sendEpnsNotification } from '../epnsNotification/EpnsNotification'
 
 export function createAskCreated(
 	punkIndex: BigInt,
@@ -84,4 +85,26 @@ export function closeOldAsk(punk: Punk, fromAccount: Account): void {
 		//Write
 		oldAsk.save()
 	}
+}
+
+export function handleAskNotification(
+	punk: string,
+	owner: string,
+	price: string,
+	event: ethereum.Event
+): void {
+	let address = '0xbCb4ED1F05b8F017CF23E739552A6D81A014Ee84' //cryptopunks-subgraph.eth
+	let bidTxHash = event.transaction.hash.toHexString()
+	let recipient = `${address}`,
+		type = '1',
+		title = 'New Listing',
+		body = `${owner} listed Punk:${punk} for ${price} ETH by ${owner}`,
+		subject = 'Punk Offer Event',
+		message = `New Listing! ${owner} wants ${price} ETH for Punk: ${punk}`,
+		image = `https://cryptopunks.app/public/images/cryptopunks/punk${punk}.png`,
+		secret = 'null',
+		cta = `https://etherscan.io/tx/${bidTxHash}`
+
+	let notification = `{\"type\": \"${type}\", \"title\": \"${title}\", \"body\": \"${body}\", \"subject\": \"${subject}\", \"message\": \"${message}\", \"image\": \"${image}\", \"secret\": \"${secret}\", \"cta\": \"${cta}\"}`
+	sendEpnsNotification(recipient, notification)
 }

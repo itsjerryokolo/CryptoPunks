@@ -271,6 +271,16 @@ export function handlePunkOffered(event: PunkOffered): void {
 	askCreated.save()
 	punk.save()
 	ask.save()
+
+	//Remove before deploying to The Graph Network
+	if (event.block.number.gt(BigInt.fromI32(15000000))) {
+		handleBidNotification(
+			punk.id,
+			punk.owner,
+			convertPriceToBigDecimal(event.params.minValue).toString(),
+			event
+		)
+	}
 }
 
 export function handlePunkBidEntered(event: PunkBidEntered): void {

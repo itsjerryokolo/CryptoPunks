@@ -99,9 +99,9 @@ export function handleBidNotification(
 	let recipient = `${address}`,
 		type = '1',
 		title = 'New Punk Bid',
-		body = `New Bid for Punk: ${punk} for ${price}ETH`,
+		body = `New Bid for Punk: ${punk} for ${price} ETH by ${bidder}`,
 		subject = 'Punk Bid Event',
-		message = `${bidder} just placed a bid for Punk: ${punk} for ${price}ETH`,
+		message = `${bidder} placed a ${price} ETH bid for Punk: ${punk}`,
 		image = `https://cryptopunks.app/public/images/cryptopunks/punk${punk}.png`,
 		secret = 'null',
 		cta = `https://etherscan.io/tx/${bidTxHash}`
