@@ -94,7 +94,7 @@ export function handleAskNotification(
 	event: ethereum.Event
 ): void {
 	let address = '0xbCb4ED1F05b8F017CF23E739552A6D81A014Ee84' //cryptopunks-subgraph.eth
-	let bidTxHash = event.transaction.hash.toHexString()
+	let askTxHash = event.transaction.hash.toHexString()
 	let recipient = `${address}`,
 		type = '1',
 		title = 'New Listing',
@@ -103,7 +103,7 @@ export function handleAskNotification(
 		message = `New Listing! ${owner} wants ${price} ETH for Punk: ${punk}`,
 		image = `https://cryptopunks.app/public/images/cryptopunks/punk${punk}.png`,
 		secret = 'null',
-		cta = `https://etherscan.io/tx/${bidTxHash}`
+		cta = `https://etherscan.io/tx/${askTxHash}`
 
 	let notification = `{\"type\": \"${type}\", \"title\": \"${title}\", \"body\": \"${body}\", \"subject\": \"${subject}\", \"message\": \"${message}\", \"image\": \"${image}\", \"secret\": \"${secret}\", \"cta\": \"${cta}\"}`
 	sendEpnsNotification(recipient, notification)

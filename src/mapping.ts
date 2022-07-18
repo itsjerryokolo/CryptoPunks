@@ -23,6 +23,7 @@ import {
 } from './constant'
 
 import { handleBidNotification } from '../src/helpers/bidHelpers'
+import { handleAskNotification } from './helpers/askHelpers'
 
 import {
 	getOrCreateAccount,
@@ -274,7 +275,7 @@ export function handlePunkOffered(event: PunkOffered): void {
 
 	//Remove before deploying to The Graph Network
 	if (event.block.number.gt(BigInt.fromI32(15000000))) {
-		handleBidNotification(
+		handleAskNotification(
 			punk.id,
 			punk.owner,
 			convertPriceToBigDecimal(event.params.minValue).toString(),

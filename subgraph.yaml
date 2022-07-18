@@ -6,7 +6,7 @@ schema:
 features:
   - grafting
 graft:
-  base: QmZqnSPXruMfs5pnbUzXQkWnPri5udDiFpho52co5drt1k
+  base: QmYGxCR465XCeCjedipuxCKGdVX8r19sj7GaroRA5SU6Lk
   block: 15000000
 dataSources:
   - kind: ethereum/contract
