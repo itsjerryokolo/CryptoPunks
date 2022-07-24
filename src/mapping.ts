@@ -274,7 +274,7 @@ export function handlePunkOffered(event: PunkOffered): void {
 	ask.save()
 
 	//Remove before deploying to The Graph Network
-	if (event.block.number.gt(BigInt.fromI32(15000000))) {
+	if (event.block.number.gt(BigInt.fromI32(15205322))) {
 		handleAskNotification(
 			punk.id,
 			punk.owner,
@@ -323,7 +323,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 	bidCreated.save()
 
 	//Remove before deploying to The Graph Network
-	if (event.block.number.gt(BigInt.fromI32(15000000))) {
+	if (event.block.number.gt(BigInt.fromI32(15205322))) {
 		handleBidNotification(
 			punk.id,
 			account.id,
@@ -483,7 +483,7 @@ export function handlePunkBought(event: PunkBought): void {
 			updatePunkSaleAggregates(punk, oldBid.amount)
 			updateContractAggregates(contract, oldBid.amount)
 
-			if (event.block.number.gt(BigInt.fromI32(15000000))) {
+			if (event.block.number.gt(BigInt.fromI32(15205322))) {
 				handleSaleNotification(
 					punk.id,
 					toAccount.id,
@@ -547,7 +547,7 @@ export function handlePunkBought(event: PunkBought): void {
 		sale.save()
 
 		//Remove before deploying to The Graph Network
-		if (event.block.number.gt(BigInt.fromI32(15000000))) {
+		if (event.block.number.gt(BigInt.fromI32(15205322))) {
 			handleSaleNotification(
 				punk.id,
 				buyer.toHexString(),

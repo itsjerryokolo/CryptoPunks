@@ -98,7 +98,7 @@ export function handleAskNotification(
 	let recipient = `${address}`,
 		type = '1',
 		title = 'New Listing',
-		body = `${owner} listed Punk:${punk} for ${price} ETH by ${owner}`,
+		body = `${owner} listed Punk:${punk} for ${price} ETH`,
 		subject = 'Punk Offer Event',
 		message = `New Listing! ${owner} wants ${price} ETH for Punk: ${punk}`,
 		image = `https://cryptopunks.app/public/images/cryptopunks/punk${punk}.png`,

@@ -6,8 +6,8 @@ schema:
 features:
   - grafting
 graft:
-  base: QmYGxCR465XCeCjedipuxCKGdVX8r19sj7GaroRA5SU6Lk
-  block: 15000000
+  base: QmaWuaC2x6YV8GZVNWizKtuYkyZqPGCfKMdEB15i6DYZpx
+  block: 15205322
 dataSources:
   - kind: ethereum/contract
     name: cryptopunks
