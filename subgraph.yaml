@@ -18,7 +18,7 @@ dataSources:
       startBlock: 3914494
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Account
@@ -62,7 +62,7 @@ dataSources:
       startBlock: 10821736
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - ProxyRegistered
@@ -84,7 +84,7 @@ dataSources:
       abi: ERC721Sale
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Account
@@ -106,7 +106,7 @@ dataSources:
       abi: RaribleExchangeV1
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Buy
@@ -128,7 +128,7 @@ dataSources:
       abi: Opensea
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Account
@@ -150,7 +150,7 @@ dataSources:
       abi: CryptoPunksData
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Punk
