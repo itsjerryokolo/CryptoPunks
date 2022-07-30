@@ -614,6 +614,10 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 		//We need the contract address to filter our transactions from other marketplace(OpenSea,RaribleExchangeV1, ERC721Sale) sales
 		cToken.referenceId = event.address.toHexString()
 
+		transfer.from = fromAccount.id
+		transfer.to = toAccount.id
+		transfer.nft = punk.id
+
 		updateAccountHoldings(toAccount, fromAccount)
 		punk.owner = toAccount.id
 		punk.numberOfTransfers = punk.numberOfTransfers.plus(BIGINT_ONE)
