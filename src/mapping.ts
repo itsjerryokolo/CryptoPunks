@@ -250,7 +250,7 @@ export function handlePunkOffered(event: PunkOffered): void {
 	let fromAccount = getOrCreateAccount(Address.fromBytes(punk.owner))
 	closeOldAsk(punk, fromAccount)
 
-	let ask = getOrCreateAsk(punk.owner.toString(), event)
+	let ask = getOrCreateAsk(punk.owner.toHexString(), event)
 
 	ask.nft = punk.id
 	ask.from = punk.owner
@@ -326,7 +326,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 	if (event.block.number.gt(BigInt.fromI32(15205322))) {
 		handleBidNotification(
 			punk.id,
-			account.id.toString(),
+			account.id.toHexString(),
 			convertPriceToBigDecimal(event.params.value).toString(),
 			event
 		)
@@ -547,14 +547,14 @@ export function handlePunkBought(event: PunkBought): void {
 		sale.save()
 
 		//Remove before deploying to The Graph Network
-		// 	if (event.block.number.gt(BigInt.fromI32(15205322))) {
-		// 		handleSaleNotification(
-		// 			punk.id,
-		// 			buyer.toHexString(),
-		// 			convertPriceToBigDecimal(price).toString(),
-		// 			event
-		// 		)
-		// 	}
+		if (event.block.number.gt(BigInt.fromI32(15205322))) {
+			handleSaleNotification(
+				punk.id,
+				buyer.toHexString(),
+				convertPriceToBigDecimal(price).toString(),
+				event
+			)
+		}
 	}
 }
 

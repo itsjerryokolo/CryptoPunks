@@ -53,7 +53,7 @@ export function getOrCreateAsk(
 	let ask = Ask.load(askId)
 	if (!ask) {
 		ask = new Ask(askId)
-		ask.from = Address.fromString(fromAddress)
+		ask.from = Address.fromHexString(fromAddress)
 		ask.open = true
 		ask.offerType = 'ASK'
 	}
