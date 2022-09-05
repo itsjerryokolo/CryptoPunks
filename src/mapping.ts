@@ -143,8 +143,8 @@ export function handleTransfer(event: cTokenTransfer): void {
 		let toAccount = getOrCreateAccount(event.params.to)
 		let cToken = getOrCreateCToken(event)
 
-		cToken.from = event.params.from.toHexString()
-		cToken.to = event.params.to.toHexString()
+		cToken.from = event.params.from
+		cToken.to = event.params.to
 		cToken.owner = event.params.to.toHexString()
 		cToken.amount = event.params.value
 
@@ -247,10 +247,10 @@ export function handlePunkOffered(event: PunkOffered): void {
 
 	let punk = Punk.load(event.params.punkIndex.toString())!
 	let askCreated = createAskCreated(event.params.punkIndex, event)
-	let fromAccount = getOrCreateAccount(Address.fromString(punk.owner))
+	let fromAccount = getOrCreateAccount(Address.fromBytes(punk.owner))
 	closeOldAsk(punk, fromAccount)
 
-	let ask = getOrCreateAsk(punk.owner, event)
+	let ask = getOrCreateAsk(punk.owner.toString(), event)
 
 	ask.nft = punk.id
 	ask.from = punk.owner
@@ -259,7 +259,7 @@ export function handlePunkOffered(event: PunkOffered): void {
 	ask.open = true
 
 	askCreated.ask = ask.id
-	askCreated.to = event.params.toAddress.toHexString()
+	askCreated.to = event.params.toAddress
 	askCreated.from = punk.owner
 	askCreated.amount = event.params.minValue
 
@@ -277,7 +277,7 @@ export function handlePunkOffered(event: PunkOffered): void {
 	if (event.block.number.gt(BigInt.fromI32(15205322))) {
 		handleAskNotification(
 			punk.id,
-			punk.owner,
+			punk.owner.toHexString(),
 			convertPriceToBigDecimal(event.params.minValue).toString(),
 			event
 		)
@@ -326,7 +326,7 @@ export function handlePunkBidEntered(event: PunkBidEntered): void {
 	if (event.block.number.gt(BigInt.fromI32(15205322))) {
 		handleBidNotification(
 			punk.id,
-			account.id,
+			account.id.toString(),
 			convertPriceToBigDecimal(event.params.value).toString(),
 			event
 		)
@@ -404,7 +404,7 @@ export function handlePunkNoLongerForSale(event: PunkNoLongerForSale): void {
 		//https://cryptopunks.app/cryptopunks/details/2158
 		//This is a weird case where an offer can be withdrawn before it's created
 
-		let ask = getOrCreateAsk(punk.owner, event)
+		let ask = getOrCreateAsk(punk.owner.toHexString(), event)
 		ask.nft = punk.id
 		ask.open = false
 		ask.from = punk.owner
@@ -486,7 +486,7 @@ export function handlePunkBought(event: PunkBought): void {
 			if (event.block.number.gt(BigInt.fromI32(15205322))) {
 				handleSaleNotification(
 					punk.id,
-					toAccount.id,
+					toAccount.id.toHexString(),
 					convertPriceToBigDecimal(oldBid.amount).toString(),
 					event
 				)
@@ -547,14 +547,14 @@ export function handlePunkBought(event: PunkBought): void {
 		sale.save()
 
 		//Remove before deploying to The Graph Network
-		if (event.block.number.gt(BigInt.fromI32(15205322))) {
-			handleSaleNotification(
-				punk.id,
-				buyer.toHexString(),
-				convertPriceToBigDecimal(price).toString(),
-				event
-			)
-		}
+		// 	if (event.block.number.gt(BigInt.fromI32(15205322))) {
+		// 		handleSaleNotification(
+		// 			punk.id,
+		// 			buyer.toHexString(),
+		// 			convertPriceToBigDecimal(price).toString(),
+		// 			event
+		// 		)
+		// 	}
 	}
 }
 
@@ -579,7 +579,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 
 		contract.totalSupply = contract.totalSupply.plus(BIGINT_ONE)
 
-		wrap.to = event.params.to.toHexString()
+		wrap.to = event.params.to
 
 		//Write
 		wrap.save()
@@ -606,8 +606,8 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 
 		//We create a cToken Entity here to store IDs for future comparison
 		let cToken = getOrCreateCToken(event)
-		cToken.from = event.params.from.toHexString()
-		cToken.to = event.params.to.toHexString()
+		cToken.from = event.params.from
+		cToken.to = event.params.to
 		cToken.owner = event.params.to.toHexString()
 		cToken.punkId = event.params.tokenId.toString()
 
@@ -635,7 +635,7 @@ export function handleWrappedPunkTransfer(event: WrappedPunkTransfer): void {
 
 export function handleProxyRegistered(event: ProxyRegistered): void {
 	let userProxy = new UserProxy(event.params.proxy.toHexString())
-	userProxy.user = event.params.user.toHexString()
+	userProxy.user = event.params.user
 	userProxy.timestamp = event.block.timestamp
 	userProxy.txHash = event.transaction.hash
 	userProxy.blockNumber = event.block.number

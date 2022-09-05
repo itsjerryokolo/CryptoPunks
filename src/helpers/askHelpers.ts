@@ -1,4 +1,4 @@
-import { BigInt, ethereum } from '@graphprotocol/graph-ts'
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts'
 import {
 	AskRemoved,
 	AskCreated,
@@ -53,7 +53,7 @@ export function getOrCreateAsk(
 	let ask = Ask.load(askId)
 	if (!ask) {
 		ask = new Ask(askId)
-		ask.from = fromAddress
+		ask.from = Address.fromString(fromAddress)
 		ask.open = true
 		ask.offerType = 'ASK'
 	}

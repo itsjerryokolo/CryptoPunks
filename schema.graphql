@@ -69,7 +69,7 @@ interface Event {
 
 type Account @entity {
   "Ethereum Address"
-  id: ID!
+  id: Bytes!
 
   "All Punks owned by Account"
   punksOwned: [Punk!] @derivedFrom(field: "owner")

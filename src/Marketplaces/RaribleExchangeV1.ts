@@ -37,7 +37,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
 		wrappedPunkContractAddress == WRAPPED_PUNK_ADDRESS
 	) {
 		let trueBuyer = getMakerAddress(event)
-		if (trueBuyer !== null && trueBuyer == event.params.owner.toHexString()) {
+		if (trueBuyer !== null && trueBuyer == event.params.owner) {
 			/**
 		    @summary Logic for validating a bidAccepted sale
 			@description 
@@ -85,10 +85,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
 			sale.save()
 			contract.save()
 			punk.save()
-		} else if (
-			trueBuyer !== null &&
-			trueBuyer == event.params.buyer.toHexString()
-		) {
+		} else if (trueBuyer !== null && trueBuyer == event.params.buyer) {
 			/**
 			 @summary - Logic for Regular Sale
 				- Example: https://etherscan.io/tx/0x51583622e0dcfda43c6481ba073eb1bbd6b7f3ef98c28d3564918491344d8ce3#eventlog

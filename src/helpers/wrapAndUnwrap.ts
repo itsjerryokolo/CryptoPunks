@@ -13,7 +13,7 @@ export function createWrap(
 			.concat('-')
 			.concat(event.logIndex.toString())
 	)
-	wrap.from = fromAccount.toHexString()
+	wrap.from = fromAccount
 	wrap.type = 'WRAP'
 	wrap.timestamp = event.block.timestamp
 	wrap.nft = nft.toString()
@@ -38,8 +38,8 @@ export function createUnwrap(
 			.concat('-')
 			.concat(event.logIndex.toString())
 	)
-	unWrap.from = fromAccount.toHexString()
-	unWrap.to = toAccount.toHexString()
+	unWrap.from = fromAccount
+	unWrap.to = toAccount
 	unWrap.type = 'UNWRAP'
 	unWrap.timestamp = event.block.timestamp
 	unWrap.logNumber = event.logIndex

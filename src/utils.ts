@@ -1,4 +1,4 @@
-import { BigInt, ethereum, BigDecimal } from '@graphprotocol/graph-ts'
+import { BigInt, ethereum, BigDecimal, Bytes } from '@graphprotocol/graph-ts'
 import { CToken } from '../generated/schema'
 import { BIGINT_ONE } from './constant'
 
@@ -93,7 +93,7 @@ export function getPunkId(event: ethereum.Event): string | null {
  * @returns `string` if transaction is a WrappedPunk Transfer event, or `null` otherwise
  */
 
-export function getMakerAddress(event: ethereum.Event): string | null {
+export function getMakerAddress(event: ethereum.Event): Bytes | null {
 	/**
    @description
    	- We only care about transactions concerning WrappedPunk contract saved from the WrappedPunk Transfer event.
@@ -115,7 +115,7 @@ export function getMakerAddress(event: ethereum.Event): string | null {
 	}
 
 	let makerAddress = cToken.to
-	return makerAddress as string
+	return makerAddress
 }
 
 /**

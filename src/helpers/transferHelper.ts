@@ -1,6 +1,5 @@
 import { BigInt, ethereum } from '@graphprotocol/graph-ts'
 import { Transfer } from '../../generated/schema'
-
 import { getGlobalId } from '../utils'
 
 export function getOrCreateTransfer(
@@ -25,6 +24,5 @@ export function getOrCreateTransfer(
 	transfer.blockHash = event.block.hash
 	transfer.type = 'TRANSFER'
 
-	transfer.save()
 	return transfer as Transfer
 }

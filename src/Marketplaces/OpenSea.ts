@@ -45,10 +45,7 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
 				Address.fromString(wrappedPunkContractAddress)
 			)
 
-			if (
-				makerAddress !== null &&
-				makerAddress == event.params.taker.toHexString()
-			) {
+			if (makerAddress !== null && makerAddress == event.params.taker) {
 				//Regular wrappedPunk sale
 				let price = event.params.price
 				let buyer = event.params.taker
@@ -68,10 +65,7 @@ export function handleOpenSeaSale(event: OrdersMatched): void {
 				sale.save()
 				toAccount.save()
 				fromAccount.save()
-			} else if (
-				makerAddress !== null &&
-				makerAddress == event.params.maker.toHexString()
-			) {
+			} else if (makerAddress !== null && makerAddress == event.params.maker) {
 				/**
            @summary Logic for validating bidAccepted sale:
 		   @description 

@@ -7,7 +7,7 @@ export function createPunk(tokenId: BigInt, owner: Address): Punk {
 	let punk = new Punk(tokenId.toString())
 	punk.wrapped = false
 	punk.tokenId = tokenId
-	punk.owner = owner.toHexString()
+	punk.owner = owner
 	punk.numberOfTransfers = BIGINT_ZERO
 	punk.numberOfSales = BIGINT_ZERO
 	punk.totalAmountSpentOnPunk = BIGINT_ZERO
@@ -32,6 +32,6 @@ export function updatePunkSaleAggregates(punk: Punk, price: BigInt): void {
 
 export function updatePunkOwner(punk: Punk, toAccount: Address): void {
 	//Update Punk entity
-	punk.purchasedBy = toAccount.toHexString()
-	punk.owner = toAccount.toHexString()
+	punk.purchasedBy = toAccount
+	punk.owner = toAccount
 }

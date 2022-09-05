@@ -14,7 +14,7 @@ export function getOrCreateAssign(
 	if (!assign) {
 		assign = new Assign(getGlobalId(event))
 	}
-	assign.to = toAccount.toHexString()
+	assign.to = toAccount
 	assign.nft = punkIndex.toString()
 	assign.timestamp = event.block.timestamp
 	assign.contract = event.address.toHexString()
@@ -23,8 +23,8 @@ export function getOrCreateAssign(
 	assign.txHash = event.transaction.hash
 	assign.blockHash = event.block.hash
 	punk.metadata = metadata.id
-	punk.assignedTo = toAccount.toHexString()
-	punk.transferedTo = toAccount.toHexString()
+	punk.assignedTo = toAccount
+	punk.transferedTo = toAccount
 	assign.type = 'ASSIGN'
 	assign.save()
 

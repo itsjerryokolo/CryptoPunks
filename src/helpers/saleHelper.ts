@@ -24,7 +24,7 @@ export function getOrCreateSale(
       Find out where to properly update this field
         sale.to = toAddress.toHexString(); ***DONE
     */
-	sale.from = fromAddress.toHexString()
+	sale.from = fromAddress
 	sale.nft = punk.toString()
 
 	sale.save()
@@ -33,7 +33,7 @@ export function getOrCreateSale(
 
 export function updateSale(sale: Sale, price: BigInt, buyer: Address): void {
 	sale.amount = price
-	sale.to = buyer.toHexString()
+	sale.to = buyer
 }
 
 export function handleSaleNotification(

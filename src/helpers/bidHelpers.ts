@@ -1,4 +1,4 @@
-import { BigInt, ethereum } from '@graphprotocol/graph-ts'
+import { BigInt, Address, ethereum } from '@graphprotocol/graph-ts'
 import {
 	BidCreated,
 	BidRemoved,
@@ -19,7 +19,7 @@ export function getOrCreateBid(
 	let bid = Bid.load(bidId) //Should not be null
 	if (!bid) {
 		bid = new Bid(bidId)
-		bid.from = fromAddress
+		bid.from = Address.fromString(fromAddress)
 		bid.offerType = 'BID'
 		bid.open = true
 	}
@@ -44,7 +44,7 @@ export function createBidCreated(
 
 	bidCreated.type = 'BID_CREATED'
 	bidCreated.nft = punkIndex.toString()
-	bidCreated.from = fromAddress
+	bidCreated.from = Address.fromString(fromAddress)
 	bidCreated.timestamp = event.block.timestamp
 	bidCreated.logNumber = event.logIndex
 	bidCreated.blockNumber = event.block.number
@@ -63,7 +63,7 @@ export function createBidRemoved(
 ): BidRemoved {
 	let bidRemoved = new BidRemoved(getGlobalId(event).concat('-BID_REMOVED'))
 
-	bidRemoved.from = fromAddress
+	bidRemoved.from = Address.fromString(fromAddress)
 	bidRemoved.contract = event.address.toHexString()
 	bidRemoved.nft = punkIndex.toString()
 	bidRemoved.timestamp = event.block.timestamp
