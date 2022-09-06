@@ -7,10 +7,10 @@ import {
 } from 'matchstick-as/assembly/index'
 // import { log } from 'matchstick-as/assembly/log'
 import { logStore } from 'matchstick-as/assembly/store'
-import { PunkTransfer } from '../../generated/cryptopunks/cryptopunks'
-import { handlePunkTransfer } from '../../src/mapping'
+import { PunkTransfer } from '../generated/cryptopunks/cryptopunks'
+import { handlePunkTransfer } from '../src/mapping'
 
-import { WRAPPED_PUNK_ADDRESS, ZERO_ADDRESS } from '../../src/constant'
+import { WRAPPED_PUNK_ADDRESS, ZERO_ADDRESS } from '../src/constant'
 
 ///////////////////////////////////
 /// Mock Values ///
