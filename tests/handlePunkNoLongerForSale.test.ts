@@ -10,7 +10,7 @@ import {
 	beforeEach,
 } from 'matchstick-as/assembly/index'
 import { handlePunkNoLongerForSale } from '../src/mapping'
-import Utils from '../tests/helpers/utils'
+import Utils from './helpers/utils'
 
 describe('handleAssign', () => {
 	beforeEach(() => {
