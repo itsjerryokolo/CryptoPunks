@@ -22,7 +22,7 @@ export default class Utils {
 		return BigInt.zero()
 	}
 
-	static seedEntity(): void {
+	static seedBounty(): void {
 		let entity = new Entity()
 
 		entity.setBytes('id', Utils.id_BYTES)
