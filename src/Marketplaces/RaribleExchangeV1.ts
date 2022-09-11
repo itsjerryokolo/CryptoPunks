@@ -52,7 +52,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
 			let price = event.params.buyValue
 			let buyer = event.params.owner
 			let seller = event.params.buyer
-			let tokenId = event.params.buyTokenId.toString()
+			let tokenId = event.params.sellToken.toString()
 
 			let bidPrice = getPriceAfterRaribleCut(price)
 
@@ -93,7 +93,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
 			let price = event.params.buyValue
 			let buyer = event.params.buyer
 			let seller = event.params.owner
-			let tokenId = event.params.buyTokenId.toString()
+			let tokenId = event.params.sellToken.toString()
 
 			let contract = getOrCreateWrappedPunkContract(
 				Address.fromString(wrappedPunkContractAddress)
