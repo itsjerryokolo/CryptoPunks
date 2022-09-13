@@ -52,7 +52,7 @@ export function handleExchangeV1Buy(event: RaribleExchangeV1Buy): void {
 			let price = event.params.buyValue
 			let buyer = event.params.owner
 			let seller = event.params.buyer
-			let tokenId = event.params.sellToken.toString()
+			let tokenId = event.params.buyToken.toString()
 
 			let bidPrice = getPriceAfterRaribleCut(price)
 
