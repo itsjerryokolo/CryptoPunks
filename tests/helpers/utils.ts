@@ -29,16 +29,32 @@ export default class Utils {
 		return Bytes.fromHexString('0x0000000000000000000000000000000000000000')
 	}
 
+	static get loremIpsum(): string {
+		return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
+	}
+
 	static get Bi_ZERO(): BigInt {
 		return BigInt.zero()
+	}
+
+	static get Bi_ONE(): BigInt {
+		return BigInt.fromI32(1)
 	}
 
 	static seedAccount(): void {
 		let entity = new Entity()
 
-		entity.setString('id', Utils.id_STRING)
-		entity.setBytes('address', Utils.id_BYTES)
-		entity.setBigInt('status', Utils.Bi_ZERO)
+		entity.setBytes('id', Utils.id_BYTES)
+		entity.setBigInt('averageAmountSpent', Utils.Bi_ZERO)
+		entity.setBigInt('totalEarned', Utils.Bi_ZERO)
+		entity.setBigInt('totalSpent', Utils.Bi_ZERO)
+		entity.setBigInt('numberOfSales', Utils.Bi_ZERO)
+		entity.setBigInt('numberOfTransfers', Utils.Bi_ZERO)
+		entity.setBigInt('numberOfPunksAssigned', Utils.Bi_ZERO)
+		entity.setBigInt('numberOfPunksOwned', Utils.Bi_ZERO)
+		entity.setBigInt('numberOfPurchases', Utils.Bi_ZERO)
+		entity.setBigInt('averageAmountSpent', Utils.Bi_ZERO)
+		entity.setString('accountUrl', Utils.loremIpsum)
 
 		store.set('Account', Utils.id_STRING, entity)
 	}

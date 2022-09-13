@@ -37,8 +37,8 @@ describe('handleTransfer', () => {
 		assert.fieldEquals(
 			'Punk',
 			Utils.id_STRING,
-			'id',
-			Utils.id_BYTES.toHexString()
+			'numberOfTransfers',
+			Utils.Bi_ONE.toString()
 		)
 	})
 })
