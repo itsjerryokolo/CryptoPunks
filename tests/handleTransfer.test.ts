@@ -1,4 +1,4 @@
-import { Bytes, BigInt, Address, ethereum } from '@graphprotocol/graph-ts'
+import { Bytes, BigInt, log, ethereum } from '@graphprotocol/graph-ts'
 import { Assign, Transfer } from '../generated/cryptopunks/cryptopunks'
 import {
 	newMockEvent,
@@ -20,13 +20,16 @@ describe('handleTransfer', () => {
 		clearStore()
 	})
 	test('handleTransfer', () => {
+		log.info('handleTransfer1', [])
 		let newTransferEvent = createNewTransferEvent(
 			Utils.Bi_ZERO,
 			Utils.accountDummyZero_BYTES,
 			Utils.id_BYTES
 		)
+		log.info('handleTransfer2', [])
 
 		handleTransfer(newTransferEvent)
+		log.info('handleTransfer3', [])
 
 		assert.fieldEquals(
 			'Account',
@@ -34,6 +37,8 @@ describe('handleTransfer', () => {
 			'id',
 			Utils.id_BYTES.toHexString()
 		)
+		log.info('handleTransfer4', [])
+
 		assert.fieldEquals(
 			'Punk',
 			Utils.id_STRING,
@@ -45,13 +50,13 @@ describe('handleTransfer', () => {
 
 export function createNewTransferEvent(
 	punkId: BigInt,
-	fromAccount: Bytes,
-	toAccount: Bytes
+	fromAccount: Address,
+	toAccount: Address
 ): Transfer {
 	let newTransferEvent = changetype<Transfer>(newMockEvent())
 
 	let parameters: Array<ethereum.EventParam> = [
-		new ethereum.EventParam('from', ethereum.Value.fromBytes(fromAccount)),
+		new ethereum.EventParam('from', ethereum.Value.fromAddress(fromAccount)),
 		new ethereum.EventParam('to', ethereum.Value.fromBytes(toAccount)),
 		new ethereum.EventParam(
 			'punkIndex',

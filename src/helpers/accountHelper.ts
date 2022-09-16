@@ -1,10 +1,10 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt, Bytes } from '@graphprotocol/graph-ts'
 import { Account } from '../../generated/schema'
 import { BIGINT_ONE, BIGINT_ZERO } from '../constant'
 import { calculateAverage } from '../utils'
 
 export function getOrCreateAccount(address: Address): Account {
-	let id = address
+	let id = address as Bytes
 	let account = Account.load(id)
 	let url = 'https://cryptopunks.app/cryptopunks/accountinfo?account='
 
