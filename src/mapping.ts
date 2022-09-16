@@ -135,7 +135,7 @@ export function handleAssign(event: Assigned): void {
 
 export function handleTransfer(event: cTokenTransfer): void {
 	/**
-	   @summary Throw-away entity
+	   @summary cToken as helper entity
       		e.g: https://etherscan.io/tx/0x23d6e24628dabf4fa92fa93630e5fa6f679fac75071aab38d7e307a3c0f4a3ca#eventlog
  	 */
 	if (event.params.to.toHexString() != ZERO_ADDRESS) {

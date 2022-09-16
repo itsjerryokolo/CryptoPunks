@@ -21,6 +21,10 @@ export default class Utils {
 	static get accountDummyOne(): Address {
 		return Address.fromHexString('0x06b306c85e5f33b1b2d971822ce0ed42fb7ab9a1')
 	}
+
+	static get accountDummyOne_BYTES(): Bytes {
+		return Bytes.fromHexString('0x06b306c85e5f33b1b2d971822ce0ed42fb7ab9a1')
+	}
 	static get accountDummyZero(): Address {
 		return Address.fromHexString('0x0000000000000000000000000000000000000000')
 	}
@@ -57,5 +61,18 @@ export default class Utils {
 		entity.setString('accountUrl', Utils.loremIpsum)
 
 		store.set('Account', Utils.id_STRING, entity)
+	}
+
+	static seedUserProxy(): void {
+		let entity = new Entity()
+
+		entity.setString('id', Utils.id_STRING)
+		entity.setBigInt('user', Utils.Bi_ZERO)
+		entity.setBigInt('blockNumber', Utils.Bi_ZERO)
+		entity.setBigInt('blockHash', Utils.Bi_ZERO)
+		entity.setBigInt('txHash', Utils.Bi_ZERO)
+		entity.setBigInt('timestamp', Utils.Bi_ZERO)
+
+		store.set('UserProxy', Utils.id_STRING, entity)
 	}
 }
