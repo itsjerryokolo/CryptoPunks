@@ -1,5 +1,5 @@
-import { Bytes, BigInt, log, ethereum } from '@graphprotocol/graph-ts'
-import { Assign, Transfer } from '../generated/cryptopunks/cryptopunks'
+import { Address, BigInt, log, ethereum } from '@graphprotocol/graph-ts'
+import { Transfer } from '../generated/cryptopunks/cryptopunks'
 import {
 	newMockEvent,
 	test,
@@ -23,8 +23,8 @@ describe('handleTransfer', () => {
 		log.info('handleTransfer1', [])
 		let newTransferEvent = createNewTransferEvent(
 			Utils.Bi_ZERO,
-			Utils.accountDummyZero_BYTES,
-			Utils.id_BYTES
+			Utils.accountDummyZero,
+			Utils.accountDummyOne
 		)
 		log.info('handleTransfer2', [])
 

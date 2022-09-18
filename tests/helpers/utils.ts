@@ -1,12 +1,4 @@
-import {
-	Bytes,
-	BigInt,
-	Address,
-	Entity,
-	store,
-	log,
-} from '@graphprotocol/graph-ts'
-import { Account } from '../../generated/schema'
+import { Bytes, BigInt, Address, Entity, store } from '@graphprotocol/graph-ts'
 import { getOrCreateAccount } from '../../src/helpers/accountHelper'
 
 export default class Utils {
@@ -36,7 +28,7 @@ export default class Utils {
 	}
 
 	static get loremIpsum(): string {
-		return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
+		return 'Lorem ipsum dolor sit amet'
 	}
 
 	static get Bi_ZERO(): BigInt {
