@@ -35,7 +35,7 @@ A list of example queries you can make can be found here: [Queries.md](Queries.m
 Subscribe to get realtime event notifications from the subgraph.
 
 ```
-https://staging.epns.io#/channels
+https://staging.push.org/#/channels
 ```
 
 Search for `Cryptopunks Marketplace` and opt-in.
