@@ -6,31 +6,31 @@ sidebar_position: 2
 
 ### Entities for the CryptoPunks Subgraph are all listed below
 
-- [Account](#Account)
-- [Punk](#Punk)
-- [Metadata](#Metadata)
-- [Trait](#Trait)
-- [Ask](#Ask)
-- [Bid](#Bid)
-- [Contract](#Contract)
-- [Assign](#Assign)
-- [Sale](#Sale)
-- [AskCreated](#AskCreated)
-- [BidCreated](#BidCreated)
-- [BidRemoved](#BidRemoved)
-- [AskRemoved](#AskRemoved)
-- [Transfer](#Transfer)
-- [CToken](#CToken)
-- [Wrap](#Wrap)
-- [Unwrap](#Unwrap)
-- [UserProxy](#UserProxy)
-- [EpnsNotificationCounter](#EpnsNotificationCounter)
-- [EpnsPushNotification](#EpnsPushNotification)
-- [NFT](#NFT)
-- [Event](#Event)
-- [Offer](#Offer)
+- [Account](#account)
+- [Punk](#punk)
+- [Metadata](#metadata)
+- [Trait](#trait)
+- [Ask](#ask)
+- [Bid](#bid)
+- [Contract](#contract)
+- [Assign](#assign)
+- [Sale](#sale)
+- [AskCreated](#askcreated)
+- [BidCreated](#bidcreated)
+- [BidRemoved](#bidremoved)
+- [AskRemoved](#askremoved)
+- [Transfer](#transfer)
+- [CToken](#ctoken)
+- [Wrap](#wrap)
+- [Unwrap](#unwrap)
+- [UserProxy](#userproxy)
+- [EpnsNotificationCounter](#epnsnotificationcounter)
+- [EpnsPushNotification](#epnspushnotification)
+- [NFT](#nft)
+- [Event](#event)
+- [Offer](#offer)
 
-# Account
+## Account
 
 | Field                 | Type         | Description                                       |
 | --------------------- | ------------ | ------------------------------------------------- |
@@ -53,7 +53,7 @@ sidebar_position: 2
 | averageAmountSpent    | BigInt!      | Average amount spent buying Punks by Account      |
 | accountUrl            | String!      | Account URL                                       |
 
-# Punk
+## Punk
 
 | Field                  | Type       | Description                                                              |
 | ---------------------- | ---------- | ------------------------------------------------------------------------ |
@@ -78,7 +78,7 @@ sidebar_position: 2
 | totalAmountSpentOnPunk | BigInt!    | Total amount spent purchasing Punk across OpenSea & Rarible marketplaces |
 | averageSalesPrice      | BigInt!    | Average price for Punk across OpenSea & Rarible marketplaces             |
 
-# MetaData
+## MetaData
 
 | Field       | Type      | Description    |
 | ----------- | --------- | -------------- |
@@ -91,7 +91,7 @@ sidebar_position: 2
 | punk        | Punk!     | Punk           |
 | traits      | [Trait!]! | Punk Traits    |
 
-# Trait
+## Trait
 
 | Field        | Type         | Description                     |
 | ------------ | ------------ | ------------------------------- |
@@ -100,7 +100,7 @@ sidebar_position: 2
 | metaDatas    | [Metadata!]! | Punk Metadata                   |
 | numberOfNfts | BigInt!      | Number of Punks with this trait |
 
-# Ask
+## Ask
 
 | Field   | Type     | Description                                            |
 | ------- | -------- | ------------------------------------------------------ |
@@ -112,7 +112,7 @@ sidebar_position: 2
 | created | Event    | Ask created at                                         |
 | removed | Event    | Ask removed at                                         |
 
-# Bid
+## Bid
 
 | Field     | Type       | Description                                            |
 | --------- | ---------- | ------------------------------------------------------ |
@@ -125,7 +125,7 @@ sidebar_position: 2
 | removed   | Event      | Bid removed at                                         |
 | offerType | offerType! | Type of Offer                                          |
 
-# Contract
+## Contract
 
 | Field             | Type    | Description                                      |
 | ----------------- | ------- | ------------------------------------------------ |
@@ -137,7 +137,7 @@ sidebar_position: 2
 | totalAmountTraded | BigInt! | Total Sales in ETH for Punks                     |
 | imageHash         | String  | The hash of the composite image of all the Punks |
 
-# Assign
+## Assign
 
 | Field       | Type       | Description                 |
 | ----------- | ---------- | --------------------------- |
@@ -154,7 +154,7 @@ sidebar_position: 2
 | txHash      | Bytes!     | Event transaction hash      |
 | timeStamp   | BigInt!    | Transaction timestamp       |
 
-# Sale
+## Sale
 
 | Field       | Type       | Description              |
 | ----------- | ---------- | ------------------------ |
@@ -171,7 +171,7 @@ sidebar_position: 2
 | txHash      | Bytes!     | Event transaction hash   |
 | timeStamp   | BigInt!    | Transaction timestamp    |
 
-# AskCreated
+## AskCreated
 
 | Field       | Type       | Description                 |
 | ----------- | ---------- | --------------------------- |
@@ -189,7 +189,7 @@ sidebar_position: 2
 | txHash      | Bytes!     | Event transaction hash      |
 | timeStamp   | BigInt!    | Transaction timestamp       |
 
-# BidCreated
+## BidCreated
 
 | Field       | Type       | Description              |
 | ----------- | ---------- | ------------------------ |
@@ -207,7 +207,7 @@ sidebar_position: 2
 | txHash      | Bytes!     | Event transaction hash   |
 | timeStamp   | BigInt!    | Transaction timestamp    |
 
-# BidRemoved
+## BidRemoved
 
 | Field       | Type       | Description                  |
 | ----------- | ---------- | ---------------------------- |
@@ -225,7 +225,7 @@ sidebar_position: 2
 | txHash      | Bytes!     | Event transaction hash       |
 | timeStamp   | BigInt!    | Transaction timestamp        |
 
-# AskRemoved
+## AskRemoved
 
 | Field       | Type       | Description                  |
 | ----------- | ---------- | ---------------------------- |
@@ -243,7 +243,7 @@ sidebar_position: 2
 | txHash      | Bytes!     | Event transaction hash       |
 | timeStamp   | BigInt!    | Transaction timestamp        |
 
-# Transfer
+## Transfer
 
 | Field       | Type       | Description              |
 | ----------- | ---------- | ------------------------ |
@@ -260,7 +260,7 @@ sidebar_position: 2
 | txHash      | Bytes!     | Event transaction hash   |
 | timeStamp   | BigInt!    | Transaction timestamp    |
 
-# CToken
+## CToken
 
 | Field       | Type    | Description                                                            |
 | ----------- | ------- | ---------------------------------------------------------------------- |
@@ -276,7 +276,7 @@ sidebar_position: 2
 | txHash      | Bytes!  | Event transaction hash                                                 |
 | timeStamp   | BigInt! | Transaction timestamp                                                  |
 
-# Wrap
+## Wrap
 
 | Field       | Type       | Description               |
 | ----------- | ---------- | ------------------------- |
@@ -293,7 +293,7 @@ sidebar_position: 2
 | txHash      | Bytes!     | Event transaction hash    |
 | timeStamp   | BigInt!    | Transaction timestamp     |
 
-# UnWrap
+## UnWrap
 
 | Field       | Type       | Description                 |
 | ----------- | ---------- | --------------------------- |
@@ -310,7 +310,7 @@ sidebar_position: 2
 | txHash      | Bytes!     | Event transaction hash      |
 | timeStamp   | BigInt!    | Transaction timestamp       |
 
-# UserProxy
+## UserProxy
 
 | Field       | Type     | Description                   |
 | ----------- | -------- | ----------------------------- |
@@ -321,14 +321,14 @@ sidebar_position: 2
 | txHash      | Bytes!   | Event transaction hash        |
 | timeStamp   | BigInt!  | Transaction timestamp         |
 
-# EpnsNotificationCounter
+## EpnsNotificationCounter
 
 | Field      | Type    | Description |
 | ---------- | ------- | ----------- |
 | id         | ID!     | ID          |
 | totalcount | BigInt! | Total count |
 
-# EpnsPushNotification
+## EpnsPushNotification
 
 | Field              | Type    | Description         |
 | ------------------ | ------- | ------------------- |

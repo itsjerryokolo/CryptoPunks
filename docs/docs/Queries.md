@@ -10,8 +10,6 @@ You can build your own queries using a [GraphQL Explorer](https://graphiql-onlin
 
 ### Sales
 
-Description: This query fetches the sales or the last 30 days.
-
 ```graphql
 query Last30DaysSales($timestamp_gt: String) {
   sales(
@@ -39,8 +37,6 @@ With `$timestamp_gt` set like this:
 ```
 
 ### Get Punk Data
-
-Description: This query fetches the data for a punk such as; `numberOfTransfers`, `numberOfSales`, `currentAskCreated`, `currentBidCreated`, `owner`, `assignedTo`.
 
 ```graphql
 {
@@ -70,8 +66,6 @@ Description: This query fetches the data for a punk such as; `numberOfTransfers`
 
 ### Asks for a Punk
 
-Description: This query fetches the asks for a punk.
-
 ```graphql
 {
   asks(orderDirection: desc, where: { nft: "365" }) {
@@ -95,8 +89,6 @@ Description: This query fetches the asks for a punk.
 ```
 
 ### Owner data
-
-Description: This query fetches the data for an owner such as; `asks`, `bought`, `sent`, `received`, `assigned`.
 
 ```graphql
 {
@@ -152,8 +144,6 @@ Description: This query fetches the data for an owner such as; `asks`, `bought`,
 ```
 
 ### Male Punks
-
-Description: This query fetches data for male Punks.
 
 ```graphql
 {

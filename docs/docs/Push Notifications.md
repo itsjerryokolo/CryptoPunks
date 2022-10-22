@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-### EPNS-Push Notifications
+### Push Notifications
 
 Subscribe to get realtime event notifications from the subgraph.
 
