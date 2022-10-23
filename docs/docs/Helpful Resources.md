@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 5
 ---
 
 These additional resources will help you interact with, and query the CryptoPunks Subgraph.
