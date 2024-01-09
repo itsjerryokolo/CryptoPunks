@@ -7,14 +7,14 @@ No two are exactly alike, and each one of them can be officially owned by a sing
 
 ## Subgraph Url
 ```
-https://thegraph.com/explorer/subgraph?id=YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7&view=Overview
+https://thegraph.com/explorer/subgraphs/2hTKKMwLsdfJm9N7gUeajkgg8sdJwky56Zpkvg8ZcyP8?view=Overview&chain=arbitrum-one
 ```
 
 ## GraphQL Endpoint
 
 You first need to create an `API-KEY`. See: https://youtu.be/UrfIpm-Vlgs
 ```
-https://gateway.thegraph.com/api/[API-KEY]/subgraphs/id/YqMJatbgbqy1GodtbYZv4U9NzyaScCgSF7CAE5ivAM7
+https://gateway-arbitrum.network.thegraph.com/api/[api-key]/subgraphs/id/2hTKKMwLsdfJm9N7gUeajkgg8sdJwky56Zpkvg8ZcyP8
 ```
 ## Queries
 A list of example queries you can make can be found here: [Queries.md](Queries.md) 
