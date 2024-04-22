@@ -14,8 +14,8 @@
     "test:force": "rm -rf ./tests/.bin ./build && yarn test"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.33.1",
-    "@graphprotocol/graph-ts": "0.27.0",
+    "@graphprotocol/graph-cli": "^0.70.0",
+    "@graphprotocol/graph-ts": "^0.35.0",
     "keytar": "7.4.0"
   },
   "devDependencies": {
