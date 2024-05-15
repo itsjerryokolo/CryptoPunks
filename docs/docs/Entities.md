@@ -24,31 +24,28 @@ sidebar_position: 2
 - [UserProxy](#userproxy)
 - [EpnsNotificationCounter](#epnsnotificationcounter)
 - [EpnsPushNotification](#epnspushnotification)
-- [NFT](#nft)
-- [Event](#event)
-- [Offer](#offer)
 
 ## Account
 
 | Field                 | Type         | Description                                       |
 | --------------------- | ------------ | ------------------------------------------------- |
 | id                    | Bytes!       | Etherum address                                   |
-| punksOwned            | [Punk!]      | All punks owned by account                        |
-| bought                | [Sale!]!     | Purchases by account                              |
-| nftsOwned             | [NFT!]!      | All punks owned by account                        |
+| punksOwned            | [Punk!]      | All Punks owned by account                        |
+| bought                | [Sale!]!     | Purchases by Account                              |
+| nftsOwned             | [NFT!]!      | All Punks owned by account                        |
 | assigned              | [Assign!]!   | Punks assigned to account (if any)                |
-| sent                  | [Transfer!]! | Punk transfers by account                         |
-| received              | [Transfer!]! | Punk transfers to account                         |
-| bids                  | [Bid!]!      | Query bids by account                             |
-| asks                  | [Ask!]!      | Punks offered for sale by account                 |
-| numberOfPunksOwned    | BigInt!      | Total number of punks owned by account            |
-| numberOfPunksAssigned | BigInt!      | Total number of punks assigned to account         |
-| numberOfTransfers     | BigInt!      | Total number of transfer by account               |
-| numberOfSales         | BigInt!      | Total number of sales by account                  |
-| numberOfPurchases     | BigInt!      | Total number of purchases by account              |
-| totalSpent            | BigInt!      | Total amount spent buying punks by account        |
-| totalEarned           | BigInt!      | Total amount earned by account from selling punks |
-| averageAmountSpent    | BigInt!      | Average amount spent buying punks by account      |
+| sent                  | [Transfer!]! | Punk transfers by Account                         |
+| received              | [Transfer!]! | Punk transfers to Account                         |
+| bids                  | [Bid!]!      | Query bids by Account                             |
+| asks                  | [Ask!]!      | Punks offered for sale by Account                 |
+| numberOfPunksOwned    | BigInt!      | Total number of Punks owned by account            |
+| numberOfPunksAssigned | BigInt!      | Total number of Punks assigned to account         |
+| numberOfTransfers     | BigInt!      | Total number of transfer by Account               |
+| numberOfSales         | BigInt!      | Total number of sales by Account                  |
+| numberOfPurchases     | BigInt!      | Total number of purchases by Account              |
+| totalSpent            | BigInt!      | Total amount spent buying Punks by Account        |
+| totalEarned           | BigInt!      | Total amount earned by Account from selling Punks |
+| averageAmountSpent    | BigInt!      | Average amount spent buying Punks by Account      |
 | accountUrl            | String!      | Account URL                                       |
 
 ## Punk
@@ -56,56 +53,56 @@ sidebar_position: 2
 | Field                  | Type       | Description                                                              |
 | ---------------------- | ---------- | ------------------------------------------------------------------------ |
 | id                     | ID!        | Punk ID                                                                  |
-| transferedTo           | Account    | Account that received punk                                               |
-| assignedTo             | Account    | Account that claimed punk                                                |
-| purchasedBy            | Account    | Punk buyers                                                              |
-| metadata               | MetaData   | Punk metadata                                                            |
-| contract               | Contract   | Contract data                                                            |
-| tokenId                | BigInt!    | Punk tokenID                                                             |
-| owner                  | Account!   | Current owner of punk                                                    |
-| wrapped                | Boolean!   | Wrap status                                                              |
-| events                 | [Event!]!  | All punk events                                                          |
-| currentAsk             | Ask        | Current ask for punk                                                     |
-| currentBid             | Bid        | Current bid for punk                                                     |
+| transferedTo           | Account    | Account that received Punk                                               |
+| assignedTo             | Account    | Account that claimed Punk                                                |
+| purchasedBy            | Account    | Punk Buyers                                                              |
+| metadata               | MetaData   | Punk Metadata                                                            |
+| contract               | Contract   | Contract Data                                                            |
+| tokenId                | BigInt!    | Punk TokenID                                                             |
+| owner                  | Account!   | Current owner of Punk                                                    |
+| wrapped                | Boolean!   | Wrap Status                                                              |
+| events                 | [Event!]!  | All Punk events                                                          |
+| currentAsk             | Ask        | Current Ask for Punk                                                     |
+| currentBid             | Bid        | Current Bid for Punk                                                     |
 | currentAskCreated      | AskCreated | Current AskCreated event                                                 |
 | currentBidCreated      | BidCreated | Current BidCreated event                                                 |
-| numberOfTransfers      | BigInt!    | Number of times punk has been transferred                                |
-| numberOfSales          | BigInt!    | Number of times punk was sold                                            |
+| numberOfTransfers      | BigInt!    | Number of times Punk has been transferred                                |
+| numberOfSales          | BigInt!    | Number of times Punk was sold                                            |
 | currentAskRemoved      | AskRemoved | Current AskRemoved event                                                 |
 | currentBidRemoved      | BidRemoved | Current BidRemoved event                                                 |
-| totalAmountSpentOnPunk | BigInt!    | Total amount spent purchasing punk across opensea & rarible marketplaces |
-| averageSalesPrice      | BigInt!    | Average price for punk across opensea & rarible marketplaces             |
+| totalAmountSpentOnPunk | BigInt!    | Total amount spent purchasing Punk across OpenSea & Rarible marketplaces |
+| averageSalesPrice      | BigInt!    | Average price for Punk across OpenSea & Rarible marketplaces             |
 
 ## MetaData
 
 | Field       | Type      | Description    |
 | ----------- | --------- | -------------- |
 | id          | ID!       | Metadata ID    |
-| tokenId     | BigInt!   | Punk token ID  |
-| tokenURI    | String!   | URI of punk    |
-| image       | String    | Punk image     |
-| svg         | String    | Punk svg image |
+| tokenId     | BigInt!   | Punk Token ID  |
+| tokenURI    | String!   | URI of Punk    |
+| image       | String    | Punk Image     |
+| svg         | String    | Punk Svg image |
 | contractURI | String!   | Contract URI   |
 | punk        | Punk!     | Punk           |
-| traits      | [Trait!]! | Punk traits    |
+| traits      | [Trait!]! | Punk Traits    |
 
 ## Trait
 
 | Field        | Type         | Description                     |
 | ------------ | ------------ | ------------------------------- |
 | id           | ID!          | Trait ID                        |
-| type         | TraitType!   | Type of trait                   |
-| metaDatas    | [Metadata!]! | Punk metadata                   |
-| numberOfNfts | BigInt!      | Number of punks with this trait |
+| type         | TraitType!   | Type of Trait                   |
+| metaDatas    | [Metadata!]! | Punk Metadata                   |
+| numberOfNfts | BigInt!      | Number of Punks with this trait |
 
 ## Ask
 
 | Field   | Type     | Description                                            |
 | ------- | -------- | ------------------------------------------------------ |
 | id      | ID!      | Ask ID                                                 |
-| from    | Account! | Account that created ask                               |
-| open    | Boolean! | Open status of punk. Asks can be either open or closed |
-| amount  | BigInt!  | Ask for punk in ETH                                    |
+| from    | Account! | Account that created Ask                               |
+| open    | Boolean! | Open Status of Punk. Asks can be either Open or Closed |
+| amount  | BigInt!  | Ask for Punk in ETH                                    |
 | nft     | NFT      | Punk being offered for sale                            |
 | created | Event    | Ask created at                                         |
 | removed | Event    | Ask removed at                                         |
@@ -116,7 +113,7 @@ sidebar_position: 2
 | --------- | ---------- | ------------------------------------------------------ |
 | id        | ID!        | Bid ID                                                 |
 | from      | Account!   | Bidder                                                 |
-| open      | Boolean!   | Open status of punk. Bids can be either open or closed |
+| open      | Boolean!   | Open status of Punk. Bids can be either Open or Closed |
 | amount    | BigInt!    | Bid amount in ETH                                      |
 | nft       | NFT        | Punk bidded                                            |
 | created   | Event      | Bid created at                                         |
@@ -127,24 +124,24 @@ sidebar_position: 2
 
 | Field             | Type    | Description                                      |
 | ----------------- | ------- | ------------------------------------------------ |
-| id                | ID!     | Contract address                                 |
-| symbol            | String  | Token symbol                                     |
-| name              | String  | Token name                                       |
+| id                | ID!     | Contract Address                                 |
+| symbol            | String  | Token Symbol                                     |
+| name              | String  | Token Name                                       |
 | totalSupply       | BigInt! | Total supply of tokens                           |
-| totalSales        | BigInt! | Total number of punk sales                       |
-| totalAmountTraded | BigInt! | Total sales in ETH for punks                     |
-| imageHash         | String  | The hash of the composite image of all the punks |
+| totalSales        | BigInt! | Total number of Punk sales                       |
+| totalAmountTraded | BigInt! | Total Sales in ETH for Punks                     |
+| imageHash         | String  | The hash of the composite image of all the Punks |
 
 ## Assign
 
 | Field       | Type       | Description                 |
 | ----------- | ---------- | --------------------------- |
 | id          | ID!        | Assign ID                   |
-| contract    | Contract   | Contract metadata           |
+| contract    | Contract   | Contract Metada             |
 | nft         | NFT        | Punk that was assigned      |
-| to          | Account    | Account that claimed punk   |
+| to          | Account    | Account that claimed Punk   |
 | amount      | BigInt     | Punk amount                 |
-| from        | Account    | Account that created assign |
+| from        | Account    | Account that created Assign |
 | type        | EventType! | Event type                  |
 | logNumber   | BigInt!    | Transaction log number      |
 | blockNumber | BigInt!    | Transaction block number    |
@@ -207,39 +204,39 @@ sidebar_position: 2
 
 ## BidRemoved
 
-| Field       | Type       | Description                |
-| ----------- | ---------- | -------------------------- |
-| id          | ID!        | BidRemoved ID              |
-| from        | Account    | Account that removed bid   |
-| to          | Account    | Account                    |
-| bid         | bid        | Punk bid removed           |
-| amount      | BigInt     | Bid in ETH                 |
-| contract    | Contract   | Contract metadata          |
-| nft         | NFT        | Punk whose bid was removed |
-| logNumber   | BigInt!    | Transaction log number     |
-| type        | EventType! | Event type                 |
-| blockNumber | BigInt!    | Transaction block number   |
-| blockHash   | Bytes!     | Event block hash           |
-| txHash      | Bytes!     | Event transaction hash     |
-| timeStamp   | BigInt!    | Transaction timestamp      |
+| Field       | Type       | Description                  |
+| ----------- | ---------- | ---------------------------- |
+| id          | ID!        | BidRemoved ID                |
+| from        | Account    | Account that removed bid     |
+| to          | Account    | Account                      |
+| bid         | bid        | Punk bid removed             |
+| amount      | BigInt     | Bid that was removed, in ETH |
+| contract    | Contract   | Contract metadata            |
+| nft         | NFT        | Punk whose bid was removed   |
+| logNumber   | BigInt!    | Transaction log number       |
+| type        | EventType! | Event type                   |
+| blockNumber | BigInt!    | Transaction block number     |
+| blockHash   | Bytes!     | Event block hash             |
+| txHash      | Bytes!     | Event transaction hash       |
+| timeStamp   | BigInt!    | Transaction timestamp        |
 
 ## AskRemoved
 
-| Field       | Type       | Description                |
-| ----------- | ---------- | -------------------------- |
-| id          | ID!        | AskRemoved ID              |
-| ask         | bid        | Punk ask removed           |
-| from        | Account    | Account that removed ask   |
-| to          | Account    | Account                    |
-| amount      | BigInt     | Ask in ETH                 |
-| contract    | Contract   | Contract metadata          |
-| nft         | NFT        | Punk whose ask was removed |
-| logNumber   | BigInt!    | Transaction log number     |
-| type        | EventType! | Event type                 |
-| blockNumber | BigInt!    | Transaction block number   |
-| blockHash   | Bytes!     | Event block hash           |
-| txHash      | Bytes!     | Event transaction hash     |
-| timeStamp   | BigInt!    | Transaction timestamp      |
+| Field       | Type       | Description                  |
+| ----------- | ---------- | ---------------------------- |
+| id          | ID!        | AskRemoved ID                |
+| ask         | bid        | Punk ask removed             |
+| from        | Account    | Account that removed Ask     |
+| to          | Account    | Account                      |
+| amount      | BigInt     | Ask that was removed, in ETH |
+| contract    | Contract   | Contract metadata            |
+| nft         | NFT        | Punk whose ask was removed   |
+| logNumber   | BigInt!    | Transaction log number       |
+| type        | EventType! | Event type                   |
+| blockNumber | BigInt!    | Transaction block number     |
+| blockHash   | Bytes!     | Event block hash             |
+| txHash      | Bytes!     | Event transaction hash       |
+| timeStamp   | BigInt!    | Transaction timestamp        |
 
 ## Transfer
 
@@ -265,7 +262,7 @@ sidebar_position: 2
 | id          | ID!     | TxHash + logNumber                                                     |
 | from        | Account | Sender                                                                 |
 | to          | Account | Receiver                                                               |
-| owner       | String! | New owner of punk                                                      |
+| owner       | String! | New owner of Punk                                                      |
 | amount      | BigInt  | Amount of cToken transferred                                           |
 | punkId      | String  | Punk ID                                                                |
 | referenceId | String! | Field for storing referenceIDs of other events in the same transaction |
@@ -279,7 +276,7 @@ sidebar_position: 2
 | Field       | Type       | Description               |
 | ----------- | ---------- | ------------------------- |
 | id          | ID!        | Wrap ID                   |
-| from        | Account    | Account that wrapped punk |
+| from        | Account    | Account that wrapped Punk |
 | to          | Account    | Receiver                  |
 | amount      | BigInt     | Punk amount               |
 | contract    | Contract   | Contract metadata         |
@@ -296,7 +293,7 @@ sidebar_position: 2
 | Field       | Type       | Description                 |
 | ----------- | ---------- | --------------------------- |
 | id          | ID!        | Wrap ID                     |
-| from        | Account    | Account that unwrapped punk |
+| from        | Account    | Account that unwrapped Punk |
 | to          | Account    | Receiver                    |
 | amount      | BigInt     | Punk amount                 |
 | contract    | Contract   | Contract metadata           |
@@ -312,8 +309,8 @@ sidebar_position: 2
 
 | Field       | Type     | Description                   |
 | ----------- | -------- | ----------------------------- |
-| id          | ID!      | Contract address of UserProxy |
-| user        | Account! | Account that owns the proxy   |
+| id          | ID!      | Contract Address of UserProxy |
+| user        | Account! | Account that owns the Proxy   |
 | blockNumber | BigInt!  | Transaction block number      |
 | blockHash   | Bytes!   | Event block hash              |
 | txHash      | Bytes!   | Event transaction hash        |
